@@ -1,4 +1,5 @@
 #include <string>
+#include <cstdlib>
 
 // TODO: dummy compilable source file
 int main(int argc, char* argv[])
@@ -12,6 +13,9 @@ int main(int argc, char* argv[])
 	
 	std::string password(argv[2]);
 
+	// temporary solution to keep it compilable
+	(void)port;
+	(void)password;
 
 	return 0;
 }
