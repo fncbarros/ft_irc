@@ -30,5 +30,7 @@
 *.exe
 *.out
 *.app
-ft_irc
+ircserv
 
+# Client folder
+bircd/
