@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <cstdlib>
 
 // TODO: dummy compilable source file
 int main(int argc, char* argv[])
