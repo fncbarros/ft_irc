@@ -4,11 +4,17 @@ CXX := c++
 
 CXXFLAGS := -Wall -Werror -Wextra -std=c++98
 
-OBJ := $(wildcard *.o)
+HEADERS := Server.hpp
 
-$(NAME):
+SRCS := ircserv.cpp \
+		Server.cpp \
+
+OBJ := $(SRCS:%.cpp=%.o)
 
 all: $(NAME)
+
+$(NAME): $(OBJ)
+	$(CXX) $(OBJ) -I $(HEADERS) -o $(NAME)
 
 clean:
 	rm $(OBJ)
