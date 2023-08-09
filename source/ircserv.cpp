@@ -1,6 +1,6 @@
 #include <string>
 #include <cstdlib>
-#include <sys/types.h>          /* See NOTES */
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <iostream>
 #include <string.h>
@@ -8,7 +8,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-// TODO: dummy compilable source file
 int main(int argc, char* argv[])
 {
 	int sckt;
@@ -32,13 +31,14 @@ int main(int argc, char* argv[])
 	sckt_addr.sin_family = AF_INET;
 	sckt_addr.sin_port = htons(port);
 	sckt_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
-	
+
 	if (bind(sckt, (sockaddr *)&sckt_addr, sckt_len) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
 		return (1);
 	}
 
+	// blocking function. Waits for requests
 	if (listen(sckt, 20) < 0)
 	{
 		std::cout << "Failed to listen the socket" << std::endl;
