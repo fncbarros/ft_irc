@@ -4,21 +4,32 @@ CXX := c++
 
 CXXFLAGS := -Wall -Werror -Wextra -std=c++98
 
-HEADERS := Server.hpp
+INC_PATH := includes
+
+HEADERS := includes/Server.hpp \
+			includes/common.hpp
 
 SRCS := ircserv.cpp \
 		Server.cpp \
 
 OBJ := $(SRCS:%.cpp=%.o)
 
+LIBS := 
+
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CXX) $(OBJ) -I $(HEADERS) -o $(NAME)
+$(NAME): $(OBJ) $(HEADERS)
+	$(CXX) $(OBJ) -I $(INC_PATH) -o $(NAME)
 
 clean:
 	rm $(OBJ)
 
-fclean:
+fclean: clean
+	rm -f $(NAME)
 
-.PHONY: all, clean, fclean
+re: fclean all
+
+debug: CXXFLAGS += -g
+debug: re
+
+.PHONY: all, clean, fclean, re, debug
