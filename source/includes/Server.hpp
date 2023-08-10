@@ -9,22 +9,22 @@
 /*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "common.hpp"
 #include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <netinet/in.h>
 #include <vector>
 
-static const short ADDR_FAM = AF_INET;
-static const unsigned int SOCKLEN = sizeof(struct sockaddr_in);
-
-typedef struct sockaddr_in s_sockaddr;
+typedef struct sockaddr s_sockaddr;
+typedef struct sockaddr_in s_sockaddr_in;
 typedef int socket_t;
+
+static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
 
 class Server
 {
 public:
     Server();
-    Server(short port, std::string passwd);
+    Server(int port, std::string passwd);
     ~Server();
 
     void setPort(int port);
@@ -36,7 +36,7 @@ private:
     int _port;
     std::string _passwd;
     int _socket;
-    s_sockaddr _socket_addr;
+    struct sockaddr_in _socket_addr;
     std::vector<socket_t> _connections;
 
 };

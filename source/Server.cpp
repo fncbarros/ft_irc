@@ -10,9 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "includes/Server.hpp"
 
 #include <string.h>
+#include <strings.h>
 #include <iostream>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -23,16 +24,16 @@ Server::Server()
 , _socket(0)
 , _socket_addr()
 {
-    memset(&_socket_addr, 0, sizeof(_socket_addr));
+    bzero(&_socket_addr, sizeof(_socket_addr));
 }
 
-Server::Server(uint8_t port, std::string passwd)
+Server::Server(int port, std::string passwd)
 : _port(port)
 , _passwd(passwd)
 , _socket(0)
 , _socket_addr()
 {
-    memset(&_socket_addr, 0, sizeof(_socket_addr));
+    bzero(&_socket_addr, sizeof(_socket_addr));
     setConnection();
 }
 
@@ -40,7 +41,7 @@ Server::~Server()
 {
 	std::cout << "Closing connections" << std::endl;
 
-    std::vector<socket_t>::const_iterator it = _connections.cbegin();
+    std::vector<socket_t>::const_iterator it = _connections.begin();
     for (; it != _connections.end(); it++)
     {
 	    close(*it);
@@ -61,19 +62,21 @@ void Server::setPassword(std::string passwd)
 
 void Server::setConnection()
 {
-    _socket_addr.sin_family = AF_INET;
+    _socket_addr.sin_family = AF;
 	_socket_addr.sin_port = htons(_port);
-	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
-    
-    if ((_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	_socket_addr.sin_addr.s_addr = inet_addr(ADDRESS);
+
+    if ((_socket = socket(AF, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
+        std::cout << "Err: " << strerror(errno) << std::endl;
         // throw err
 	}
 
-    if (bind(_socket, (sockaddr *)&_socket_addr, SOCKLEN) < 0)
+    if (bind(_socket, (s_sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
+        std::cout << "Err: " << strerror(errno) << std::endl;
         // throw err
 	}
 }
@@ -83,22 +86,34 @@ void Server::connectionLoop()
 	socklen_t sckt_len = SOCKLEN;
     std::vector<socket_t>::iterator it = _connections.begin();
 
+    if (errno)
+    {
+        return ;
+    }
+
     while (true)
     {
         if (listen(_socket, 20) < 0)
         {
             std::cout << "Failed to listen the socket" << std::endl;
+            std::cout << "Err: " << strerror(errno) << std::endl;
+            break ;
             // throw err
         }
 
-        int it = accept(_socket, (sockaddr *)&_socket_addr, &sckt_len);
+        int socket = accept(_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
         
-        if (it < 0)
+        if (socket < 0)
         {
             std::cout << "Failed to accept the socket" << std::endl;
+            std::cout << "Err: " << strerror(errno) << std::endl;
+            break ;
             // throw err
         }
-
-    	std::cout << "Connection Established" << std::endl;
+        else
+        {
+            *it = socket;
+    	    std::cout << "Connection Established" << std::endl;
+        }
     }
 }
