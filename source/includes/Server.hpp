@@ -12,6 +12,7 @@
 
 #include "Client.hpp"
 
+// Const Definitions
 static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
 
 class Server
@@ -23,14 +24,14 @@ class Server
 
     // Public functions
     public:
-        void setConnection();
         void connectionLoop(void);
 
     // Internal functions
     private:
         Server(); // no public default constructor
-        void read_message(void) const;
-
+        void setConnection();
+        std::string readMessage(void) const;
+        void parse();
 
     // Data
     private:

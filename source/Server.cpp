@@ -17,11 +17,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-Server::Server()
-
-{
-}
-
+// Special functions
 Server::Server(int port, std::string passwd)
 : _port(port)
 , _socket(0)
@@ -40,40 +36,14 @@ Server::~Server()
     close(_socket);
 }
 
-void    Server::read_message(void) const
-{
-    char buffer[BUFFER_SIZE] = {0};
-
-    int bytesReceived = recv(_socket_process, buffer, BUFFER_SIZE, 0);
-    if (bytesReceived < 0)
-    {
-        std::cout << "Failed to read Client Socket" << std::endl;
-    }
-    std::cout << "Client message received" << std::endl;
-    std::cout << "[ " << buffer << " ]" << std::endl;
-}
-
-// void    Server::write_message()
-// {
-//     std::string buffer(":Welcome to the Internet Relay Network "+ _nickname + "!" + _username + "@" + ADDRESS + "\n");
-//     const size_t fd = send(_socket_process, buffer.c_str(), buffer.size(), 0);
-//     if (fd == buffer.size())
-//     {
-//         std::cout << "Message sent" << std::endl;
-//     }
-//     else
-//     {
-//         std::cout << "Message fail :/" << std::endl;
-//     }
-// }
-
+// Public functions
 void Server::setConnection()
 {
-    _socket_addr.sin_family = AF;
+    _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(_port);
 	_socket_addr.sin_addr.s_addr = inet_addr(ADDRESS);
 
-    if ((_socket = socket(AF, SOCK_STREAM, 0)) < 0)
+    if ((_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
@@ -87,6 +57,25 @@ void Server::setConnection()
         // throw err
 	}
     std::cout << "connection bind" << std::endl;
+}
+
+// Internal functions
+Server::Server()
+{
+}
+
+std::string    Server::readMessage(void) const
+{
+    char buffer[BUFFER_SIZE] = {0};
+
+    int bytesReceived = recv(_socket_process, buffer, BUFFER_SIZE, 0);
+    if (bytesReceived < 0)
+    {
+        std::cout << "Failed to read Client Socket" << std::endl;
+    }
+    std::cout << "Client message received" << std::endl;
+    std::cout << "[ " << buffer << " ]" << std::endl;
+    return (buffer);
 }
 
 void Server::connectionLoop()
@@ -124,4 +113,5 @@ void Server::connectionLoop()
     	    std::cout << "Connection Established" << std::endl;
         }
     }
+
 }
