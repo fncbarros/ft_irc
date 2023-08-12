@@ -21,6 +21,5 @@ int main(int argc, char* argv[])
 	}
 
 	Server server(std::atoi(argv[1]), argv[2]);
-	server.setConnection();
 	server.connectionLoop();
 }

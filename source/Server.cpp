@@ -79,12 +79,12 @@ void Server::setConnection()
         std::cout << "Err: " << strerror(errno) << std::endl;
         // throw err
 	}
+    std::cout << "connection bind" << std::endl;
 }
 
 void Server::connectionLoop()
 {
 	socklen_t sckt_len = SOCKLEN;
-    std::vector<socket_t>::iterator it = _connections.begin();
 
     if (errno)
     {
@@ -112,7 +112,8 @@ void Server::connectionLoop()
         }
         else
         {
-            *it = socket;
+            std::cout << "connection accepted" << std::endl;
+            _connections.push_back(socket);
     	    std::cout << "Connection Established" << std::endl;
         }
     }
