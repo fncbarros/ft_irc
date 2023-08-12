@@ -18,19 +18,17 @@
 #include <arpa/inet.h>
 
 Server::Server()
-: _port(0)
-, _passwd("")
-, _socket(0)
-, _socket_addr()
+
 {
-    bzero(&_socket_addr, sizeof(_socket_addr));
 }
 
 Server::Server(int port, std::string passwd)
 : _port(port)
-, _passwd(passwd)
 , _socket(0)
+, _socket_process()
+, _passwd(passwd)
 , _socket_addr()
+, _connections()
 {
     bzero(&_socket_addr, sizeof(_socket_addr));
     setConnection();
@@ -42,16 +40,32 @@ Server::~Server()
     close(_socket);
 }
 
-
-void Server::setPort(int port)
+void    Server::read_message(void) const
 {
-    _port = port;
+    char buffer[BUFFER_SIZE] = {0};
+
+    int bytesReceived = recv(_socket_process, buffer, BUFFER_SIZE, 0);
+    if (bytesReceived < 0)
+    {
+        std::cout << "Failed to read Client Socket" << std::endl;
+    }
+    std::cout << "Client message received" << std::endl;
+    std::cout << "[ " << buffer << " ]" << std::endl;
 }
 
-void Server::setPassword(std::string passwd)
-{
-    _passwd = passwd;
-}
+// void    Server::write_message()
+// {
+//     std::string buffer(":Welcome to the Internet Relay Network "+ _nickname + "!" + _username + "@" + ADDRESS + "\n");
+//     const size_t fd = send(_socket_process, buffer.c_str(), buffer.size(), 0);
+//     if (fd == buffer.size())
+//     {
+//         std::cout << "Message sent" << std::endl;
+//     }
+//     else
+//     {
+//         std::cout << "Message fail :/" << std::endl;
+//     }
+// }
 
 void Server::setConnection()
 {
@@ -94,9 +108,9 @@ void Server::connectionLoop()
             // throw err
         }
 
-        int socket = accept(_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
+        _socket_process = accept(_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
         
-        if (socket < 0)
+        if (_socket_process < 0)
         {
             std::cout << "Failed to accept the socket" << std::endl;
             std::cout << "Err: " << strerror(errno) << std::endl;
@@ -106,7 +120,7 @@ void Server::connectionLoop()
         else
         {
             std::cout << "connection accepted" << std::endl;
-            _connections.push_back(Client(socket));
+            read_message();
     	    std::cout << "Connection Established" << std::endl;
         }
     }

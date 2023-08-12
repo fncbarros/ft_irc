@@ -16,21 +16,29 @@ static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
 
 class Server
 {
-public:
-    Server();
-    Server(int port, std::string passwd);
-    ~Server();
+    // Special functions
+    public:
+        Server(int port, std::string passwd);
+        ~Server();
 
-    void setPort(int port);
-    void setPassword(std::string passwd);
-    void setConnection();
-    void connectionLoop();
+    // Public functions
+    public:
+        void setConnection();
+        void connectionLoop(void);
 
-private:
-    int _port;
-    std::string _passwd;
-    int _socket;
-    struct sockaddr_in _socket_addr;
-    std::vector<Client> _connections;
+    // Internal functions
+    private:
+        Server(); // no public default constructor
+        void read_message(void) const;
+
+
+    // Data
+    private:
+        int _port;
+        int _socket;
+        int _socket_process;
+        std::string _passwd;
+        struct sockaddr_in _socket_addr;
+        std::vector<Client> _connections;
 
 };

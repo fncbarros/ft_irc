@@ -4,18 +4,28 @@
 
 class Client
 {
+    // Special functions
+    public:
+        Client(const std::string &nick, const std::string &user, const std::string &pass);
+        ~Client();
+    
+    // Public functions
+    public:
+        const std::string get_nickname(void) const;
+        const std::string get_username(void) const;
+        const std::string get_password(void) const;
+        bool        auth(const std::string &nick, const std::string &pass) const;
+
+    // Internal functions
     private:
-        socket_t _socket_id;
+        Client();
+
+
+    // Data
+    private:
         std::string _nickname;
         std::string _username;
         std::string _password;
-        void    wellcome_client();
-        void    read_message();
-
-    public:
-        Client(/* args */);
-        Client(socket_t socket_id);
-        ~Client();
 };
 
 #endif

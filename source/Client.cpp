@@ -4,34 +4,35 @@ Client::Client(/* args */)
 {
 }
 
-void    Client::wellcome_client()
+Client::Client(const std::string &nick, const std::string &user, const std::string &pass)
+: _nickname(nick)
+, _username(user)
+, _password(pass)
 {
-    read_message();
+    std::cout << "Client created: " << _nickname << " " << _username << " " << _password << std::endl;
 }
 
-void    Client::read_message()
+const std::string Client::get_nickname(void) const
 {
-    char buffer[BUFFER_SIZE] = {0};
-
-    int bytesReceived = recv(_socket_id, buffer, BUFFER_SIZE, 0);
-    if (bytesReceived < 0)
-    {
-        std::cout << "Failed to read Client Socket" << std::endl;
-    }
-    std::cout << "Client message received" << std::endl;
-    std::cout << "[ " << buffer << " ]" << std::endl;
+    return (_nickname);
 }
 
-Client::Client(socket_t socket_id) : _socket_id(socket_id)
+const std::string Client::get_username(void) const
 {
+    return (_username);
+}
 
-    std::cout << "Client created" << std::endl;
-    std::cout << "Client id " << _socket_id << std::endl; 
-    wellcome_client();
+const std::string Client::get_password(void) const
+{
+    return (_password);
+}
+
+bool        Client::auth(const std::string &nick, const std::string &pass) const
+{
+    return (nick == _nickname) && (pass == _password);
 }
 
 Client::~Client()
 {
-    close(_socket_id);
     std::cout << "Client destroyed" << std::endl;
 }
