@@ -17,20 +17,14 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-Server::Server()
-: _port(0)
-, _passwd("")
-, _socket(0)
-, _socket_addr()
-{
-    bzero(&_socket_addr, sizeof(_socket_addr));
-}
-
+// Special functions
 Server::Server(int port, std::string passwd)
 : _port(port)
-, _passwd(passwd)
 , _socket(0)
+, _socket_process()
+, _passwd(passwd)
 , _socket_addr()
+, _connections()
 {
     bzero(&_socket_addr, sizeof(_socket_addr));
     setConnection();
@@ -42,24 +36,14 @@ Server::~Server()
     close(_socket);
 }
 
-
-void Server::setPort(int port)
-{
-    _port = port;
-}
-
-void Server::setPassword(std::string passwd)
-{
-    _passwd = passwd;
-}
-
+// Public functions
 void Server::setConnection()
 {
-    _socket_addr.sin_family = AF;
+    _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(_port);
 	_socket_addr.sin_addr.s_addr = inet_addr(ADDRESS);
 
-    if ((_socket = socket(AF, SOCK_STREAM, 0)) < 0)
+    if ((_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
@@ -73,6 +57,25 @@ void Server::setConnection()
         // throw err
 	}
     std::cout << "connection bind" << std::endl;
+}
+
+// Internal functions
+Server::Server()
+{
+}
+
+std::string    Server::readMessage(void) const
+{
+    char buffer[BUFFER_SIZE] = {0};
+
+    int bytesReceived = recv(_socket_process, buffer, BUFFER_SIZE, 0);
+    if (bytesReceived < 0)
+    {
+        std::cout << "Failed to read Client Socket" << std::endl;
+    }
+    std::cout << "Client message received" << std::endl;
+    std::cout << "[ " << buffer << " ]" << std::endl;
+    return (buffer);
 }
 
 void Server::connectionLoop()
@@ -94,9 +97,9 @@ void Server::connectionLoop()
             // throw err
         }
 
-        int socket = accept(_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
+        _socket_process = accept(_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
         
-        if (socket < 0)
+        if (_socket_process < 0)
         {
             std::cout << "Failed to accept the socket" << std::endl;
             std::cout << "Err: " << strerror(errno) << std::endl;
@@ -106,8 +109,9 @@ void Server::connectionLoop()
         else
         {
             std::cout << "connection accepted" << std::endl;
-            _connections.push_back(Client(socket));
+            read_message();
     	    std::cout << "Connection Established" << std::endl;
         }
     }
+
 }
