@@ -16,7 +16,6 @@
 #include <strings.h>
 #include <iostream>
 #include <arpa/inet.h>
-#include <unistd.h>
 
 Server::Server()
 : _port(0)
@@ -39,13 +38,7 @@ Server::Server(int port, std::string passwd)
 
 Server::~Server()
 {
-	std::cout << "Closing connections" << std::endl;
-
-    std::vector<socket_t>::const_iterator it = _connections.begin();
-    for (; it != _connections.end(); it++)
-    {
-	    close(*it);
-    }
+	std::cout << "Closing Server" << std::endl;
     close(_socket);
 }
 
@@ -113,7 +106,7 @@ void Server::connectionLoop()
         else
         {
             std::cout << "connection accepted" << std::endl;
-            _connections.push_back(socket);
+            _connections.push_back(Client(socket));
     	    std::cout << "Connection Established" << std::endl;
         }
     }

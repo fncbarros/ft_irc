@@ -9,14 +9,8 @@
 /*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "common.hpp"
-#include <string>
-#include <netinet/in.h>
-#include <vector>
 
-typedef struct sockaddr s_sockaddr;
-typedef struct sockaddr_in s_sockaddr_in;
-typedef int socket_t;
+#include "Client.hpp"
 
 static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
 
@@ -37,6 +31,6 @@ private:
     std::string _passwd;
     int _socket;
     struct sockaddr_in _socket_addr;
-    std::vector<socket_t> _connections;
+    std::vector<Client> _connections;
 
 };

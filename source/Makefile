@@ -7,10 +7,12 @@ CXXFLAGS := -Wall -Werror -Wextra -std=c++98
 INC_PATH := includes
 
 HEADERS := includes/Server.hpp \
-			includes/common.hpp
+			includes/common.hpp \
+			includes/Client.hpp \
 
 SRCS := ircserv.cpp \
 		Server.cpp \
+		Client.cpp \
 
 OBJ := $(SRCS:%.cpp=%.o)
 
