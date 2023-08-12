@@ -11,9 +11,30 @@
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include <map>
+#include <list>
+
+// Type Definitions
+typedef std::pair<std::string, std::string> Operation;
+typedef std::map<std::string, std::string> OperationsMap;
 
 // Const Definitions
 static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
+static const std::string c_tokensArray[] =
+{
+    "USER",
+    "NICK",
+    "PASSWORD",
+    // etc.
+};
+const Operation c_operatorsPairArray[] = {
+    std::make_pair("JOIN", "join"),
+    std::make_pair("KICK", "kick"),
+    std::make_pair("INVITE", "invite"),
+    std::make_pair("TOPIC", "topic"),
+    std::make_pair("MODE", "mode"),
+};
+static const OperationsMap c_operationsMap(c_operatorsPairArray, c_operatorsPairArray + sizeof(c_operatorsPairArray) / sizeof(c_operatorsPairArray[0]));
 
 class Server
 {

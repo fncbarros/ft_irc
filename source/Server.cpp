@@ -16,6 +16,7 @@
 #include <strings.h>
 #include <iostream>
 #include <arpa/inet.h>
+#include <sstream>
 
 // Special functions
 Server::Server(int port, std::string passwd)
@@ -73,15 +74,17 @@ std::string    Server::readMessage(void) const
     {
         std::cout << "Failed to read Client Socket" << std::endl;
     }
+    /*************************TMP*******************************/
     std::cout << "Client message received" << std::endl;
-    std::cout << "[ " << buffer << " ]" << std::endl;
+    // std::cout << "[ " << buffer << " ]" << std::endl;
+    /*************************TMP*******************************/
     return (buffer);
 }
 
 void Server::connectionLoop()
 {
 	socklen_t sckt_len = SOCKLEN;
-
+    
     if (errno)
     {
         return ;
@@ -109,9 +112,29 @@ void Server::connectionLoop()
         else
         {
             std::cout << "connection accepted" << std::endl;
-            read_message();
-    	    std::cout << "Connection Established" << std::endl;
+            parse();
+            std::cout << "Connection Established" << std::endl;
         }
     }
+}
 
+void Server::parse()
+{
+    std::string buffer(readMessage());
+
+    size_t point = buffer.find(" ");
+    size_t eol = buffer.find("\n");
+    std::string s1(buffer.substr(0, point));
+    std::string s2(buffer.substr(point + 1, eol));
+
+    /*************************TMP*******************************/
+    std::cout << "String1: " << s1 << std::endl;
+    std::cout << "String2: " << s2 << std::endl;
+    /*************************TMP*******************************/
+
+    // parse first string
+        // if password (??)
+        // if USER info
+        // if operator
+        // check /n/r ??
 }
