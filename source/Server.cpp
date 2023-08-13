@@ -17,6 +17,9 @@
 #include <iostream>
 #include <arpa/inet.h>
 
+// Const Definitions
+static const char *ADDRESS = "0.0.0.0";
+
 // Special functions
 Server::Server(int port, std::string passwd)
 : _port(port)
@@ -109,7 +112,7 @@ void Server::connectionLoop()
         else
         {
             std::cout << "connection accepted" << std::endl;
-            read_message();
+            readMessage();
     	    std::cout << "Connection Established" << std::endl;
         }
     }
