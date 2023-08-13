@@ -12,6 +12,8 @@
 
 #include "includes/Client.hpp"
 
+#include <iostream>
+
 Client::Client(const std::string &nick, const std::string &user, const std::string &pass)
 : _nickname(nick)
 , _username(user)

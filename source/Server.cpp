@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "includes/Server.hpp"
+#include "includes/common.hpp"
 
 #include <string.h>
 #include <strings.h>
@@ -22,7 +23,7 @@
 Server::Server(int port, std::string passwd)
 : _port(port)
 , _socket(0)
-, _socket_process()
+, _socket_process(0)
 , _passwd(passwd)
 , _socket_addr()
 , _connections()
@@ -121,19 +122,22 @@ void Server::connectionLoop()
 void Server::parse()
 {
     std::string buffer(readMessage());
+    size_t eol = 0u;
 
-    size_t point = buffer.find(" ");
-    size_t eol = buffer.find("\n");
-    std::string s1(buffer.substr(0, point));
-    std::string s2(buffer.substr(point + 1, eol));
-
-    /*************************TMP*******************************/
-    std::cout << "String1: " << s1 << std::endl;
-    std::cout << "String2: " << s2 << std::endl;
-    /*************************TMP*******************************/
+    while (buffer.substr(eol, 3u) != EOM)
+    {
+        size_t point = buffer.find(" ");
+        eol = buffer.find("\n");
+        std::string s1(buffer.substr(0, point));
+        std::string s2(buffer.substr(point + 1, eol));
+        /*************************TMP*******************************/
+        std::cout << "String1: " << s1 << std::endl;
+        std::cout << "String2: " << s2 << std::endl;
+        /*************************TMP*******************************/
+    }
 
     // parse first string
-        // if password (??)
+        // if password
         // if USER info
         // if operator
         // check /n/r ??

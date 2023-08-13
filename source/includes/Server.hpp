@@ -10,16 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+
 #include "Client.hpp"
+
+#include <string>
 #include <map>
-#include <list>
+#include <vector>
+#include <netinet/in.h>
 
 // Type Definitions
 typedef std::pair<std::string, std::string> Operation;
 typedef std::map<std::string, std::string> OperationsMap;
 
 // Const Definitions
-static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
+static const unsigned int SOCKLEN = sizeof(sockaddr_in);
 static const std::string c_tokensArray[] =
 {
     "USER",

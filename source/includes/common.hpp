@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+
 // Includes
 #include <iostream>
 #include <sys/types.h>
@@ -28,3 +30,4 @@ const int BUFFER_SIZE = 30720;
 
 // Const Definitions
 static const char *ADDRESS = "0.0.0.0";
+static const char *EOM = "\n\r"; // End of Message

@@ -9,8 +9,9 @@
 /*   Updated: 2023/08/10 19:21:20 by fbarros          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <cstdlib>
 
+#include <cstdlib>
+#include <iostream>
 #include "includes/Server.hpp"
 
 int main(int argc, char* argv[])

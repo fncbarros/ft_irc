@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
-#include "common.hpp"
+#pragma once
+
+#include <string>
 
 class Client
 {
@@ -39,5 +39,3 @@ class Client
         std::string _username;
         std::string _password;
 };
-
-#endif
