@@ -70,6 +70,6 @@ class Server
         int _server_socket;
         std::string _passwd;
         struct sockaddr_in _socket_addr;
-        std::vector<Client> _connections;
+        std::vector<Client *> _connections;
         fd_set  _connections_set;
 };

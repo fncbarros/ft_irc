@@ -30,6 +30,10 @@ Server::Server(int port, std::string passwd)
 Server::~Server()
 {
 	std::cout << "Closing Server" << std::endl;
+    for (std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        delete *it;
+    }
     close(_server_socket);
 }
 
@@ -64,11 +68,6 @@ void Server::setConnection()
     std::cout << "connection bind" << std::endl;
 }
 
-// Internal functions
-Server::Server()
-{
-}
-
 std::string    Server::readMessage(int fd) const
 {
     std::cout << "connection accepted" << std::endl;
@@ -96,7 +95,7 @@ int Server::acceptNewConnection()
     }
     else
     {
-        _connections.push_back(Client(new_socket_connection));
+        _connections.push_back(new Client(new_socket_connection));
         FD_SET(new_socket_connection, &_connections_set);
     }
     
@@ -106,9 +105,9 @@ int Server::acceptNewConnection()
 void    Server::inspectEvent(int fd)
 {
     std::cout << "inspect Event received" << std::endl;
-    for(std::vector<Client>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
     {
-        if (it->getId() == fd)
+        if ((*it)->getId() == fd)
         {
             tokenList msg = parse(readMessage(fd));
             exec(msg);
@@ -183,10 +182,6 @@ tokenList Server::parse(std::string buffer)
         std::string s2(line.substr(spacePosition + 1));
 
         list.push_back(tokenPair(s1, s2));
-        /*************************TMP*******************************/
-        // std::cout << "String1: " << s1 << std::endl;
-        // std::cout << "String2: " << s2 << std::endl;
-        /*************************TMP*******************************/
     }
 
     return list;
