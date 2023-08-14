@@ -20,6 +20,8 @@ Client::Client(const int socket_id)
 
 Client::~Client()
 {
+    if (_socket_id)
+        close(_socket_id);
     std::cout << "Client destroyed" << std::endl;
 }
 

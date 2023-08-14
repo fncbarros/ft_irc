@@ -17,55 +17,67 @@
 #include <arpa/inet.h>
 
 // Special functions
-Server::Server(int port, std::string passwd)
-: _port(port)
-, _passwd(passwd)
+Server::Server()
+: _passwd()
 , _socket_addr()
 , _connections()
+, _interrupt(false)
 {
     bzero(&_socket_addr, sizeof(_socket_addr));
-    setConnection();
 }
 
 Server::~Server()
 {
+    _interrupt = true;
 	std::cout << "Closing Server" << std::endl;
-    for (std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    if (!_connections.empty())
     {
-        delete *it;
+        for (std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+        {
+            if (*it)
+                delete *it;
+        }
     }
-    close(_server_socket);
+    if (_server_socket)
+        close(_server_socket);
 }
 
 // Public functions
-void Server::setConnection()
+int Server::setConnection(const int port, const std::string password)
 {
+    (void) password;
     _socket_addr.sin_family = AF_INET;
-	_socket_addr.sin_port = htons(_port);
+	_socket_addr.sin_port = htons(port);
 	_socket_addr.sin_addr.s_addr = inet_addr(ADDRESS);
 
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        // throw err
+        return (1);
 	}
 
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        // throw err
+        return (1);
 	}
 
     if (listen(_server_socket, 20) < 0)
     {
         std::cout << "Failed to listen the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        // throw err
+        return (1);
     }
     
     std::cout << "connection bind" << std::endl;
+    return (0);
+}
+
+void Server::interrupt()
+{
+    _interrupt = true;
 }
 
 std::string    Server::readMessage(int fd) const
@@ -84,19 +96,22 @@ std::string    Server::readMessage(int fd) const
 
 int Server::acceptNewConnection()
 {
+    if (_interrupt)
+        return (-1);
     int new_socket_connection;
 	socklen_t sckt_len = sizeof(_socket_addr);
     new_socket_connection = accept(_server_socket, (sockaddr *)&_socket_addr, &sckt_len);
     if (new_socket_connection < 0)
     {
-        std::cout << "Failed to accept the socket" << std::endl;
+        std::cout << "Failed to create the connection" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        // throw err
+        return (-1);
     }
     else
     {
         _connections.push_back(new Client(new_socket_connection));
         FD_SET(new_socket_connection, &_connections_set);
+        std::cout << "new connection created" << std::endl;
     }
     
     return new_socket_connection;
@@ -104,17 +119,15 @@ int Server::acceptNewConnection()
 
 void    Server::inspectEvent(int fd)
 {
-    std::cout << "inspect Event received" << std::endl;
-    for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    if (!_interrupt)
     {
-        if ((*it)->getId() == fd)
+        for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
         {
-            tokenList msg = parse(readMessage(fd));
-            exec(msg);
-        }
-        else
-        {
-            std::cout << "Client not found" << std::endl;
+            if ((*it)->getId() == fd)
+            {
+                tokenList msg = parse(readMessage(fd));
+                exec(msg);
+            }
         }
     }
 }
@@ -128,14 +141,14 @@ void Server::connectionLoop()
     FD_SET(_server_socket, &_connections_set);
     actual_max_socket = _server_socket;
 
-    while (true)
+    while (!_interrupt)
     {
         // the fd_set is always destroyed by the select() method
         ready_connections = _connections_set;
         if (select(FD_SETSIZE, &ready_connections, NULL, NULL, NULL) < 0)
         {
             std::cout << "Select error" << std::endl;
-            // throw err
+            continue;
         }
         for (int fd = 3; fd < FD_SETSIZE; fd++) 
         {
@@ -143,9 +156,8 @@ void Server::connectionLoop()
             {
                 if (fd == _server_socket)
                 {
-                    std::cout << "new connection created" << std::endl;
-                    int new_client = acceptNewConnection();
-                    inspectEvent(new_client);
+                    if (int new_client = acceptNewConnection() > 0)
+                        inspectEvent(new_client);
                 }
                 else
                 {
