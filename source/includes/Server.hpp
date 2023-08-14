@@ -21,29 +21,19 @@
 #include <sstream>
 
 // Type Definitions
-typedef std::pair<std::string, std::string> Operation;
-typedef std::map<std::string, std::string> OperationsMap;
+typedef void (*OperationCallback)(const std::string);
+typedef std::pair<std::string, OperationCallback> Operation;
+typedef std::map<std::string, OperationCallback> OperationsMap;
 
-// Const Definitions
 static const unsigned int SOCKLEN = sizeof(sockaddr_in);
-static const std::string c_tokensArray[] =
-{
-    "USER",
-    "NICK",
-    "PASSWORD",
-    // etc.
-};
-const Operation c_operationsPairArray[] = {
-    std::make_pair("JOIN", "join"),
-    std::make_pair("KICK", "kick"),
-    std::make_pair("INVITE", "invite"),
-    std::make_pair("TOPIC", "topic"),
-    std::make_pair("MODE", "mode"),
-};
-static const OperationsMap c_operationsMap(c_operationsPairArray, c_operationsPairArray + sizeof(c_operationsPairArray) / sizeof(c_operationsPairArray[0]));
 
 class Server
 {
+    // Const Data
+    private:
+        const Operation c_operationsPairArray[9];
+        const OperationsMap c_operationsMap;
+
     // Special functions
     public:
         Server(int port, std::string passwd);
@@ -60,6 +50,16 @@ class Server
         std::string readMessage(void) const;
         void parse(std::string buffer);
 
+        // Callbacks
+        static void execJOIN(const std::string line);
+        static void execKICK(const std::string line);
+        static void execINVITE(const std::string line);
+        static void execTOPIC(const std::string line);
+        static void execMODE(const std::string line);
+        static void execUSER(const std::string line);
+        static void execPASS(const std::string line);
+        static void execNICK(const std::string line);
+
     // Data
     private:
         int _port;
@@ -68,5 +68,4 @@ class Server
         std::string _passwd;
         struct sockaddr_in _socket_addr;
         std::vector<Client> _connections;
-
 };

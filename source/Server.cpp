@@ -19,7 +19,26 @@
 
 // Special functions
 Server::Server(int port, std::string passwd)
-: _port(port)
+: c_operationsPairArray
+(
+    std::make_pair("JOIN", execJOIN),
+    std::make_pair("KICK", execKICK),
+    std::make_pair("INVITE", execINVITE),
+    std::make_pair("TOPIC", execTOPIC),
+    std::make_pair("MODE", execMODE),
+    // USER INFO
+    std::make_pair("USER", execUSER),
+    std::make_pair("PASS", execPASS),
+    std::make_pair("NICK", execNICK),
+    // Other
+    std::make_pair("CAP", execUSER),
+)
+, c_operationsMap
+(
+        c_operationsPairArray,
+        c_operationsPairArray + sizeof(c_operationsPairArray) / sizeof(c_operationsPairArray[0])
+)
+, _port(port)
 , _socket(0)
 , _socket_process(0)
 , _passwd(passwd)
@@ -121,31 +140,38 @@ void Server::parse(std::string buffer)
 {
     std::istringstream iss(buffer);
     std::string line;
+    std::vector<std::string> strList;
 
     while (std::getline(iss, line))
     {
+        strList.push_back(line);
+    }
+
+    for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
+    {
+        line = *it;
         size_t spacePosition = line.find(' ');
 
         if (spacePosition == std::string::npos || (buffer.find(EOM) + 1) == line.size())
         {
-            break ;
+//            break ;
         }
 
         std::string s1(line.substr(0, spacePosition));
         std::string s2(line.substr(spacePosition + 1));
 
-        OperationsMap::const_iterator it = c_operationsMap.find(s1);
-        if (it != c_operationsMap.end())
+        OperationsMap::const_iterator map_it = c_operationsMap.find(s1);
+        if (map_it != c_operationsMap.end())
         {
-            std::cout << it->second << ": " << s2 << std::endl;
+            std::cout << map_it->second << ": " << s2 << std::endl;
         }
         else
         {
-            std::cout << s1 << std::endl;
+            std::cout << s1 << s2 << std::endl;
         }
         /*************************TMP*******************************/
-//        std::cout << "String1: " << s1 << std::endl;
-//        std::cout << "String2: " << s2 << std::endl;
+        // std::cout << "String1: " << s1 << std::endl;
+        // std::cout << "String2: " << s2 << std::endl;
         /*************************TMP*******************************/
     }
 
@@ -154,4 +180,46 @@ void Server::parse(std::string buffer)
         // if USER info
         // if operator
         // check /n/r ??
+}
+
+void Server::execJOIN(const std::string line)
+{
+    std::cout << "***JOIN: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execKICK(const std::string line)
+{
+    std::cout << "***KICK: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execINVITE(const std::string line)
+{
+    std::cout << "***INVITE: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execTOPIC(const std::string line)
+{
+    std::cout << "***TOPIC: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execMODE(const std::string line)
+{
+    std::cout << "***MODE: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execPASS(const std::string line)
+{
+    std::cout << "***PASS: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execNICK(const std::string line)
+{
+    std::cout << "***NICK: ";
+    std::cout << line << std::endl;
 }
