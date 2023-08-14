@@ -12,14 +12,10 @@
 
 #include "includes/Client.hpp"
 
-#include <iostream>
-
-Client::Client(const std::string &nick, const std::string &user, const std::string &pass)
-: _nickname(nick)
-, _username(user)
-, _password(pass)
+Client::Client(const int socket_id)
+: _socket_id(socket_id)
 {
-    std::cout << "Client created: " << _nickname << " " << _username << " " << _password << std::endl;
+    std::cout << "Client created: " << _socket_id << std::endl;
 }
 
 Client::~Client()
@@ -34,7 +30,7 @@ Client::Client(/* args */)
 // Public functions
 const std::string Client::getNickname(void) const { return (_nickname); }
 const std::string Client::getUsername(void) const { return (_username); }
-const std::string Client::getPassword(void) const { return (_password); }
+int         Client::getId(void)       const { return (_socket_id); }
 
 bool        Client::auth(const std::string &nick, const std::string &pass) const
 {

@@ -25,8 +25,6 @@ typedef void (*OperationCallback)(const std::string);
 typedef std::pair<std::string, OperationCallback> Operation;
 typedef std::map<std::string, OperationCallback> OperationsMap;
 
-static const unsigned int SOCKLEN = sizeof(sockaddr_in);
-
 class Server
 {
     // Const Data
@@ -47,7 +45,13 @@ class Server
     private:
         Server(); // no public default constructor
         void setConnection();
-        std::string readMessage(void) const;
+        std::string readMessage(int fd) const;
+        int acceptNewConnection();
+        /**
+         *  Check in the connections vector the 
+         * client that have the same socket_id as fd parameter and read the fd message
+        */
+        void inspectEvent(int fd); 
         void parse(std::string buffer);
 
         // Callbacks
@@ -63,9 +67,9 @@ class Server
     // Data
     private:
         int _port;
-        int _socket;
-        int _socket_process;
+        int _server_socket;
         std::string _passwd;
         struct sockaddr_in _socket_addr;
         std::vector<Client> _connections;
+        fd_set  _connections_set;
 };
