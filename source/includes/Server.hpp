@@ -18,6 +18,7 @@
 #include <map>
 #include <vector>
 #include <netinet/in.h>
+#include <sstream>
 
 // Type Definitions
 typedef std::pair<std::string, std::string> Operation;
@@ -32,14 +33,14 @@ static const std::string c_tokensArray[] =
     "PASSWORD",
     // etc.
 };
-const Operation c_operatorsPairArray[] = {
+const Operation c_operationsPairArray[] = {
     std::make_pair("JOIN", "join"),
     std::make_pair("KICK", "kick"),
     std::make_pair("INVITE", "invite"),
     std::make_pair("TOPIC", "topic"),
     std::make_pair("MODE", "mode"),
 };
-static const OperationsMap c_operationsMap(c_operatorsPairArray, c_operatorsPairArray + sizeof(c_operatorsPairArray) / sizeof(c_operatorsPairArray[0]));
+static const OperationsMap c_operationsMap(c_operationsPairArray, c_operationsPairArray + sizeof(c_operationsPairArray) / sizeof(c_operationsPairArray[0]));
 
 class Server
 {
@@ -57,7 +58,7 @@ class Server
         Server(); // no public default constructor
         void setConnection();
         std::string readMessage(void) const;
-        void parse();
+        void parse(std::string buffer);
 
     // Data
     private:

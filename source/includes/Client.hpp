@@ -23,10 +23,11 @@ class Client
     
     // Public functions
     public:
-        const std::string getNickname(void) const;
-        const std::string getUsername(void) const;
-        const std::string getPassword(void) const;
-        bool        auth(const std::string &nick, const std::string &pass) const;
+        const std::string   getNickname(void) const;
+        const std::string   getUsername(void) const;
+        const std::string   getPassword(void) const;
+        bool                auth(const std::string &nick, const std::string &pass) const;
+        bool                isOperator() const;
 
     // Internal functions
     private:
@@ -38,4 +39,5 @@ class Client
         std::string _nickname;
         std::string _username;
         std::string _password;
+        bool        _operator;
 };

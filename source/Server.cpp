@@ -15,9 +15,7 @@
 
 #include <string.h>
 #include <strings.h>
-#include <iostream>
 #include <arpa/inet.h>
-#include <sstream>
 
 // Special functions
 Server::Server(int port, std::string passwd)
@@ -52,7 +50,7 @@ void Server::setConnection()
         // throw err
 	}
 
-    if (bind(_socket, (s_sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
+    if (bind(_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
@@ -101,7 +99,7 @@ void Server::connectionLoop()
             // throw err
         }
 
-        _socket_process = accept(_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
+        _socket_process = accept(_socket, (sockaddr *)&_socket_addr, &sckt_len);
         
         if (_socket_process < 0)
         {
@@ -113,26 +111,41 @@ void Server::connectionLoop()
         else
         {
             std::cout << "connection accepted" << std::endl;
-            parse();
+            parse(readMessage());
             std::cout << "Connection Established" << std::endl;
         }
     }
 }
 
-void Server::parse()
+void Server::parse(std::string buffer)
 {
-    std::string buffer(readMessage());
-    size_t eol = 0u;
+    std::istringstream iss(buffer);
+    std::string line;
 
-    while (buffer.substr(eol, 3u) != EOM)
+    while (std::getline(iss, line))
     {
-        size_t point = buffer.find(" ");
-        eol = buffer.find("\n");
-        std::string s1(buffer.substr(0, point));
-        std::string s2(buffer.substr(point + 1, eol));
+        size_t spacePosition = line.find(' ');
+
+        if (spacePosition == std::string::npos || (buffer.find(EOM) + 1) == line.size())
+        {
+            break ;
+        }
+
+        std::string s1(line.substr(0, spacePosition));
+        std::string s2(line.substr(spacePosition + 1));
+
+        OperationsMap::const_iterator it = c_operationsMap.find(s1);
+        if (it != c_operationsMap.end())
+        {
+            std::cout << it->second << ": " << s2 << std::endl;
+        }
+        else
+        {
+            std::cout << s1 << std::endl;
+        }
         /*************************TMP*******************************/
-        std::cout << "String1: " << s1 << std::endl;
-        std::cout << "String2: " << s2 << std::endl;
+//        std::cout << "String1: " << s1 << std::endl;
+//        std::cout << "String2: " << s2 << std::endl;
         /*************************TMP*******************************/
     }
 

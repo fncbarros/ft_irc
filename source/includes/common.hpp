@@ -23,8 +23,6 @@
 #include <unistd.h>
 
 // Type Definitions
-typedef struct sockaddr s_sockaddr;
-typedef struct sockaddr_in s_sockaddr_in;
 typedef int socket_t;
 const int BUFFER_SIZE = 30720;
 
