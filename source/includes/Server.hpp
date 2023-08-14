@@ -44,17 +44,17 @@ class Server
 {
     // Special functions
     public:
-        Server(int port, std::string passwd);
+         Server();
         ~Server();
 
     // Public functions
     public:
         void connectionLoop(void);
+        int setConnection(const int port, const std::string password);
+        void interrupt();
 
     // Internal functions
     private:
-        Server(); // no public default constructor
-        void setConnection();
         std::string readMessage(int fd) const;
         int acceptNewConnection();
         /**
@@ -78,10 +78,10 @@ class Server
 
     // Data
     private:
-        int _port;
         int _server_socket;
         std::string _passwd;
         struct sockaddr_in _socket_addr;
         std::vector<Client *> _connections;
+        bool    _interrupt;
         fd_set  _connections_set;
 };
