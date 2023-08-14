@@ -30,7 +30,11 @@ class Server
         int acceptNewConnection();
         std::string readMessage(int fd) const;
         void parse();
-        void inspectEvent(int fd);
+        /**
+         *  Check in the connections vector the 
+         * client that have the same socket_id as fd parameter and read the fd message
+        */
+        void inspectEvent(int fd); 
 
     // Data
     private:
