@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#pragma once
+
 #include "common.hpp"
 
 class Client
@@ -23,10 +23,12 @@ class Client
     
     // Public functions
     public:
-        const std::string getNickname(void) const;
-        const std::string getUsername(void) const;
-        int         getId(void) const;
-        bool        auth(const std::string &nick, const std::string &pass) const;
+        const std::string   getNickname(void) const;
+        const std::string   getUsername(void) const;
+        int                 getId(void) const;
+        bool                auth(const std::string &nick, const std::string &pass) const;
+        bool                isOperator() const;
+
 
     // Internal functions
     private:
@@ -34,10 +36,9 @@ class Client
 
     // Data
     private:
-        int _socket_id;
+        int         _socket_id;
         std::string _nickname;
         std::string _username;
         std::string _password;
+        bool        _operator;
 };
-
-#endif

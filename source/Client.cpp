@@ -36,3 +36,8 @@ bool        Client::auth(const std::string &nick, const std::string &pass) const
 {
     return (nick == _nickname) && (pass == _password);
 }
+
+bool        Client::isOperator() const
+{
+    return _operator;
+}
