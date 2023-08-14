@@ -24,7 +24,7 @@ $(NAME): $(OBJ) $(HEADERS)
 	$(CXX) $(OBJ) -I $(INC_PATH) -o $(NAME)
 
 clean:
-	rm $(OBJ)
+	rm -f $(OBJ)
 
 fclean: clean
 	rm -f $(NAME)
