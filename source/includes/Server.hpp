@@ -12,9 +12,6 @@
 
 #include "Client.hpp"
 
-// Const Definitions
-static const unsigned int SOCKLEN = sizeof(s_sockaddr_in);
-
 class Server
 {
     // Special functions
@@ -30,16 +27,18 @@ class Server
     private:
         Server(); // no public default constructor
         void setConnection();
-        std::string readMessage(void) const;
+        int acceptNewConnection();
+        std::string readMessage(int fd) const;
         void parse();
+        void inspectEvent(int fd);
 
     // Data
     private:
         int _port;
-        int _socket;
-        int _socket_process;
+        int _server_socket;
         std::string _passwd;
         struct sockaddr_in _socket_addr;
         std::vector<Client> _connections;
+        fd_set  _connections_set;
 
 };
