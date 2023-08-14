@@ -13,6 +13,7 @@ HEADERS := includes/Server.hpp \
 SRCS := ircserv.cpp \
 		Server.cpp \
 		Client.cpp \
+		utils.cpp
 
 OBJ := $(SRCS:%.cpp=%.o)
 

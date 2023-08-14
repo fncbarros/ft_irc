@@ -15,6 +15,7 @@
 #include <string.h>
 #include <strings.h>
 #include <arpa/inet.h>
+#include <cctype>
 
 // Special functions
 Server::Server(int port, std::string passwd)
@@ -98,7 +99,7 @@ int Server::acceptNewConnection()
         _connections.push_back(new Client(new_socket_connection));
         FD_SET(new_socket_connection, &_connections_set);
     }
-    
+
     return new_socket_connection;
 }
 
@@ -181,10 +182,38 @@ tokenList Server::parse(std::string buffer)
         std::string s1(line.substr(0, spacePosition));
         std::string s2(line.substr(spacePosition + 1));
 
+        validateToken(s1);
+
         list.push_back(tokenPair(s1, s2));
     }
 
     return list;
+}
+
+std::string toUpper(const std::string& original)
+{
+    std::string result = original;
+    for (size_t i = 0; i < original.length(); i++)
+    {
+        result[i] = std::toupper(original[i]);
+    }
+    return result;
+}
+
+void Server::validateToken(std::string& token) const
+{
+    size_t i;
+
+    std::string tmp = Utils::toUpper(token);
+    for (i = 0; i < token_num; i++)
+    {
+        if (possible_tokens[i] == tmp)
+        {
+            tmp = possible_tokens[i];
+            break ;
+        }
+    }
+    token = (i < token_num) ? tmp : "IGNORE";
 }
 
 void Server::exec(tokenList map)
@@ -225,11 +254,10 @@ void Server::exec(tokenList map)
         }
         else
         {
-            // later
+            std::cout << "token not recognised\n";
         }
     }
 }
-
 
 void Server::execJOIN(const std::string line)
 {

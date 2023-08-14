@@ -22,3 +22,9 @@
 #include <vector>
 #include <unistd.h>
 #include <iostream>
+
+// Utils
+namespace Utils
+{
+    std::string toUpper(const std::string& original);
+}

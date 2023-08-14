@@ -22,6 +22,18 @@
 
 // Const Definitions
 static const char *ADDRESS = "0.0.0.0";
+static const size_t token_num = 8;
+static const std::string possible_tokens[token_num] =
+{
+    "JOIN",
+    "KICK",
+    "INVITE",
+    "TOPIC",
+    "MODE",
+    "USER",
+    "PASS",
+    "NICK",
+};
 
 // Type Definitions
 const int BUFFER_SIZE = 30720;
@@ -51,8 +63,8 @@ class Server
         */
         void inspectEvent(int fd);
         tokenList parse(std::string buffer);
+        void validateToken(std::string& token) const;
         void exec(tokenList map);
-
 
         // Callbacks
         void execJOIN(const std::string line);
