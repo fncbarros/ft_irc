@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <string>
+#include "common.hpp"
 
 class Client
 {
@@ -27,6 +27,8 @@ class Client
         const std::string   getUsername(void) const;
         int                 getId(void) const;
         bool                auth(const std::string &nick, const std::string &pass) const;
+        bool                isOperator() const;
+
 
     // Internal functions
     private:

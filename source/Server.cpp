@@ -11,38 +11,14 @@
 /* ************************************************************************** */
 
 #include "includes/Server.hpp"
-#include "includes/common.hpp"
 
 #include <string.h>
 #include <strings.h>
 #include <arpa/inet.h>
 
-// Const Definitions
-static const char *ADDRESS = "0.0.0.0";
-
 // Special functions
 Server::Server(int port, std::string passwd)
-: c_operationsPairArray
-(
-    std::make_pair("JOIN", execJOIN),
-    std::make_pair("KICK", execKICK),
-    std::make_pair("INVITE", execINVITE),
-    std::make_pair("TOPIC", execTOPIC),
-    std::make_pair("MODE", execMODE),
-    // USER INFO
-    std::make_pair("USER", execUSER),
-    std::make_pair("PASS", execPASS),
-    std::make_pair("NICK", execNICK),
-    // Other
-    std::make_pair("CAP", execUSER),
-)
-, c_operationsMap
-(
-        c_operationsPairArray,
-        c_operationsPairArray + sizeof(c_operationsPairArray) / sizeof(c_operationsPairArray[0])
-)
-, _port(port)
-, _socket(0)
+: _port(port)
 , _passwd(passwd)
 , _socket_addr()
 , _connections()
@@ -71,7 +47,7 @@ void Server::setConnection()
         // throw err
 	}
 
-    if (bind(_server_socket, (s_sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
+    if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
@@ -96,7 +72,6 @@ Server::Server()
 std::string    Server::readMessage(int fd) const
 {
     std::cout << "connection accepted" << std::endl;
-
     char buffer[BUFFER_SIZE] = {0};
 
     int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
@@ -108,11 +83,11 @@ std::string    Server::readMessage(int fd) const
     return (buffer);
 }
 
-int Server::acceptNewConnection() 
+int Server::acceptNewConnection()
 {
     int new_socket_connection;
 	socklen_t sckt_len = sizeof(_socket_addr);
-    new_socket_connection = accept(_server_socket, (s_sockaddr *)&_socket_addr, &sckt_len);
+    new_socket_connection = accept(_server_socket, (sockaddr *)&_socket_addr, &sckt_len);
     if (new_socket_connection < 0)
     {
         std::cout << "Failed to accept the socket" << std::endl;
@@ -135,7 +110,8 @@ void    Server::inspectEvent(int fd)
     {
         if (it->getId() == fd)
         {
-            parse(readMessage(fd));
+            tokenList msg = parse(readMessage(fd));
+            exec(msg);
         }
         else
         {
@@ -181,11 +157,12 @@ void Server::connectionLoop()
     }
 }
 
-void Server::parse(std::string buffer)
+tokenList Server::parse(std::string buffer)
 {
     std::istringstream iss(buffer);
     std::string line;
     std::vector<std::string> strList;
+    tokenList list;   
 
     while (std::getline(iss, line))
     {
@@ -197,35 +174,67 @@ void Server::parse(std::string buffer)
         line = *it;
         size_t spacePosition = line.find(' ');
 
-        if (spacePosition == std::string::npos || (buffer.find(EOM) + 1) == line.size())
+        if (spacePosition == std::string::npos)
         {
-//            break ;
+           continue ;
         }
 
         std::string s1(line.substr(0, spacePosition));
         std::string s2(line.substr(spacePosition + 1));
 
-        OperationsMap::const_iterator map_it = c_operationsMap.find(s1);
-        if (map_it != c_operationsMap.end())
-        {
-            std::cout << map_it->second << ": " << s2 << std::endl;
-        }
-        else
-        {
-            std::cout << s1 << s2 << std::endl;
-        }
+        list.push_back(tokenPair(s1, s2));
         /*************************TMP*******************************/
         // std::cout << "String1: " << s1 << std::endl;
         // std::cout << "String2: " << s2 << std::endl;
         /*************************TMP*******************************/
     }
 
-    // parse first string
-        // if password
-        // if USER info
-        // if operator
-        // check /n/r ??
+    return list;
 }
+
+void Server::exec(tokenList map)
+{
+    for (tokenList::iterator it = map.begin(); it != map.end(); it++)
+    {
+        if (it->first == "JOIN")
+        {
+            execJOIN(it->second);
+        }
+        else if(it->first == "KICK")
+        {
+            execKICK(it->second);
+        }
+        else if(it->first == "INVITE")
+        {
+            execINVITE(it->second);
+        }        
+        else if(it->first == "TOPIC")
+        {
+            execTOPIC(it->second);
+        }
+        else if(it->first == "MODE")
+        {
+            execMODE(it->second);
+        }
+        else if(it->first == "USER")
+        {
+            execUSER(it->second);
+        }
+        else if(it->first == "PASS")
+        {
+            execPASS(it->second);
+        }
+        else if(it->first == "NICK")
+        {
+            execNICK(it->second);
+        }
+        else
+        {
+            // later
+        }
+    }
+}
+
 
 void Server::execJOIN(const std::string line)
 {
@@ -254,6 +263,12 @@ void Server::execTOPIC(const std::string line)
 void Server::execMODE(const std::string line)
 {
     std::cout << "***MODE: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execUSER(const std::string line)
+{
+    std::cout << "***USER: ";
     std::cout << line << std::endl;
 }
 

@@ -13,25 +13,23 @@
 #pragma once
 
 #include "Client.hpp"
+#include "common.hpp"
 
-#include <string>
 #include <map>
 #include <vector>
 #include <netinet/in.h>
 #include <sstream>
 
+// Const Definitions
+static const char *ADDRESS = "0.0.0.0";
+
 // Type Definitions
-typedef void (*OperationCallback)(const std::string);
-typedef std::pair<std::string, OperationCallback> Operation;
-typedef std::map<std::string, OperationCallback> OperationsMap;
+const int BUFFER_SIZE = 30720;
+typedef std::pair<std::string, std::string> tokenPair;
+typedef std::vector<std::pair<std::string, std::string> > tokenList;
 
 class Server
 {
-    // Const Data
-    private:
-        const Operation c_operationsPairArray[9];
-        const OperationsMap c_operationsMap;
-
     // Special functions
     public:
         Server(int port, std::string passwd);
@@ -48,21 +46,23 @@ class Server
         std::string readMessage(int fd) const;
         int acceptNewConnection();
         /**
-         *  Check in the connections vector the 
+         *  Check in the connections vector the
          * client that have the same socket_id as fd parameter and read the fd message
         */
-        void inspectEvent(int fd); 
-        void parse(std::string buffer);
+        void inspectEvent(int fd);
+        tokenList parse(std::string buffer);
+        void exec(tokenList map);
+
 
         // Callbacks
-        static void execJOIN(const std::string line);
-        static void execKICK(const std::string line);
-        static void execINVITE(const std::string line);
-        static void execTOPIC(const std::string line);
-        static void execMODE(const std::string line);
-        static void execUSER(const std::string line);
-        static void execPASS(const std::string line);
-        static void execNICK(const std::string line);
+        void execJOIN(const std::string line);
+        void execKICK(const std::string line);
+        void execINVITE(const std::string line);
+        void execTOPIC(const std::string line);
+        void execMODE(const std::string line);
+        void execUSER(const std::string line);
+        void execPASS(const std::string line);
+        void execNICK(const std::string line);
 
     // Data
     private:

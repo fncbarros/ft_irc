@@ -21,11 +21,4 @@
 #include <netinet/in.h>
 #include <vector>
 #include <unistd.h>
-
-// Type Definitions
-typedef int socket_t;
-const int BUFFER_SIZE = 30720;
-
-// Const Definitions
-static const char *ADDRESS = "0.0.0.0";
-static const char *EOM = "\n\r"; // End of Message
+#include <iostream>
