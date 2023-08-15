@@ -21,8 +21,8 @@
 #include <sstream>
 
 // Const Definitions
-static const char *ADDRESS = "0.0.0.0";
-static const size_t token_num = 8;
+// static const char *ADDRESS = "0.0.0.0";
+static const size_t token_num = 9;
 static const std::string possible_tokens[token_num] =
 {
     "JOIN",
@@ -33,6 +33,7 @@ static const std::string possible_tokens[token_num] =
     "USER",
     "PASS",
     "NICK",
+    "QUIT",
 };
 
 // Type Definitions
@@ -49,39 +50,40 @@ class Server
 
     // Public functions
     public:
-        void connectionLoop(void);
-        int setConnection(const int port, const std::string password);
-        void interrupt();
+        void        connectionLoop(void);
+        int         setConnection(const int port, const std::string password);
+        void        interrupt();
 
     // Internal functions
     private:
         std::string readMessage(int fd) const;
-        int acceptNewConnection();
+        int         acceptNewConnection();
         /**
          *  Check in the connections vector the
          * client that have the same socket_id as fd parameter and read the fd message
         */
-        void inspectEvent(int fd);
-        tokenList parse(std::string buffer);
-        void validateToken(std::string& token) const;
-        void exec(tokenList map);
+        void        inspectEvent(int fd);
+        tokenList   parse(std::string buffer);
+        void        validateToken(std::string& token) const;
+        void        exec(tokenList map);
 
-        // Callbacks
-        void execJOIN(const std::string line);
-        void execKICK(const std::string line);
-        void execINVITE(const std::string line);
-        void execTOPIC(const std::string line);
-        void execMODE(const std::string line);
-        void execUSER(const std::string line);
-        void execPASS(const std::string line);
-        void execNICK(const std::string line);
+        // Operation methods
+        void        execJOIN(const std::string line);
+        void        execKICK(const std::string line);
+        void        execINVITE(const std::string line);
+        void        execTOPIC(const std::string line);
+        void        execMODE(const std::string line);
+        void        execUSER(const std::string line);
+        void        execPASS(const std::string line);
+        void        execNICK(const std::string line);
+        void        quit();
 
     // Data
     private:
-        int _server_socket;
-        std::string _passwd;
-        struct sockaddr_in _socket_addr;
-        std::vector<Client *> _connections;
-        bool    _interrupt;
-        fd_set  _connections_set;
+        int                     _server_socket;
+        std::string             _passwd;
+        struct sockaddr_in      _socket_addr;
+        std::vector<Client *>   _connections;
+        bool                    _interrupt;
+        fd_set                  _connections_set;
 };

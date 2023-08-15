@@ -29,11 +29,6 @@ class Client
         bool                auth(const std::string &nick, const std::string &pass) const;
         bool                isOperator() const;
 
-
-    // Internal functions
-    private:
-        Client();
-
     // Data
     private:
         int         _socket_id;

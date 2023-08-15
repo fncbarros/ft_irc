@@ -25,10 +25,6 @@ Client::~Client()
     std::cout << "Client destroyed" << std::endl;
 }
 
-Client::Client(/* args */)
-{
-}
-
 // Public functions
 const std::string Client::getNickname(void) const { return (_nickname); }
 const std::string Client::getUsername(void) const { return (_username); }

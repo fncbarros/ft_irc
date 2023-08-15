@@ -49,7 +49,7 @@ int Server::setConnection(const int port, const std::string password)
     (void) password;
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
-	_socket_addr.sin_addr.s_addr = inet_addr(ADDRESS);
+	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
 
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -136,11 +136,9 @@ void    Server::inspectEvent(int fd)
 void Server::connectionLoop()
 {
     fd_set ready_connections;
-    int actual_max_socket = 0;
     // initialize the fd_set
     FD_ZERO(&_connections_set);
     FD_SET(_server_socket, &_connections_set);
-    actual_max_socket = _server_socket;
 
     while (!_interrupt)
     {
@@ -202,16 +200,6 @@ tokenList Server::parse(std::string buffer)
     return list;
 }
 
-std::string toUpper(const std::string& original)
-{
-    std::string result = original;
-    for (size_t i = 0; i < original.length(); i++)
-    {
-        result[i] = std::toupper(original[i]);
-    }
-    return result;
-}
-
 void Server::validateToken(std::string& token) const
 {
     size_t i;
@@ -225,7 +213,10 @@ void Server::validateToken(std::string& token) const
             break ;
         }
     }
-    token = (i < token_num) ? tmp : "IGNORE";
+    if (i < token_num)
+    {
+        token = tmp;
+    }
 }
 
 void Server::exec(tokenList map)
@@ -264,9 +255,13 @@ void Server::exec(tokenList map)
         {
             execNICK(it->second);
         }
+        else if(it->first == "NICK")
+        {
+            quit();
+        }
         else
         {
-            std::cout << "token not recognised\n";
+            std::cout << it->first << it->second << std::endl;
         }
     }
 }
@@ -317,4 +312,9 @@ void Server::execNICK(const std::string line)
 {
     std::cout << "***NICK: ";
     std::cout << line << std::endl;
+}
+
+void Server::quit()
+{
+    std::cout << "***QUIT***\n";
 }

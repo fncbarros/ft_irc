@@ -27,4 +27,4 @@
 namespace Utils
 {
     std::string toUpper(const std::string& original);
-}
+} // namespace Utils
