@@ -32,5 +32,6 @@
 *.app
 ircserv
 
-# Client folder
-bircd/
+# ...
+.idea
+.vscode

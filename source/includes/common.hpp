@@ -22,6 +22,25 @@
 #include <vector>
 #include <unistd.h>
 #include <iostream>
+#include <sstream>
+
+// Const data
+static const size_t token_num = 12;
+static const std::string possible_tokens[token_num] =
+{
+    "JOIN",
+    "KICK",
+    "INVITE",
+    "TOPIC",
+    "MODE",
+    "USER",
+    "PASS",
+    "NICK",
+    "LIST",
+    "WHO",
+    "QUIT",
+    "PRIVMSG",
+};
 
 // Utils
 namespace Utils

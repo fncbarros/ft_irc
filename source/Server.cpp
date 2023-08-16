@@ -122,13 +122,75 @@ void    Server::inspectEvent(int fd)
 {
     if (!_interrupt)
     {
-        for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+        return ;
+    }
+
+    const std::string rawMsg = readMessage(fd);
+    const tokenList processedMsg = parse(rawMsg);
+    Client *client;
+
+    for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        if ((*it)->getId() == fd)
         {
-            if ((*it)->getId() == fd)
-            {
-                tokenList msg = parse(readMessage(fd));
-                exec(msg);
-            }
+            client = *it;
+        }
+
+    }
+
+    for (tokenList::const_iterator line = processedMsg.begin(); line != processedMsg.end(); line++)
+    {
+        if (line->first == "JOIN")
+        {
+            client->execJOIN(line->second);
+        }
+        else if(line->first == "KICK")
+        {
+            client->execKICK(line->second);
+        }
+        else if(line->first == "INVITE")
+        {
+            client->execINVITE(line->second);
+        }        
+        else if(line->first == "TOPIC")
+        {
+            client->execTOPIC(line->second);
+        }
+        else if(line->first == "MODE")
+        {
+            client->execMODE(line->second);
+        }
+        else if(line->first == "USER")
+        {
+            client->execUSER(line->second);
+        }
+        else if(line->first == "PASS")
+        {
+            client->execPASS(line->second);
+        }
+        else if(line->first == "NICK")
+        {
+            client->execNICK(line->second);
+        }
+        else if(line->first == "LIST")
+        {
+            client->execLIST();
+        }
+        else if(line->first == "WHO")
+        {
+            client->execWHO();
+        }
+        else if(line->first == "QUIT")
+        {
+            client->execQUIT();
+        }
+        else if(line->first == "PRIVMSG")
+        {
+            client->execPRIVMSG(line->second);
+        }
+        else
+        {
+            std::cout << line->first << line->second << std::endl;
         }
     }
 }
@@ -149,7 +211,7 @@ void Server::connectionLoop()
             std::cout << "Select error" << std::endl;
             continue;
         }
-        for (int fd = 3; fd < FD_SETSIZE; fd++) 
+        for (int fd = 3; fd < FD_SETSIZE; fd++)
         {
             if (FD_ISSET(fd, &ready_connections))
             {
@@ -217,104 +279,4 @@ void Server::validateToken(std::string& token) const
     {
         token = tmp;
     }
-}
-
-void Server::exec(tokenList map)
-{
-    for (tokenList::iterator it = map.begin(); it != map.end(); it++)
-    {
-        if (it->first == "JOIN")
-        {
-            execJOIN(it->second);
-        }
-        else if(it->first == "KICK")
-        {
-            execKICK(it->second);
-        }
-        else if(it->first == "INVITE")
-        {
-            execINVITE(it->second);
-        }        
-        else if(it->first == "TOPIC")
-        {
-            execTOPIC(it->second);
-        }
-        else if(it->first == "MODE")
-        {
-            execMODE(it->second);
-        }
-        else if(it->first == "USER")
-        {
-            execUSER(it->second);
-        }
-        else if(it->first == "PASS")
-        {
-            execPASS(it->second);
-        }
-        else if(it->first == "NICK")
-        {
-            execNICK(it->second);
-        }
-        else if(it->first == "NICK")
-        {
-            quit();
-        }
-        else
-        {
-            std::cout << it->first << it->second << std::endl;
-        }
-    }
-}
-
-void Server::execJOIN(const std::string line)
-{
-    std::cout << "***JOIN: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execKICK(const std::string line)
-{
-    std::cout << "***KICK: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execINVITE(const std::string line)
-{
-    std::cout << "***INVITE: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execTOPIC(const std::string line)
-{
-    std::cout << "***TOPIC: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execMODE(const std::string line)
-{
-    std::cout << "***MODE: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execUSER(const std::string line)
-{
-    std::cout << "***USER: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execPASS(const std::string line)
-{
-    std::cout << "***PASS: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execNICK(const std::string line)
-{
-    std::cout << "***NICK: ";
-    std::cout << line << std::endl;
-}
-
-void Server::quit()
-{
-    std::cout << "***QUIT***\n";
 }

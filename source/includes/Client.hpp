@@ -29,6 +29,20 @@ class Client
         bool                auth(const std::string &nick, const std::string &pass) const;
         bool                isOperator() const;
 
+        // Operation methods
+        void                execJOIN(const std::string line);
+        void                execKICK(const std::string line);
+        void                execINVITE(const std::string line);
+        void                execTOPIC(const std::string line);
+        void                execMODE(const std::string line);
+        void                execUSER(const std::string line);
+        void                execPASS(const std::string line);
+        void                execNICK(const std::string line);
+        void                execLIST();
+        void                execWHO();
+        void                execQUIT();
+        void                execPRIVMSG(const std::string line);
+
     // Data
     private:
         int         _socket_id;
