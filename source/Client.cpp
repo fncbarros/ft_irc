@@ -25,17 +25,20 @@ Client::~Client()
     std::cout << "Client destroyed" << std::endl;
 }
 
-// Public functions
-const std::string Client::getNickname(void) const { return (_nickname); }
-const std::string Client::getUsername(void) const { return (_username); }
-int         Client::getId(void)       const { return (_socket_id); }
+// Getters
+const std::string Client::getNickname(void) const { return _nickname; }
 
-bool        Client::auth(const std::string &nick, const std::string &pass) const
+const std::string Client::getUsername(void) const { return _username; }
+
+int Client::getId(void) const { return _socket_id; }
+
+// Public functions
+bool Client::auth(const std::string &nick, const std::string &pass) const
 {
     return (nick == _nickname) && (pass == _password);
 }
 
-bool        Client::isOperator() const
+bool Client::isOperator() const
 {
     return _operator;
 }
@@ -88,18 +91,21 @@ void Client::execNICK(const std::string line)
     std::cout << line << std::endl;
 }
 
-void Client::execLIST()
+void Client::execLIST(const std::string line)
 {
+    (void)line;
     std::cout << "***LIST***\n";
 }
 
-void Client::execWHO()
+void Client::execWHO(const std::string line)
 {
+    (void)line;
     std::cout << "***WHO***\n";
 }
 
-void Client::execQUIT()
+void Client::execQUIT(const std::string line)
 {
+    (void)line;
     std::cout << "***QUIT***\n";
 }
 

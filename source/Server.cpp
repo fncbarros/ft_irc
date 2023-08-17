@@ -55,25 +55,25 @@ int Server::setConnection(const int port, const std::string password)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (1);
+        return 1;
 	}
 
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (1);
+        return 1;
 	}
 
     if (listen(_server_socket, 20) < 0)
     {
         std::cout << "Failed to listen the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (1);
+        return 1;
     }
     
     std::cout << "connection bind" << std::endl;
-    return (0);
+    return 0;
 }
 
 void Server::interrupt()
@@ -92,13 +92,15 @@ std::string    Server::readMessage(int fd) const
         std::cout << "Failed to read Client Socket" << std::endl;
     }
     std::cout << "Client message received" << std::endl;
-    return (buffer);
+    return buffer;
 }
 
 int Server::acceptNewConnection()
 {
     if (_interrupt)
-        return (-1);
+    {
+        return -1;
+    }
     int new_socket_connection;
 	socklen_t sckt_len = sizeof(_socket_addr);
     new_socket_connection = accept(_server_socket, (sockaddr *)&_socket_addr, &sckt_len);
@@ -106,7 +108,7 @@ int Server::acceptNewConnection()
     {
         std::cout << "Failed to create the connection" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (-1);
+        return -1;
     }
     else
     {
@@ -120,7 +122,7 @@ int Server::acceptNewConnection()
 
 void    Server::inspectEvent(int fd)
 {
-    if (!_interrupt)
+    if (!_interrupt || fd <= 0)
     {
         return ;
     }
@@ -135,7 +137,6 @@ void    Server::inspectEvent(int fd)
         {
             client = *it;
         }
-
     }
 
     for (tokenList::const_iterator line = processedMsg.begin(); line != processedMsg.end(); line++)
@@ -151,7 +152,7 @@ void    Server::inspectEvent(int fd)
         else if(line->first == "INVITE")
         {
             client->execINVITE(line->second);
-        }        
+        }
         else if(line->first == "TOPIC")
         {
             client->execTOPIC(line->second);
@@ -174,15 +175,15 @@ void    Server::inspectEvent(int fd)
         }
         else if(line->first == "LIST")
         {
-            client->execLIST();
+            client->execLIST(line->second);
         }
         else if(line->first == "WHO")
         {
-            client->execWHO();
+            client->execWHO(line->second);
         }
         else if(line->first == "QUIT")
         {
-            client->execQUIT();
+            client->execQUIT(line->second);
         }
         else if(line->first == "PRIVMSG")
         {
@@ -213,18 +214,14 @@ void Server::connectionLoop()
         }
         for (int fd = 3; fd < FD_SETSIZE; fd++)
         {
-            if (FD_ISSET(fd, &ready_connections))
+            // if fd is not ready for reading, go to next one
+            if (!FD_ISSET(fd, &ready_connections))
             {
-                if (fd == _server_socket)
-                {
-                    if (int new_client = acceptNewConnection() > 0)
-                        inspectEvent(new_client);
-                }
-                else
-                {
-                    inspectEvent(fd);
-                }
+                continue ;
             }
+
+            const int clientFd = (fd == _server_socket) ? acceptNewConnection() : fd;
+            inspectEvent(clientFd); // Note: inspectEvent() validates clientFd
         }
     }
 }

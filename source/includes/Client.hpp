@@ -38,11 +38,10 @@ class Client
         void                execUSER(const std::string line);
         void                execPASS(const std::string line);
         void                execNICK(const std::string line);
-        void                execLIST();
-        void                execWHO();
-        void                execQUIT();
+        void                execLIST(const std::string line);
+        void                execWHO(const std::string line);
+        void                execQUIT(const std::string line);
         void                execPRIVMSG(const std::string line);
-
     // Data
     private:
         int         _socket_id;
