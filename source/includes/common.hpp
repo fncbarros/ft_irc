@@ -46,4 +46,5 @@ static const std::string possible_tokens[token_num] =
 namespace Utils
 {
     std::string toUpper(const std::string& original);
+    bool        isDigit(const std::string& s);
 } // namespace Utils
