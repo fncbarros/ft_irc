@@ -22,19 +22,6 @@
 
 // Const Definitions
 // static const char *ADDRESS = "0.0.0.0";
-static const size_t token_num = 9;
-static const std::string possible_tokens[token_num] =
-{
-    "JOIN",
-    "KICK",
-    "INVITE",
-    "TOPIC",
-    "MODE",
-    "USER",
-    "PASS",
-    "NICK",
-    "QUIT",
-};
 
 // Type Definitions
 const int BUFFER_SIZE = 30720;
@@ -65,23 +52,28 @@ class Server
         void        inspectEvent(int fd);
         tokenList   parse(std::string buffer);
         void        validateToken(std::string& token) const;
-        void        exec(tokenList map);
+        void        exec(Client& client, tokenList processedMsg);
+        bool        auth( const std::string &password) const;
 
+    public:
         // Operation methods
-        void        execJOIN(const std::string line);
-        void        execKICK(const std::string line);
-        void        execINVITE(const std::string line);
-        void        execTOPIC(const std::string line);
-        void        execMODE(const std::string line);
-        void        execUSER(const std::string line);
-        void        execPASS(const std::string line);
-        void        execNICK(const std::string line);
-        void        quit();
+        void        execJOIN(Client& client, const std::string line);
+        void        execKICK(Client& client, const std::string line);
+        void        execINVITE(Client& client, const std::string line);
+        void        execTOPIC(Client& client, const std::string line);
+        void        execMODE(Client& client, const std::string line);
+        void        execUSER(Client& client, const std::string line);
+        void        execPASS(Client& client, const std::string line);
+        void        execNICK(Client& client, const std::string line);
+        void        execLIST(Client& client, const std::string line);
+        void        execWHO(Client& client, const std::string line);
+        void        execQUIT(Client& client, const std::string line);
+        void        execPRIVMSG(Client& client, const std::string line);
 
     // Data
     private:
         int                     _server_socket;
-        std::string             _passwd;
+        std::string             _password;
         struct sockaddr_in      _socket_addr;
         std::vector<Client *>   _connections;
         bool                    _interrupt;

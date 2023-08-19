@@ -23,4 +23,15 @@ namespace Utils
         }
         return result;
     }
+
+    bool isDigit(const std::string& s)
+    {
+        bool ret = !s.empty();
+
+        for (std::string::const_iterator it = s.begin(); it < s.end(); it++)
+        {
+            ret &= (*it <= '9' && *it >= '0');
+        }
+        return ret;
+    }
 }

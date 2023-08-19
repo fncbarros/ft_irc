@@ -26,7 +26,6 @@ class Client
         const std::string   getNickname(void) const;
         const std::string   getUsername(void) const;
         int                 getId(void) const;
-        bool                auth(const std::string &nick, const std::string &pass) const;
         bool                isOperator() const;
 
     // Data
@@ -34,6 +33,5 @@ class Client
         int         _socket_id;
         std::string _nickname;
         std::string _username;
-        std::string _password;
         bool        _operator;
 };

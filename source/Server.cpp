@@ -19,7 +19,7 @@
 
 // Special functions
 Server::Server()
-: _passwd()
+: _password()
 , _socket_addr()
 , _connections()
 , _interrupt(false)
@@ -55,25 +55,25 @@ int Server::setConnection(const int port, const std::string password)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (1);
+        return 1;
 	}
 
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (1);
+        return 1;
 	}
 
     if (listen(_server_socket, 20) < 0)
     {
         std::cout << "Failed to listen the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (1);
+        return 1;
     }
     
     std::cout << "connection bind" << std::endl;
-    return (0);
+    return 0;
 }
 
 void Server::interrupt()
@@ -92,13 +92,15 @@ std::string    Server::readMessage(int fd) const
         std::cout << "Failed to read Client Socket" << std::endl;
     }
     std::cout << "Client message received" << std::endl;
-    return (buffer);
+    return buffer;
 }
 
 int Server::acceptNewConnection()
 {
     if (_interrupt)
-        return (-1);
+    {
+        return -1;
+    }
     int new_socket_connection;
 	socklen_t sckt_len = sizeof(_socket_addr);
     new_socket_connection = accept(_server_socket, (sockaddr *)&_socket_addr, &sckt_len);
@@ -106,7 +108,7 @@ int Server::acceptNewConnection()
     {
         std::cout << "Failed to create the connection" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
-        return (-1);
+        return -1;
     }
     else
     {
@@ -118,17 +120,82 @@ int Server::acceptNewConnection()
     return new_socket_connection;
 }
 
-void    Server::inspectEvent(int fd)
+void Server::inspectEvent(int fd)
 {
-    if (!_interrupt)
+    if (_interrupt || fd <= 0)
     {
-        for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+        return ;
+    }
+
+    const std::string rawMsg = readMessage(fd);
+    const tokenList processedMsg = parse(rawMsg);
+    Client *client;
+
+    for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        if ((*it)->getId() == fd)
         {
-            if ((*it)->getId() == fd)
-            {
-                tokenList msg = parse(readMessage(fd));
-                exec(msg);
-            }
+            client = *it;
+        }
+    }
+    exec(*client, processedMsg);
+}
+
+void Server::exec(Client& client, tokenList processedMsg)
+{
+    for (tokenList::const_iterator line = processedMsg.begin(); line != processedMsg.end(); line++)
+    {
+        if (line->first == "JOIN")
+        {
+            execJOIN(client, line->second);
+        }
+        else if(line->first == "KICK")
+        {
+            execKICK(client, line->second);
+        }
+        else if(line->first == "INVITE")
+        {
+            execINVITE(client, line->second);
+        }
+        else if(line->first == "TOPIC")
+        {
+            execTOPIC(client, line->second);
+        }
+        else if(line->first == "MODE")
+        {
+            execMODE(client, line->second);
+        }
+        else if(line->first == "USER")
+        {
+            execUSER(client, line->second);
+        }
+        else if(line->first == "PASS")
+        {
+            execPASS(client, line->second);
+        }
+        else if(line->first == "NICK")
+        {
+            execNICK(client, line->second);
+        }
+        else if(line->first == "LIST")
+        {
+            execLIST(client, line->second);
+        }
+        else if(line->first == "WHO")
+        {
+            execWHO(client, line->second);
+        }
+        else if(line->first == "QUIT")
+        {
+            execQUIT(client, line->second);
+        }
+        else if(line->first == "PRIVMSG")
+        {
+            execPRIVMSG(client, line->second);
+        }
+        else
+        {
+            std::cout << line->first << line->second << std::endl;
         }
     }
 }
@@ -149,20 +216,15 @@ void Server::connectionLoop()
             std::cout << "Select error" << std::endl;
             continue;
         }
-        for (int fd = 3; fd < FD_SETSIZE; fd++) 
+        for (int fd = 3; fd < FD_SETSIZE; fd++)
         {
-            if (FD_ISSET(fd, &ready_connections))
+            // if fd is not ready for reading, go to next one
+            if (!FD_ISSET(fd, &ready_connections))
             {
-                if (fd == _server_socket)
-                {
-                    if (int new_client = acceptNewConnection() > 0)
-                        inspectEvent(new_client);
-                }
-                else
-                {
-                    inspectEvent(fd);
-                }
+                continue ;
             }
+            const int clientFd = (fd == _server_socket) ? acceptNewConnection() : fd;
+            inspectEvent(clientFd); // Note: inspectEvent() validates clientFd
         }
     }
 }
@@ -219,102 +281,91 @@ void Server::validateToken(std::string& token) const
     }
 }
 
-void Server::exec(tokenList map)
+bool Server::auth( const std::string &password) const
 {
-    for (tokenList::iterator it = map.begin(); it != map.end(); it++)
-    {
-        if (it->first == "JOIN")
-        {
-            execJOIN(it->second);
-        }
-        else if(it->first == "KICK")
-        {
-            execKICK(it->second);
-        }
-        else if(it->first == "INVITE")
-        {
-            execINVITE(it->second);
-        }        
-        else if(it->first == "TOPIC")
-        {
-            execTOPIC(it->second);
-        }
-        else if(it->first == "MODE")
-        {
-            execMODE(it->second);
-        }
-        else if(it->first == "USER")
-        {
-            execUSER(it->second);
-        }
-        else if(it->first == "PASS")
-        {
-            execPASS(it->second);
-        }
-        else if(it->first == "NICK")
-        {
-            execNICK(it->second);
-        }
-        else if(it->first == "NICK")
-        {
-            quit();
-        }
-        else
-        {
-            std::cout << it->first << it->second << std::endl;
-        }
-    }
+    return (password == _password);
 }
 
-void Server::execJOIN(const std::string line)
+void Server::execJOIN(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***JOIN: ";
     std::cout << line << std::endl;
 }
 
-void Server::execKICK(const std::string line)
+void Server::execKICK(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***KICK: ";
     std::cout << line << std::endl;
 }
 
-void Server::execINVITE(const std::string line)
+void Server::execINVITE(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***INVITE: ";
     std::cout << line << std::endl;
 }
 
-void Server::execTOPIC(const std::string line)
+void Server::execTOPIC(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***TOPIC: ";
     std::cout << line << std::endl;
 }
 
-void Server::execMODE(const std::string line)
+void Server::execMODE(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***MODE: ";
     std::cout << line << std::endl;
 }
 
-void Server::execUSER(const std::string line)
+void Server::execUSER(Client& client, const std::string line)
 {
+    (void)client;
     std::cout << "***USER: ";
     std::cout << line << std::endl;
 }
 
-void Server::execPASS(const std::string line)
+void Server::execPASS(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***PASS: ";
     std::cout << line << std::endl;
 }
 
-void Server::execNICK(const std::string line)
+void Server::execNICK(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
     std::cout << "***NICK: ";
     std::cout << line << std::endl;
 }
 
-void Server::quit()
+void Server::execLIST(Client& client, const std::string line)
 {
+    std::cout << client.getUsername() << ": ";
+    (void)line;
+    std::cout << "***LIST***\n";
+}
+
+void Server::execWHO(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    (void)line;
+    std::cout << "***WHO***\n";
+}
+
+void Server::execQUIT(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    (void)line;
     std::cout << "***QUIT***\n";
+}
+
+void Server::execPRIVMSG(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***PRIVMSG: ";
+    std::cout << line << std::endl;
 }
