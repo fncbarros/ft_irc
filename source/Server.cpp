@@ -135,12 +135,9 @@ bool Server::inspectEvent(int fd)
         return false;
 
     const tokenList processedMsg = parse(rawMsg);
-
-    for(std::vector<Client>::iterator it = _connections.begin(); it != _connections.end(); it++)
-    {
-        if (it->getId() == fd)
-            exec(*it, processedMsg);
-    }
+    std::vector<Client>::iterator client = getClient(fd);
+    if (client != _connections.end())
+        exec(*client, processedMsg);
     return true;
 }
 
@@ -278,7 +275,10 @@ std::vector<Client>::iterator Server::getClient(const int fd)
 void Server::deleteClient(const int fd)
 {
     FD_CLR(fd, &_connections_set);
-    _connections.erase(getClient(fd));
+
+    std::vector<Client>::iterator client = getClient(fd);
+    if (client != _connections.end())
+        _connections.erase(client);
     close(fd);
 }
 
