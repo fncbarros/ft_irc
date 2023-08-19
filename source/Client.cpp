@@ -37,8 +37,6 @@ Client& Client::operator=(const Client& other)
 
 Client::~Client()
 {
-    if (_socket_id)
-        close(_socket_id);
     std::cout << "Client destroyed" << std::endl;
 }
 

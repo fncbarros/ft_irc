@@ -30,48 +30,47 @@ typedef std::vector<std::pair<std::string, std::string> > tokenList;
 
 class Server
 {
-    // Special functions
+        // Special functions
     public:
          Server();
         ~Server();
 
-    // Public functions
-    public:
-        void        connectionLoop(void);
-        int         setConnection(const int port, const std::string password);
-        void        interrupt();
-        std::vector<Client>::iterator     getClient(const int fd);
-
-    // Internal functions
+        // Internal functions
     private:
-        std::string readMessage(int fd) const;
-        int         acceptNewConnection();
+        std::string                     readMessage(int fd) const;
+        int                             acceptNewConnection();
         /**
          *  Check in the connections vector the
          * client that have the same socket_id as fd parameter and read the fd message
         */
-        bool        inspectEvent(int fd);
-        tokenList   parse(std::string buffer);
-        void        validateToken(std::string& token) const;
-        void        exec(Client& client, tokenList processedMsg);
-        bool        auth( const std::string &password) const;
+        bool                            inspectEvent(int fd);
+        tokenList                       parse(std::string buffer);
+        void                            validateToken(std::string& token) const;
+        void                            exec(Client& client, tokenList processedMsg);
+        bool                            auth( const std::string &password) const;
+        void                            deleteClient(const int fd);
+        std::vector<Client>::iterator   getClient(const int fd);
+
+        // Operation methods
+        void                            execJOIN(Client& client, const std::string line);
+        void                            execKICK(Client& client, const std::string line);
+        void                            execINVITE(Client& client, const std::string line);
+        void                            execTOPIC(Client& client, const std::string line);
+        void                            execMODE(Client& client, const std::string line);
+        void                            execUSER(Client& client, const std::string line);
+        void                            execPASS(Client& client, const std::string line);
+        void                            execNICK(Client& client, const std::string line);
+        void                            execLIST(Client& client, const std::string line);
+        void                            execWHO(Client& client, const std::string line);
+        void                            execQUIT(Client& client, const std::string line);
+        void                            execPRIVMSG(Client& client, const std::string line);
 
     public:
-        // Operation methods
-        void        execJOIN(Client& client, const std::string line);
-        void        execKICK(Client& client, const std::string line);
-        void        execINVITE(Client& client, const std::string line);
-        void        execTOPIC(Client& client, const std::string line);
-        void        execMODE(Client& client, const std::string line);
-        void        execUSER(Client& client, const std::string line);
-        void        execPASS(Client& client, const std::string line);
-        void        execNICK(Client& client, const std::string line);
-        void        execLIST(Client& client, const std::string line);
-        void        execWHO(Client& client, const std::string line);
-        void        execQUIT(Client& client, const std::string line);
-        void        execPRIVMSG(Client& client, const std::string line);
+        void                            connectionLoop(void);
+        int                             setConnection(const int port, const std::string password);
+        void                            interrupt();
 
-    // Data
+        // Data
     private:
         int                     _server_socket;
         std::string             _password;
