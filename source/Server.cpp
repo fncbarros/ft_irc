@@ -31,14 +31,6 @@ Server::~Server()
 {
     _interrupt = true;
 	std::cout << "Closing Server" << std::endl;
-    if (!_connections.empty())
-    {
-        for (std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
-        {
-            if (*it)
-                delete *it;
-        }
-    }
     if (_server_socket)
         close(_server_socket);
 }
@@ -85,6 +77,7 @@ std::string    Server::readMessage(int fd) const
 {
     std::cout << "connection accepted" << std::endl;
     char buffer[BUFFER_SIZE] = {0};
+    bzero(buffer, BUFFER_SIZE);
 
     int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
     if (bytesReceived < 0)
@@ -112,7 +105,7 @@ int Server::acceptNewConnection()
     }
     else
     {
-        _connections.push_back(new Client(new_socket_connection));
+        _connections.push_back(Client(new_socket_connection));
         FD_SET(new_socket_connection, &_connections_set);
         std::cout << "new connection created" << std::endl;
     }
@@ -120,25 +113,37 @@ int Server::acceptNewConnection()
     return new_socket_connection;
 }
 
-void Server::inspectEvent(int fd)
+bool Server::inspectEvent(int fd)
 {
-    if (_interrupt || fd <= 0)
+    if (_interrupt)
     {
-        return ;
+        return false;
+    }
+
+    if (fd == _server_socket)
+    {
+        // if connection failed, return
+        if ((fd = acceptNewConnection()) < 0)
+        {
+            return true;
+        }
     }
 
     const std::string rawMsg = readMessage(fd);
-    const tokenList processedMsg = parse(rawMsg);
-    Client *client;
-
-    for(std::vector<Client *>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    if (rawMsg.empty())
     {
-        if ((*it)->getId() == fd)
+        return false;
+    }
+    const tokenList processedMsg = parse(rawMsg);
+
+    for(std::vector<Client>::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        if (it->getId() == fd)
         {
-            client = *it;
+            exec(*it, processedMsg);
         }
     }
-    exec(*client, processedMsg);
+    return true;
 }
 
 void Server::exec(Client& client, tokenList processedMsg)
@@ -203,6 +208,9 @@ void Server::exec(Client& client, tokenList processedMsg)
 void Server::connectionLoop()
 {
     fd_set ready_connections;
+    // timeval time;
+    // time.tv_sec = 0;
+    // time.tv_usec = 500;
     // initialize the fd_set
     FD_ZERO(&_connections_set);
     FD_SET(_server_socket, &_connections_set);
@@ -211,11 +219,17 @@ void Server::connectionLoop()
     {
         // the fd_set is always destroyed by the select() method
         ready_connections = _connections_set;
-        if (select(FD_SETSIZE, &ready_connections, NULL, NULL, NULL) < 0)
+        int ret = select(FD_SETSIZE, &ready_connections, NULL, NULL, NULL);
+        if (ret < 0)
         {
-            std::cout << "Select error" << std::endl;
+            std::cout << "Select error: " << strerror(errno) << std::endl;
             continue;
         }
+        else if (ret == 0)
+        {
+            continue ;
+        }
+
         for (int fd = 3; fd < FD_SETSIZE; fd++)
         {
             // if fd is not ready for reading, go to next one
@@ -223,8 +237,12 @@ void Server::connectionLoop()
             {
                 continue ;
             }
-            const int clientFd = (fd == _server_socket) ? acceptNewConnection() : fd;
-            inspectEvent(clientFd); // Note: inspectEvent() validates clientFd
+            if (!inspectEvent(fd)) // Note: inspectEvent() validates clientFd
+            {
+                FD_CLR(fd, &_connections_set);
+                _connections.erase(getClient(fd));
+                ready_connections = _connections_set;
+            }
         }
     }
 }
@@ -358,9 +376,9 @@ void Server::execWHO(Client& client, const std::string line)
 
 void Server::execQUIT(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
     (void)line;
-    std::cout << "***QUIT***\n";
+
+    std::cout << client.getUsername() << " closed connection.\n";
 }
 
 void Server::execPRIVMSG(Client& client, const std::string line)
@@ -368,4 +386,16 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***PRIVMSG: ";
     std::cout << line << std::endl;
+}
+
+std::vector<Client>::iterator Server::getClient(const int fd)
+{
+    for (std::vector<Client>::iterator client = _connections.begin(); client != _connections.end(); client++)
+    {
+        if (client->getId() == fd)
+        {
+            return client;
+        }
+    }
+    return _connections.end();
 }

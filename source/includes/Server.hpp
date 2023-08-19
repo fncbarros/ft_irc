@@ -40,6 +40,7 @@ class Server
         void        connectionLoop(void);
         int         setConnection(const int port, const std::string password);
         void        interrupt();
+        std::vector<Client>::iterator     getClient(const int fd);
 
     // Internal functions
     private:
@@ -49,7 +50,7 @@ class Server
          *  Check in the connections vector the
          * client that have the same socket_id as fd parameter and read the fd message
         */
-        void        inspectEvent(int fd);
+        bool        inspectEvent(int fd);
         tokenList   parse(std::string buffer);
         void        validateToken(std::string& token) const;
         void        exec(Client& client, tokenList processedMsg);
@@ -75,7 +76,7 @@ class Server
         int                     _server_socket;
         std::string             _password;
         struct sockaddr_in      _socket_addr;
-        std::vector<Client *>   _connections;
+        std::vector<Client>     _connections;
         bool                    _interrupt;
         fd_set                  _connections_set;
 };

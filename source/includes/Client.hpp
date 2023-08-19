@@ -19,7 +19,10 @@ class Client
     // Special functions
     public:
         Client(const int socket_id);
+        Client(const Client& other);
+        Client& operator=(const Client& other);
         ~Client();
+        int operator==(const Client& other);
     
     // Public functions
     public:
