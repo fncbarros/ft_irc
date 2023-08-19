@@ -122,7 +122,7 @@ int Server::acceptNewConnection()
 
 void Server::inspectEvent(int fd)
 {
-    if (!_interrupt || fd <= 0)
+    if (_interrupt || fd <= 0)
     {
         return ;
     }
@@ -223,7 +223,6 @@ void Server::connectionLoop()
             {
                 continue ;
             }
-
             const int clientFd = (fd == _server_socket) ? acceptNewConnection() : fd;
             inspectEvent(clientFd); // Note: inspectEvent() validates clientFd
         }
