@@ -18,11 +18,29 @@ Client::Client(const int socket_id)
     std::cout << "Client created: " << _socket_id << std::endl;
 }
 
+Client::Client(const Client& other)
+{
+    _nickname = other.getNickname();
+    _username = other.getUsername();
+    _socket_id = other.getId();
+    _operator = other.isOperator();
+}
+
+Client& Client::operator=(const Client& other)
+{
+    if (this != &other)
+        *this = other;
+    return *this;
+}
+
 Client::~Client()
 {
-    if (_socket_id)
-        close(_socket_id);
     std::cout << "Client destroyed" << std::endl;
+}
+
+int Client::operator==(const Client& other)
+{
+    return (_socket_id == other._socket_id) && (_username == other._username);
 }
 
 // Getters
