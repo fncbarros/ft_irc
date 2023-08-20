@@ -27,6 +27,7 @@
 const int BUFFER_SIZE = 30720;
 typedef std::pair<std::string, std::string> tokenPair;
 typedef std::vector<std::pair<std::string, std::string> > tokenList;
+typedef std::vector<Client> ConnectionsList;
 
 class Server
 {
@@ -46,12 +47,12 @@ class Server
         bool                            inspectEvent(int fd);
         tokenList                       parse(std::string buffer);
         void                            validateToken(std::string& token) const;
-        void                            exec(Client& client, tokenList processedMsg);
         bool                            auth( const std::string &password) const;
         void                            deleteClient(const int fd);
-        std::vector<Client>::iterator   getClient(const int fd);
+        ConnectionsList::iterator   getClient(const int fd);
 
-        // Operation methods
+        // Operation methods (exec.cpp)
+        void                            exec(Client& client, tokenList processedMsg);
         void                            execJOIN(Client& client, const std::string line);
         void                            execKICK(Client& client, const std::string line);
         void                            execINVITE(Client& client, const std::string line);
@@ -75,7 +76,7 @@ class Server
         int                     _server_socket;
         std::string             _password;
         struct sockaddr_in      _socket_addr;
-        std::vector<Client>     _connections;
+        ConnectionsList         _connections;
         bool                    _interrupt;
         fd_set                  _connections_set;
 };

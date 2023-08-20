@@ -26,8 +26,8 @@ class Client
     
     // Public functions
     public:
-        const std::string   getNickname(void) const;
-        const std::string   getUsername(void) const;
+        std::string   getNickname(void) const;
+        std::string   getUsername(void) const;
         int                 getId(void) const;
         bool                isOperator() const;
 
