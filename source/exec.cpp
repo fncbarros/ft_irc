@@ -28,8 +28,6 @@ void Server::exec(Client& client, tokenList processedMsg)
             execMODE(client, line->second);
         else if(line->first == "USER")
             execUSER(client, line->second);
-        else if(line->first == "PASS")
-            execPASS(client, line->second);
         else if(line->first == "NICK")
             execNICK(client, line->second);
         else if(line->first == "LIST")
@@ -83,27 +81,90 @@ void Server::execMODE(Client& client, const std::string line)
 
 void Server::execUSER(Client& client, const std::string line)
 {
-    (void)client;
-    std::cout << "***USER: ";
-    std::cout << line << std::endl;
-}
+    // parse line
+    // ...
+    const std::string name = line.substr(0, line.find(' '));
+    if (name.empty())
+    {
+        // send error
+        Utils::writeTo("Missing argument.\n", client.getId());
+        return ;
+    }
 
-void Server::execPASS(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***PASS: ";
-    std::cout << line << std::endl;
+    for (ConnectionsList::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        if (it->getNickname() == name)
+        {
+            // send error
+            Utils::writeTo("User " + name + " already in use.\n", client.getId());
+            return ;
+        }
+    }
+
+    if (client.getUsername().empty())
+    {
+        Utils::writeTo("User " + name + " has been added.\n", client.getId());
+        std::cout << "User " << name << " has been added.\n";
+    }
+    else
+    {
+        Utils::writeTo("Username " + name + " set.\n", client.getId());
+        std::cout << "Username " << name << " set.\n";
+    }
+
+    client.setUsername(name);
+    //parse rest??
 }
 
 void Server::execNICK(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***NICK: ";
-    std::cout << line << std::endl;
+    // parse line
+    // ...
+    const std::string name = line.substr(0, line.find(' '));
+    if (name.empty())
+    {
+        // send error
+        Utils::writeTo("Missing argument.\n", client.getId());
+        return ;
+    }
+
+    for (ConnectionsList::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        if (it->getNickname() == name)
+        {
+            // send error
+            Utils::writeTo("Nick " + name + " already in use.\n", client.getId());
+            return ;
+        }
+    }
+
+    if (client.getNickname().empty())
+    {
+        Utils::writeTo("Nick " + name + " has been added.\n", client.getId());
+        std::cout << "Nick " << name << " has been added.\n";
+    }
+    else
+    {
+        Utils::writeTo("Nickname " + name + " set.\n", client.getId());
+        std::cout << "Nickname " << name << " set.\n";
+    }
+
+    client.setNickname(name);
+    //parse rest??
 }
 
 void Server::execLIST(Client& client, const std::string line)
 {
+    // parse line
+    if (line[0] == '#')
+    {
+        // lookup channel
+        // list users
+    }
+    else
+    {
+        // list channels
+    }
     std::cout << client.getUsername() << ": ";
     (void)line;
     std::cout << "***LIST***\n";

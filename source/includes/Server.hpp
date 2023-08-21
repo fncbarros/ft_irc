@@ -49,7 +49,7 @@ class Server
         void                            validateToken(std::string& token) const;
         bool                            auth( const std::string &password) const;
         void                            deleteClient(const int fd);
-        ConnectionsList::iterator   getClient(const int fd);
+        ConnectionsList::iterator       getClient(const int fd);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);
@@ -59,12 +59,15 @@ class Server
         void                            execTOPIC(Client& client, const std::string line);
         void                            execMODE(Client& client, const std::string line);
         void                            execUSER(Client& client, const std::string line);
-        void                            execPASS(Client& client, const std::string line);
         void                            execNICK(Client& client, const std::string line);
         void                            execLIST(Client& client, const std::string line);
         void                            execWHO(Client& client, const std::string line);
         void                            execQUIT(Client& client, const std::string line);
         void                            execPRIVMSG(Client& client, const std::string line);
+
+        // Auxiliary functions
+        static void                     printList(const ConnectionsList& list, int fd);
+//        static void                     printList(const ChannelsList& list, int fd);
 
     public:
         void                            connectionLoop(void);

@@ -224,7 +224,7 @@ void Server::validateToken(std::string& token) const
         token = tmp;
 }
 
-bool Server::auth( const std::string &password) const
+bool Server::auth( const std::string& password) const
 {
     return (password == _password);
 }
@@ -247,4 +247,15 @@ void Server::deleteClient(const int fd)
     if (client != _connections.end())
         _connections.erase(client);
     close(fd);
+}
+
+// Static functions
+void Server::printList(const ConnectionsList& list, const int fd)
+{
+    std::string nameList;
+    for (ConnectionsList::const_iterator it = list.begin(); it != list.end(); it++)
+    {
+        nameList += it->getNickname() + "\n";
+    }
+    Utils::writeTo(nameList, fd);
 }

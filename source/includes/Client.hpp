@@ -16,22 +16,23 @@
 
 class Client
 {
-    // Special functions
+        // Special functions
     public:
         Client(const int socket_id);
         Client(const Client& other);
-        Client& operator=(const Client& other);
         ~Client();
-        int operator==(const Client& other);
+        Client&         operator=(const Client& other);
+        int             operator==(const Client& other);
     
-    // Public functions
-    public:
-        std::string   getNickname(void) const;
-        std::string   getUsername(void) const;
-        int                 getId(void) const;
-        bool                isOperator() const;
+        // Public functions
+        std::string     getNickname(void) const;
+        std::string     getUsername(void) const;
+        int             getId(void) const;
+        void            setUsername(const std::string name);
+        void            setNickname(const std::string name);
+        bool            isOperator() const;
 
-    // Data
+        // Data
     private:
         int         _socket_id;
         std::string _nickname;

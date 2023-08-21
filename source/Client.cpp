@@ -50,6 +50,11 @@ std::string Client::getUsername(void) const { return _username; }
 
 int Client::getId(void) const { return _socket_id; }
 
+// Setters
+void Client::setUsername(const std::string name) { _username = name; }
+
+void Client::setNickname(const std::string name) { _nickname = name; }
+
 // Public functions
 
 bool Client::isOperator() const
