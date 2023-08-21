@@ -83,7 +83,7 @@ void Server::execUSER(Client& client, const std::string line)
 {
     // parse line
     // ...
-    const std::string name = line.substr(0, line.find(' '));
+    const std::string name = line.substr(0, line.find(' ')); // TODO: check if find returned npos
     if (name.empty())
     {
         // send error
@@ -120,7 +120,7 @@ void Server::execNICK(Client& client, const std::string line)
 {
     // parse line
     // ...
-    const std::string name = line.substr(0, line.find(' '));
+    const std::string name = line.substr(0, line.find(' ')); // TODO: check if find returned npos
     if (name.empty())
     {
         // send error
@@ -155,11 +155,20 @@ void Server::execNICK(Client& client, const std::string line)
 
 void Server::execLIST(Client& client, const std::string line)
 {
+    const std::string token = line.substr(0u, line.find(' ')); // TODO: check if find returned npos
+
     // parse line
-    if (line[0] == '#')
+    if (token[0] == '#')
     {
+        ChannelsList::const_iterator it;
         // lookup channel
+        for ( it = _channels.begin(); it != _channels.end(); it++)
+        {
+            if (token.substr(1u, token.size() - 1) == it->getName())
+                break;
+        }
         // list users
+        printList(it->getList(), client.getId()); // TODO: need getter for Channel
     }
     else
     {

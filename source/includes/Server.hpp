@@ -28,6 +28,7 @@ const int BUFFER_SIZE = 30720;
 typedef std::pair<std::string, std::string> tokenPair;
 typedef std::vector<std::pair<std::string, std::string> > tokenList;
 typedef std::vector<Client> ConnectionsList;
+typedef std::vector<Channel> ChannelsList;
 
 class Server
 {
@@ -66,7 +67,8 @@ class Server
         void                            execPRIVMSG(Client& client, const std::string line);
 
         // Auxiliary functions
-        static void                     printList(const ConnectionsList& list, int fd);
+        static void                     printList(const ConnectionsList& list, const int fd);
+        static void                     printList(const ClientList& list, const int fd);
 //        static void                     printList(const ChannelsList& list, int fd);
 
     public:
@@ -79,7 +81,8 @@ class Server
         int                     _server_socket;
         std::string             _password;
         struct sockaddr_in      _socket_addr;
-        ConnectionsList         _connections;
         bool                    _interrupt;
         fd_set                  _connections_set;
+        ConnectionsList         _connections;
+        ChannelsList            _channels;
 };

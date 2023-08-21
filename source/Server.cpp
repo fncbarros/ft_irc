@@ -18,9 +18,7 @@
 
 // Special functions
 Server::Server()
-: _password()
-, _socket_addr()
-, _connections()
+: _server_socket(0)
 , _interrupt(false)
 {
     bzero(&_socket_addr, sizeof(_socket_addr));
@@ -256,6 +254,17 @@ void Server::printList(const ConnectionsList& list, const int fd)
     for (ConnectionsList::const_iterator it = list.begin(); it != list.end(); it++)
     {
         nameList += it->getNickname() + "\n";
+    }
+    Utils::writeTo(nameList, fd);
+}
+
+// Static functions
+void Server::printList(const ClientList& list, const int fd)
+{
+    std::string nameList;
+    for (ClientList::const_iterator it = list.begin(); it != list.end(); it++)
+    {
+        nameList += (*it)->getNickname() + "\n";
     }
     Utils::writeTo(nameList, fd);
 }

@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
+#include "Channel.hpp"
 
 // Const data
 static const size_t token_num = 12;
