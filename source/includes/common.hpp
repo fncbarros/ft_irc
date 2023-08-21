@@ -34,7 +34,6 @@ static const std::string possible_tokens[token_num] =
     "TOPIC",
     "MODE",
     "USER",
-    "PASS",
     "NICK",
     "LIST",
     "WHO",
@@ -47,4 +46,5 @@ namespace Utils
 {
     std::string toUpper(const std::string& original);
     bool        isDigit(const std::string& s);
+    bool        writeTo(const std::string& s, const int fd);
 } // namespace Utils
