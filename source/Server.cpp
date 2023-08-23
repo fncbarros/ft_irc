@@ -75,6 +75,12 @@ void Server::interrupt()
     _interrupt = true;
 }
 
+void Server::setPassword(const std::string password)
+{
+    _password = password;
+}
+
+
 std::string    Server::readMessage(int fd) const
 {
     std::cout << "connection accepted" << std::endl;
@@ -120,6 +126,7 @@ bool Server::inspectEvent(int fd)
     if (_interrupt)
         return true;
 
+    // if new connection
     if (fd == _server_socket)
     {
         // if connection failed, return
@@ -133,6 +140,9 @@ bool Server::inspectEvent(int fd)
 
     const tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
+
+    if (auth(*client, processedMsg) == false)
+        return false;
     if (client != _connections.end())
         exec(*client, processedMsg);
     return true;
@@ -161,7 +171,6 @@ void Server::connectionLoop()
         }
         else if (ret == 0)
             continue ;
-
         for (int fd = 3; fd < FD_SETSIZE; fd++)
         {
             // if fd is not ready for reading, go to next one
@@ -222,10 +231,24 @@ void Server::validateToken(std::string& token) const
         token = tmp;
 }
 
-bool Server::auth( const std::string& password) const
+bool Server::auth(Client& client, tokenList processedMsg)
 {
-    return (password == _password);
+    if (client.isValid())
+        return true;
+    if (!client.isActive())
+        check_password(client, processedMsg);
+    if (!client.isActive())
+        return false;
+    return true;
 }
+
+void    Server::check_password(Client& client, tokenList processedMsg)
+{
+    std::string pass = getToken("PASS", processedMsg);
+    if (pass == _password)
+        client.setActive();
+}
+
 
 ConnectionsList::iterator Server::getClient(const int fd)
 {
@@ -237,6 +260,16 @@ ConnectionsList::iterator Server::getClient(const int fd)
     return _connections.end();
 }
 
+std::string     Server::getToken(const std::string token, tokenList processedMsg)
+{
+    for (tokenList::iterator it = processedMsg.begin(); it != processedMsg.end(); it++)
+    {
+        if (it->first == token)
+            return it->second;
+    }
+    return "";
+}
+
 void Server::deleteClient(const int fd)
 {
     FD_CLR(fd, &_connections_set);
@@ -245,6 +278,7 @@ void Server::deleteClient(const int fd)
     if (client != _connections.end())
         _connections.erase(client);
     close(fd);
+    std::cout << "Client deleted" << std::endl;
 }
 
 // Static functions

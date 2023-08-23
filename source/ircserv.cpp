@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
 
 	std::signal(SIGINT, signal_handler);
 
+	server.setPassword(password);
 	if (server.setConnection(std::atoi(argv[1]), argv[2]) > 0)
 	{
 		std::cerr << "Failed to setup the server connection" << std::endl;

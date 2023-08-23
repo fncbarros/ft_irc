@@ -26,7 +26,7 @@
 // Type Definitions
 const int BUFFER_SIZE = 30720;
 typedef std::pair<std::string, std::string> tokenPair;
-typedef std::vector<std::pair<std::string, std::string> > tokenList;
+typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
 typedef std::vector<Channel> ChannelsList;
 
@@ -48,9 +48,11 @@ class Server
         bool                            inspectEvent(int fd);
         tokenList                       parse(std::string buffer);
         void                            validateToken(std::string& token) const;
-        bool                            auth( const std::string &password) const;
+        bool                            auth(Client& client, tokenList processedMsg);
         void                            deleteClient(const int fd);
         ConnectionsList::iterator       getClient(const int fd);
+        std::string                     getToken(const std::string token, tokenList processedMsg);
+        void                            check_password(Client& client, tokenList processedMsg);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);
@@ -75,6 +77,7 @@ class Server
         void                            connectionLoop(void);
         int                             setConnection(const int port, const std::string password);
         void                            interrupt();
+        void                            setPassword(const std::string password);
 
         // Data
     private:

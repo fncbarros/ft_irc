@@ -14,6 +14,11 @@
 
 void Server::exec(Client& client, tokenList processedMsg)
 {
+    if (!client.isActive())
+    {
+        return ;
+    }
+
     for (tokenList::const_iterator line = processedMsg.begin(); line != processedMsg.end(); line++)
     {
         if (line->first == "JOIN")
@@ -39,7 +44,7 @@ void Server::exec(Client& client, tokenList processedMsg)
         else if(line->first == "PRIVMSG")
             execPRIVMSG(client, line->second);
         else
-            std::cout << line->first << line->second << std::endl;
+            std::cout << line->first << " " << line->second << std::endl;
     }
 }
 
@@ -189,7 +194,7 @@ void Server::execWHO(Client& client, const std::string line)
 void Server::execQUIT(Client& client, const std::string line)
 {
     (void)line;
-    std::cout << client.getUsername() << " closed connection.\n";
+    std::cout << client.getId() << " closed connection.\n";
     deleteClient(client.getId());
 }
 
