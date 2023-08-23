@@ -9,11 +9,14 @@ INC_PATH := includes
 HEADERS := includes/Server.hpp \
 			includes/common.hpp \
 			includes/Client.hpp \
+			includes/Channel.hpp \
 
 SRCS := ircserv.cpp \
 		Server.cpp \
 		Client.cpp \
-		utils.cpp
+		Channel.cpp \
+		utils.cpp \
+		exec.cpp \
 
 OBJ := $(SRCS:%.cpp=%.o)
 

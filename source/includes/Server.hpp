@@ -27,6 +27,8 @@
 const int BUFFER_SIZE = 30720;
 typedef std::pair<std::string, std::string> tokenPair;
 typedef std::vector<std::pair<std::string, std::string> > tokenList;
+typedef std::vector<Client> ConnectionsList;
+typedef std::vector<Channel> ChannelsList;
 
 class Server
 {
@@ -46,24 +48,28 @@ class Server
         bool                            inspectEvent(int fd);
         tokenList                       parse(std::string buffer);
         void                            validateToken(std::string& token) const;
-        void                            exec(Client& client, tokenList processedMsg);
         bool                            auth( const std::string &password) const;
         void                            deleteClient(const int fd);
-        std::vector<Client>::iterator   getClient(const int fd);
+        ConnectionsList::iterator       getClient(const int fd);
 
-        // Operation methods
+        // Operation methods (exec.cpp)
+        void                            exec(Client& client, tokenList processedMsg);
         void                            execJOIN(Client& client, const std::string line);
         void                            execKICK(Client& client, const std::string line);
         void                            execINVITE(Client& client, const std::string line);
         void                            execTOPIC(Client& client, const std::string line);
         void                            execMODE(Client& client, const std::string line);
         void                            execUSER(Client& client, const std::string line);
-        void                            execPASS(Client& client, const std::string line);
         void                            execNICK(Client& client, const std::string line);
         void                            execLIST(Client& client, const std::string line);
         void                            execWHO(Client& client, const std::string line);
         void                            execQUIT(Client& client, const std::string line);
         void                            execPRIVMSG(Client& client, const std::string line);
+
+        // Auxiliary functions
+        static void                     printList(const ConnectionsList& list, const int fd);
+        static void                     printList(const ClientList& list, const int fd);
+//        static void                     printList(const ChannelsList& list, int fd);
 
     public:
         void                            connectionLoop(void);
@@ -75,7 +81,8 @@ class Server
         int                     _server_socket;
         std::string             _password;
         struct sockaddr_in      _socket_addr;
-        std::vector<Client>     _connections;
         bool                    _interrupt;
         fd_set                  _connections_set;
+        ConnectionsList         _connections;
+        ChannelsList            _channels;
 };

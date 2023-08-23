@@ -34,4 +34,11 @@ namespace Utils
         }
         return ret;
     }
+
+    bool writeTo(const std::string& s, const int fd)
+    {
+        if (send(fd, s.c_str(), s.size(), 0) < static_cast<ssize_t>(s.size()))
+            return false;
+        return true;
+    }
 }

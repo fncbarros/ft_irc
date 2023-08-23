@@ -44,11 +44,16 @@ int Client::operator==(const Client& other)
 }
 
 // Getters
-const std::string Client::getNickname(void) const { return _nickname; }
+std::string Client::getNickname(void) const { return _nickname; }
 
-const std::string Client::getUsername(void) const { return _username; }
+std::string Client::getUsername(void) const { return _username; }
 
 int Client::getId(void) const { return _socket_id; }
+
+// Setters
+void Client::setUsername(const std::string name) { _username = name; }
+
+void Client::setNickname(const std::string name) { _nickname = name; }
 
 // Public functions
 
