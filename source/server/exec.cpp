@@ -14,7 +14,7 @@
 
 void Server::exec(Client& client, tokenList processedMsg)
 {
-    if (!client.isActive())
+    if (!client.isPassActive())
     {
         return ;
     }

@@ -92,6 +92,7 @@ std::string    Server::readMessage(int fd) const
     if (bytesReceived < 0)
         std::cout << "Failed to read Client Socket" << std::endl;
 
+    std::cout << buffer << std::endl;
     std::cout << "Client message received" << std::endl;
     return buffer;
 }
@@ -137,12 +138,11 @@ bool Server::inspectEvent(int fd)
     const std::string rawMsg = readMessage(fd);
     if (rawMsg.empty())
         return false;
-
     const tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
 
-    if (auth(*client, processedMsg) == false)
-        return false;
+    if (!client->isValid())
+        return auth(*client, processedMsg);
     if (client != _connections.end())
         exec(*client, processedMsg);
     return true;
@@ -233,20 +233,20 @@ void Server::validateToken(std::string& token) const
 
 bool Server::auth(Client& client, tokenList processedMsg)
 {
-    if (client.isValid())
-        return true;
-    if (!client.isActive())
-        check_password(client, processedMsg);
-    if (!client.isActive())
-        return false;
+    if (!client.isPassActive())
+        return checkPassword(client, processedMsg);
+  
     return true;
 }
 
-void    Server::check_password(Client& client, tokenList processedMsg)
+int    Server::checkPassword(Client& client, tokenList processedMsg)
 {
-    std::string pass = getToken("PASS", processedMsg);
-    if (pass == _password)
-        client.setActive();
+    std::string password = getToken("PASS", processedMsg);
+    if (password != _password)
+        return false;
+    
+    client.setPassActive();
+    return true;
 }
 
 

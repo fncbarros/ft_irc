@@ -52,7 +52,7 @@ class Server
         void                            deleteClient(const int fd);
         ConnectionsList::iterator       getClient(const int fd);
         std::string                     getToken(const std::string token, tokenList processedMsg);
-        void                            check_password(Client& client, tokenList processedMsg);
+        int                             checkPassword(Client& client, tokenList processedMsg);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);
