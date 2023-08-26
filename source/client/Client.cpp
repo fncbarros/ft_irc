@@ -51,6 +51,8 @@ std::string Client::getUsername(void) const { return _username; }
 
 int Client::getId(void) const { return _socket_id; }
 
+bool  Client::isActive(void) const { return(_auth.isValidPassword); }
+
 bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
 // Setters
 void Client::setUsername(const std::string name) { _username = name; }
