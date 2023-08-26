@@ -84,8 +84,9 @@ class Server
         int                     _server_socket;
         std::string             _password;
         struct sockaddr_in      _socket_addr;
-        bool                    _interrupt;
         fd_set                  _connections_set;
         ConnectionsList         _connections;
         ChannelsList            _channels;
+        bool                    _interrupt;
+        
 };

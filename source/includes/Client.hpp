@@ -14,6 +14,12 @@
 
 #include "common.hpp"
 
+typedef struct auth {
+    bool    isValidPassword;
+    bool    isValidUser;
+    bool    isValidNickName;
+} t_auth;
+
 class Client
 {
         // Special functions
@@ -42,4 +48,6 @@ class Client
         std::string _username;
         bool        _operator;
         bool        _active;
+        t_auth      _auth;
+
 };
