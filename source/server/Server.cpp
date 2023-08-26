@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/Server.hpp"
+#include "../includes/Server.hpp"
 
 #include <string.h>
 #include <strings.h>

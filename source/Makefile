@@ -11,12 +11,12 @@ HEADERS := includes/Server.hpp \
 			includes/Client.hpp \
 			includes/Channel.hpp \
 
-SRCS := ircserv.cpp \
-		Server.cpp \
-		Client.cpp \
-		Channel.cpp \
-		utils.cpp \
-		exec.cpp \
+SRCS := server/ircserv.cpp \
+		server/Server.cpp \
+		client/Client.cpp \
+		channel/Channel.cpp \
+		server/utils.cpp \
+		server/exec.cpp \
 
 OBJ := $(SRCS:%.cpp=%.o)
 

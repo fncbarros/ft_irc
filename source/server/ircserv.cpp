@@ -13,8 +13,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <csignal>
-#include "includes/Server.hpp"
-#include "includes/common.hpp"
+#include "../includes/Server.hpp"
+#include "../includes/common.hpp"
 
 Server server;
 
