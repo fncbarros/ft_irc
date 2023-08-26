@@ -6,29 +6,37 @@ CXXFLAGS := -Wall -Werror -Wextra -std=c++98
 
 INC_PATH := includes
 
+SRCSDIR = source
+OBJDIR = objs
+
 HEADERS := includes/Server.hpp \
 			includes/common.hpp \
 			includes/Client.hpp \
 			includes/Channel.hpp \
 
-SRCS := server/ircserv.cpp \
-		server/Server.cpp \
-		client/Client.cpp \
-		channel/Channel.cpp \
-		server/utils.cpp \
-		server/exec.cpp \
+SRCS = $(shell find $(SRCDIR) -name '*.cpp')
+OBJ = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 
-OBJ := $(SRCS:%.cpp=%.o)
+DIRS = $(sort $(dir $(OBJ)))
 
 LIBS := 
 
-all: $(NAME)
+all: $(OBJDIR) $(NAME)
+
+$(OBJDIR): $(DIRS)
+	mkdir -p $(DIRS)
+
+$(DIRS):
+	mkdir -p $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) -c $< -o $@
 
 $(NAME): $(OBJ) $(HEADERS)
 	$(CXX) $(OBJ) -I $(INC_PATH) -o $(NAME)
 
 clean:
-	rm -f $(OBJ)
+	rm -rf $(OBJDIR)
 
 fclean: clean
 	rm -f $(NAME)
