@@ -4,15 +4,8 @@ CXX := c++
 
 CXXFLAGS := -Wall -Werror -Wextra -std=c++98
 
-INC_PATH := includes
-
-SRCSDIR = source
+SRCDIR = source
 OBJDIR = objs
-
-HEADERS := includes/Server.hpp \
-			includes/common.hpp \
-			includes/Client.hpp \
-			includes/Channel.hpp \
 
 SRCS = $(shell find $(SRCDIR) -name '*.cpp')
 OBJ = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
@@ -32,8 +25,8 @@ $(DIRS):
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -c $< -o $@
 
-$(NAME): $(OBJ) $(HEADERS)
-	$(CXX) $(OBJ) -I $(INC_PATH) -o $(NAME)
+$(NAME): $(OBJ)
+	$(CXX) $(OBJ) -o $(NAME)
 
 clean:
 	rm -rf $(OBJDIR)
