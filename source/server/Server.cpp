@@ -37,6 +37,16 @@ Server::~Server()
 
 // Public functions
 
+void Server::interrupt()
+{
+    _interrupt = true;
+}
+
+void Server::setPassword(const std::string password)
+{
+    _password = password;
+}
+
 int Server::acceptNewConnection()
 {
     if (_interrupt)
@@ -60,16 +70,6 @@ int Server::acceptNewConnection()
     }
 
     return new_socket_connection;
-}
-
-void Server::interrupt()
-{
-    _interrupt = true;
-}
-
-void Server::setPassword(const std::string password)
-{
-    _password = password;
 }
 
 int Server::setConnection(const int port, const std::string password)
@@ -169,16 +169,5 @@ void Server::connectionLoop()
             }
         }
     }
-}
-
-// Static functions
-void Server::printList(const ConnectionsList& list, const int fd)
-{
-    std::string nameList;
-    for (ConnectionsList::const_iterator it = list.begin(); it != list.end(); it++)
-    {
-        nameList += it->getNickname() + "\n";
-    }
-    Utils::writeTo(nameList, fd);
 }
 

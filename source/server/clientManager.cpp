@@ -30,3 +30,13 @@ void Server::printClientList(const ClientList& list, const int fd)
     }
     Utils::writeTo(nameList, fd);
 }
+
+void Server::printList(const ConnectionsList& list, const int fd)
+{
+    std::string nameList;
+    for (ConnectionsList::const_iterator it = list.begin(); it != list.end(); it++)
+    {
+        nameList += it->getNickname() + "\n";
+    }
+    Utils::writeTo(nameList, fd);
+}
