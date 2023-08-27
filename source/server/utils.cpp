@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/common.hpp"
+#include <stdio.h>
 
 namespace Utils
 {
@@ -37,8 +38,14 @@ namespace Utils
 
     bool writeTo(const std::string& s, const int fd)
     {
-        if (send(fd, s.c_str(), s.size(), 0) < static_cast<ssize_t>(s.size()))
+        const std::string message(s + "\r\n");
+        std::cout << s.c_str() << std::endl;
+        std::cout << "FD-> "<< fd << std::endl;
+        if (send(fd, message.c_str(), s.size(), 0) < static_cast<ssize_t>(s.size()))
+        {
+            std::cout << "error to send" << std::endl;
             return false;
+        }
         return true;
     }
 }

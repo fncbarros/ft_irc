@@ -83,7 +83,6 @@ void Server::setPassword(const std::string password)
 
 std::string    Server::readMessage(int fd) const
 {
-    std::cout << "connection accepted" << std::endl;
     char buffer[BUFFER_SIZE] = {0};
     bzero(buffer, BUFFER_SIZE);
 
@@ -96,6 +95,12 @@ std::string    Server::readMessage(int fd) const
     std::cout << "Client message received" << std::endl;
     return buffer;
 }
+
+void    Server::sendMessage(int fd, const std::string message)
+{
+    send(fd, message.c_str(), message.size(), 0);
+}
+
 
 int Server::acceptNewConnection()
 {
@@ -141,10 +146,14 @@ bool Server::inspectEvent(int fd)
     const tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
 
-    if (!client->isValid())
-        return auth(*client, processedMsg);
     if (client != _connections.end())
-        exec(*client, processedMsg);
+    {
+        if (!client->isPassActive())
+            return auth(*client, processedMsg);
+        else
+            exec(*client, processedMsg);
+    } 
+        
     return true;
 }
 
@@ -236,15 +245,18 @@ bool Server::auth(Client& client, tokenList processedMsg)
     if (!client.isPassActive())
         return checkPassword(client, processedMsg);
   
+    std::cout << "connection accepted" << std::endl;
     return true;
 }
 
 int    Server::checkPassword(Client& client, tokenList processedMsg)
 {
     std::string password = getToken("PASS", processedMsg);
+    std::cout << "["<< password << "] [" << _password << "]" << std::endl;
     if (password != _password)
-        return false;
+        return replyPassMissMatch(client);
     
+    std::cout << "pass correct" << std::endl;
     client.setPassActive();
     return true;
 }
