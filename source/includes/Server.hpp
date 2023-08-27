@@ -19,6 +19,8 @@
 #include <vector>
 #include <netinet/in.h>
 #include <sstream>
+#include <arpa/inet.h>
+
 
 // Const Definitions
 const int BUFFER_SIZE = 30720;
@@ -76,7 +78,7 @@ class Server
         int                             replyPassMissMatch(Client& client);
         // Auxiliary functions
         static void                     printList(const ConnectionsList& list, const int fd);
-        static void                     printList(const ClientList& list, const int fd);
+        void                            printClientList(const ClientList& list, const int fd);
 //        static void                     printList(const ChannelsList& list, int fd);
 
     public:

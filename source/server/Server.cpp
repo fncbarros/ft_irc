@@ -11,10 +11,8 @@
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
-
-#include <string.h>
 #include <strings.h>
-#include <arpa/inet.h>
+
 
 // Special functions
 Server::Server()
@@ -38,6 +36,42 @@ Server::~Server()
 }
 
 // Public functions
+
+int Server::acceptNewConnection()
+{
+    if (_interrupt)
+        return -1;
+
+    int new_socket_connection;
+	socklen_t sckt_len = sizeof(_socket_addr);
+    new_socket_connection = accept(_server_socket, (sockaddr *)&_socket_addr, &sckt_len);
+
+    if (new_socket_connection < 0)
+    {
+        std::cout << "Failed to create the connection" << std::endl;
+        std::cout << "Err: " << strerror(errno) << std::endl;
+        return -1;
+    }
+    else
+    {
+        _connections.push_back(Client(new_socket_connection));
+        FD_SET(new_socket_connection, &_connections_set);
+        std::cout << "new connection created" << std::endl;
+    }
+
+    return new_socket_connection;
+}
+
+void Server::interrupt()
+{
+    _interrupt = true;
+}
+
+void Server::setPassword(const std::string password)
+{
+    _password = password;
+}
+
 int Server::setConnection(const int port, const std::string password)
 {
     (void) password;
@@ -68,63 +102,6 @@ int Server::setConnection(const int port, const std::string password)
     
     std::cout << "connection bind" << std::endl;
     return 0;
-}
-
-void Server::interrupt()
-{
-    _interrupt = true;
-}
-
-void Server::setPassword(const std::string password)
-{
-    _password = password;
-}
-
-
-std::string    Server::readMessage(int fd) const
-{
-    char buffer[BUFFER_SIZE] = {0};
-    bzero(buffer, BUFFER_SIZE);
-
-    int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
-
-    if (bytesReceived < 0)
-        std::cout << "Failed to read Client Socket" << std::endl;
-
-    std::cout << buffer << std::endl;
-    std::cout << "Client message received" << std::endl;
-    return buffer;
-}
-
-void    Server::sendMessage(int fd, const std::string message)
-{
-    send(fd, message.c_str(), message.size(), 0);
-}
-
-
-int Server::acceptNewConnection()
-{
-    if (_interrupt)
-        return -1;
-
-    int new_socket_connection;
-	socklen_t sckt_len = sizeof(_socket_addr);
-    new_socket_connection = accept(_server_socket, (sockaddr *)&_socket_addr, &sckt_len);
-
-    if (new_socket_connection < 0)
-    {
-        std::cout << "Failed to create the connection" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
-        return -1;
-    }
-    else
-    {
-        _connections.push_back(Client(new_socket_connection));
-        FD_SET(new_socket_connection, &_connections_set);
-        std::cout << "new connection created" << std::endl;
-    }
-
-    return new_socket_connection;
 }
 
 bool Server::inspectEvent(int fd)
@@ -194,105 +171,6 @@ void Server::connectionLoop()
     }
 }
 
-tokenList Server::parse(std::string buffer)
-{
-    std::istringstream iss(buffer);
-    std::string line;
-    std::vector<std::string> strList;
-    tokenList list;   
-
-    while (std::getline(iss, line))
-        strList.push_back(line);
-
-    for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
-    {
-        line = *it;
-        size_t spacePosition = line.find(' ');
-
-        if (spacePosition == std::string::npos)
-           continue ;
-
-        std::string s1(line.substr(0, spacePosition));
-        std::string s2(line.substr(spacePosition + 1));
-
-        validateToken(s1);
-
-        list.push_back(tokenPair(s1, s2));
-    }
-
-    return list;
-}
-
-void Server::validateToken(std::string& token) const
-{
-    size_t i;
-
-    std::string tmp = Utils::toUpper(token);
-    for (i = 0; i < token_num; i++)
-    {
-        if (possible_tokens[i] == tmp)
-        {
-            tmp = possible_tokens[i];
-            break ;
-        }
-    }
-    if (i < token_num)
-        token = tmp;
-}
-
-bool Server::auth(Client& client, tokenList processedMsg)
-{
-    if (!client.isPassActive())
-        return checkPassword(client, processedMsg);
-  
-    std::cout << "connection accepted" << std::endl;
-    return true;
-}
-
-int    Server::checkPassword(Client& client, tokenList processedMsg)
-{
-    std::string password = getToken("PASS", processedMsg);
-    std::cout << "["<< password << "] [" << _password << "]" << std::endl;
-    if (password != _password)
-        return replyPassMissMatch(client);
-    
-    std::cout << "pass correct" << std::endl;
-    client.setPassActive();
-    return true;
-}
-
-
-ConnectionsList::iterator Server::getClient(const int fd)
-{
-    for (ConnectionsList::iterator client = _connections.begin(); client != _connections.end(); client++)
-    {
-        if (client->getId() == fd)
-            return client;
-    }
-    return _connections.end();
-}
-
-std::string     Server::getToken(const std::string token, tokenList processedMsg)
-{
-    for (tokenList::iterator it = processedMsg.begin(); it != processedMsg.end(); it++)
-    {
-        if (it->first == token)
-            return it->second;
-    }
-    return "";
-}
-
-void Server::deleteClient(const int fd)
-{
-    FD_CLR(fd, &_connections_set);
-
-    ConnectionsList::iterator client = getClient(fd);
-    if (client != _connections.end())
-        _connections.erase(client);
-    close(fd);
-    std::cout << "Client deleted" << std::endl;
-}
-
 // Static functions
 void Server::printList(const ConnectionsList& list, const int fd)
 {
@@ -304,13 +182,3 @@ void Server::printList(const ConnectionsList& list, const int fd)
     Utils::writeTo(nameList, fd);
 }
 
-// Static functions
-void Server::printList(const ClientList& list, const int fd)
-{
-    std::string nameList;
-    for (ClientList::const_iterator it = list.begin(); it != list.end(); it++)
-    {
-        nameList += (*it)->getNickname() + "\n";
-    }
-    Utils::writeTo(nameList, fd);
-}

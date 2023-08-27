@@ -173,7 +173,7 @@ void Server::execLIST(Client& client, const std::string line)
                 break;
         }
         // list users
-        printList(it->getList(), client.getId()); // TODO: need getter for Channel
+        printClientList(it->getList(), client.getId()); // TODO: need getter for Channel
     }
     else
     {
