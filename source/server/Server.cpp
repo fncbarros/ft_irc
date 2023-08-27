@@ -84,7 +84,7 @@ int Server::acceptNewConnection()
 
 int Server::setConnection(const int port, const std::string password)
 {
-    (void) password;
+    _password = password;
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
 	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
@@ -119,12 +119,6 @@ void Server::interrupt()
 {
     _interrupt = true;
 }
-
-void Server::setPassword(const std::string password)
-{
-    _password = password;
-}
-
 
 std::string    Server::readMessage(int fd) const
 {
@@ -284,18 +278,20 @@ bool Server::auth(Client& client, tokenList processedMsg)
 {
     if (client.isValid())
         return true;
-    if (!client.isActive())
-        check_password(client, processedMsg);
-    if (!client.isActive())
+    if (!checkPassword(client, processedMsg))
         return false;
     return true;
 }
 
-void    Server::check_password(Client& client, tokenList processedMsg)
+bool    Server::checkPassword(Client& client, const tokenList& processedMsg)
 {
-    std::string pass = getToken("PASS", processedMsg);
-    if (pass == _password)
-        client.setActive();
+    if (!client.isActive())
+    {
+        std::string pass = getToken("PASS", processedMsg);
+        if (pass == _password)
+            client.setActive();
+    }
+    return client.isActive();
 }
 
 

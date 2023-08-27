@@ -25,7 +25,7 @@ $(DIRS):
 	mkdir -p $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) -I$(HEADERS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I$(HEADERS) -c $< -o $@
 
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
@@ -39,6 +39,7 @@ fclean: clean
 re: fclean all
 
 debug: CXXFLAGS += -g
+debug: CXX = clang++
 debug: re
 
 .PHONY: all, clean, fclean, re, debug

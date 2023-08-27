@@ -48,7 +48,6 @@ class Server
         // Internal functions
     private:
         std::string                     readMessage(int fd) const;
-        void                            sendMessage(int fd, const std::string message);
         int                             acceptNewConnection();
         /**
          *  Check in the connections vector the
@@ -61,7 +60,7 @@ class Server
         void                            deleteClient(const int fd);
         ConnectionsList::iterator       getClient(const int fd);
         std::string                     getToken(const std::string token, tokenList processedMsg);
-        bool                             checkPassword(Client& client, tokenList processedMsg);
+        bool                            checkPassword(Client& client, tokenList processedMsg);
         void                            activateClient(Client& client);
 
         // Operation methods (exec.cpp)
@@ -87,8 +86,7 @@ class Server
         void                             replyMyInfo(Client& client);
         // Auxiliary functions
         static void                     printList(const ConnectionsList& list, const int fd);
-        void                            printClientList(const ClientList& list, const int fd);
-//        static void                     printList(const ChannelsList& list, int fd);
+        static void                     printList(const ClientList& list, const int fd);
 
     public:
         void                            connectionLoop(void);
@@ -107,5 +105,5 @@ class Server
         ChannelsList            _channels;
         bool                    _interrupt;
         std::string             _server_date_created;
-        
+
 };
