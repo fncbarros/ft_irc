@@ -4,15 +4,17 @@ CXX := c++
 
 CXXFLAGS := -Wall -Werror -Wextra -std=c++98
 
-SRCDIR = source
-OBJDIR = objs
+SRCDIR := source
+
+OBJDIR := objs
+
+HEADERS := $(SRCDIR)/includes
 
 SRCS = $(shell find $(SRCDIR) -name '*.cpp')
-OBJ = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 
-DIRS = $(sort $(dir $(OBJ)))
+OBJ := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 
-LIBS := 
+DIRS := $(sort $(dir $(OBJ)))
 
 all: $(OBJDIR) $(NAME)
 
@@ -23,7 +25,7 @@ $(DIRS):
 	mkdir -p $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) -I$(HEADERS) -c $< -o $@
 
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)

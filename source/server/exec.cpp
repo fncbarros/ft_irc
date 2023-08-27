@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Server.hpp"
+#include <Server.hpp>
 
 void Server::exec(Client& client, tokenList processedMsg)
 {
