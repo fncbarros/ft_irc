@@ -10,10 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/Client.hpp"
+#include "../includes/Client.hpp"
 
 Client::Client(const int socket_id)
 : _socket_id(socket_id)
+, _active(false)
 {
     std::cout << "Client created: " << _socket_id << std::endl;
 }
@@ -24,6 +25,7 @@ Client::Client(const Client& other)
     _username = other.getUsername();
     _socket_id = other.getId();
     _operator = other.isOperator();
+    _active = other.isActive();
 }
 
 Client& Client::operator=(const Client& other)
@@ -35,7 +37,6 @@ Client& Client::operator=(const Client& other)
 
 Client::~Client()
 {
-    std::cout << "Client destroyed" << std::endl;
 }
 
 int Client::operator==(const Client& other)
@@ -50,10 +51,16 @@ std::string Client::getUsername(void) const { return _username; }
 
 int Client::getId(void) const { return _socket_id; }
 
+bool  Client::isActive(void) const { return(_auth.isValidPassword); }
+
+bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
 // Setters
 void Client::setUsername(const std::string name) { _username = name; }
 
 void Client::setNickname(const std::string name) { _nickname = name; }
+
+void Client::setActive(void) { _active = true; }
+
 
 // Public functions
 

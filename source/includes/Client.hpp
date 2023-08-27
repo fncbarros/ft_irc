@@ -14,6 +14,12 @@
 
 #include "common.hpp"
 
+typedef struct auth {
+    bool    isValidPassword;
+    bool    isValidUser;
+    bool    isValidNickName;
+} t_auth;
+
 class Client
 {
         // Special functions
@@ -27,10 +33,13 @@ class Client
         // Public functions
         std::string     getNickname(void) const;
         std::string     getUsername(void) const;
+        bool            isActive(void) const;
+        bool            isValid(void) const;
         int             getId(void) const;
         void            setUsername(const std::string name);
         void            setNickname(const std::string name);
-        bool            isOperator() const;
+        void            setActive(void);
+        bool            isOperator(void) const;
 
         // Data
     private:
@@ -38,4 +47,7 @@ class Client
         std::string _nickname;
         std::string _username;
         bool        _operator;
+        bool        _active;
+        t_auth      _auth;
+
 };
