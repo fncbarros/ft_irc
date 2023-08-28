@@ -8,6 +8,12 @@ int Server::replyPassMissMatch(Client& client)
     return false;
 }
 
+int Server::replyWellcome(Client& client)
+{
+    Utils::writeTo(":IRC42 " + WELLCOME + ": Welcome to the Internet Relay Network falmeida!fbarros@IRC42\r\n", client.getId());
+    return true;
+}
+
 std::string    Server::readMessage(int fd) const
 {
     char buffer[BUFFER_SIZE] = {0};

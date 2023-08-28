@@ -16,7 +16,7 @@ int    Server::checkPassword(Client& client, tokenList processedMsg)
     if (password != _password)
         return replyPassMissMatch(client);
     
-    std::cout << "pass correct" << std::endl;
+    replyWellcome(client);
     client.setPassActive();
     return true;
 }

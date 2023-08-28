@@ -26,6 +26,7 @@
 const int BUFFER_SIZE = 30720;
 
 static const std::string PASSMISMATCH = "464";
+static const std::string WELLCOME = "001";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
@@ -76,6 +77,7 @@ class Server
 
         // Reply IRC Messages
         int                             replyPassMissMatch(Client& client);
+        int                             replyWellcome(Client& client);
         // Auxiliary functions
         static void                     printList(const ConnectionsList& list, const int fd);
         void                            printClientList(const ClientList& list, const int fd);
