@@ -125,7 +125,7 @@ bool Server::inspectEvent(int fd)
 
     if (client != _connections.end())
     {
-        if (!client->isPassActive())
+        if (getToken("CAP", processedMsg) != "" && !client->isPassActive())
             return auth(*client, processedMsg);
         else
             exec(*client, processedMsg);
