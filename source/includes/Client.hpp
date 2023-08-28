@@ -33,12 +33,16 @@ class Client
         // Public functions
         std::string     getNickname(void) const;
         std::string     getUsername(void) const;
-        bool            isActive(void) const;
         bool            isValid(void) const;
+        bool            isPassActive(void) const;
+        bool            isUserActive(void) const;
+        bool            isNickActive(void) const;
         int             getId(void) const;
         void            setUsername(const std::string name);
         void            setNickname(const std::string name);
-        void            setActive(void);
+        void            setPassActive(void);
+        void            setUserActive(void);
+        void            setNickActive(void);
         bool            isOperator(void) const;
 
         // Data
@@ -47,7 +51,6 @@ class Client
         std::string _nickname;
         std::string _username;
         bool        _operator;
-        bool        _active;
         t_auth      _auth;
 
 };

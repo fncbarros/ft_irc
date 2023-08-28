@@ -19,12 +19,17 @@
 #include <vector>
 #include <netinet/in.h>
 #include <sstream>
+#include <arpa/inet.h>
+
 
 // Const Definitions
+const int BUFFER_SIZE = 30720;
+
+static const std::string PASSMISMATCH = "464";
+static const std::string WELLCOME = "001";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
-const int BUFFER_SIZE = 30720;
 typedef std::pair<std::string, std::string> tokenPair;
 typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
@@ -40,6 +45,7 @@ class Server
         // Internal functions
     private:
         std::string                     readMessage(int fd) const;
+        void                            sendMessage(int fd, const std::string message);
         int                             acceptNewConnection();
         /**
          *  Check in the connections vector the
@@ -52,7 +58,7 @@ class Server
         void                            deleteClient(const int fd);
         ConnectionsList::iterator       getClient(const int fd);
         std::string                     getToken(const std::string token, tokenList processedMsg);
-        void                            check_password(Client& client, tokenList processedMsg);
+        int                             checkPassword(Client& client, tokenList processedMsg);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);
@@ -68,9 +74,13 @@ class Server
         void                            execQUIT(Client& client, const std::string line);
         void                            execPRIVMSG(Client& client, const std::string line);
 
+
+        // Reply IRC Messages
+        int                             replyPassMissMatch(Client& client);
+        int                             replyWellcome(Client& client);
         // Auxiliary functions
         static void                     printList(const ConnectionsList& list, const int fd);
-        static void                     printList(const ClientList& list, const int fd);
+        void                            printClientList(const ClientList& list, const int fd);
 //        static void                     printList(const ChannelsList& list, int fd);
 
     public:

@@ -18,12 +18,15 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <string>
+#include <strings.h>
 #include <netinet/in.h>
 #include <vector>
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
 #include "Channel.hpp"
+#include <string.h>
+
 
 // Const data
 static const size_t token_num = 12;

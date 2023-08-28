@@ -23,10 +23,10 @@ $(DIRS):
 	mkdir -p $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ)
-	$(CXX) $(OBJ) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
 
 clean:
 	rm -rf $(OBJDIR)
