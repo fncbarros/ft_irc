@@ -38,8 +38,8 @@ class Client
         bool            isUserActive(void) const;
         bool            isNickActive(void) const;
         int             getId(void) const;
-        void            setUsername(const std::string name);
-        void            setNickname(const std::string name);
+        void            setUsername(const std::string& name);
+        void            setNickname(const std::string& name);
         void            setPassActive(void);
         void            setUserActive(void);
         void            setNickActive(void);

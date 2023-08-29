@@ -1,5 +1,17 @@
-#include "../includes/Server.hpp"
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: falmeida <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
+/*   Updated: 2023/08/12 14:47:13 by falmeida         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <Server.hpp>
+
 tokenList Server::parse(std::string buffer)
 {
     std::istringstream iss(buffer);

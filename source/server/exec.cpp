@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   exec.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -173,7 +173,7 @@ void Server::execLIST(Client& client, const std::string line)
                 break;
         }
         // list users
-        printClientList(it->getList(), client.getId()); // TODO: need getter for Channel
+        printList(it->getList(), client.getId()); // TODO: need getter for Channel
     }
     else
     {

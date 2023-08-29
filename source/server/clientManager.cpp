@@ -1,4 +1,16 @@
-#include "../includes/Server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   clientManager.cpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: falmeida <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
+/*   Updated: 2023/08/12 14:47:13 by falmeida         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <Server.hpp>
 
 ConnectionsList::iterator Server::getClient(const int fd)
 {
@@ -21,7 +33,8 @@ void Server::deleteClient(const int fd)
     std::cout << "Client deleted" << std::endl;
 }
 
-void Server::printClientList(const ClientList& list, const int fd)
+// Static functions
+void Server::printList(const ClientList& list, const int fd)
 {
     std::string nameList;
     for (ClientList::const_iterator it = list.begin(); it != list.end(); it++)
