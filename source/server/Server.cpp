@@ -78,6 +78,7 @@ int Server::setConnection(const int port, const std::string password)
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
 	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+    _server_date_created = "29-08-2023";
 
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{

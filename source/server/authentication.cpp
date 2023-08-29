@@ -17,6 +17,10 @@ int    Server::checkPassword(Client& client, tokenList processedMsg)
         return replyPassMissMatch(client);
     
     replyWellcome(client);
+    replyYourHost(client);
+    replyCreated(client);
+    replyMyInfo(client);
+
     client.setPassActive();
     return true;
 }
