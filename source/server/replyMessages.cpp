@@ -10,7 +10,7 @@ int Server::replyPassMissMatch(Client& client)
 
 int Server::replyWellcome(Client& client)
 {
-    Utils::writeTo(":IRC42 " + WELLCOME + ": Welcome to the Internet Relay Network falmeida!fbarros@IRC42\r\n", client.getId());
+    Utils::writeTo(":IRC42 NOTICE falmeida :Welcome to the Internet Relay Network falmeida!fbarros@IRC42\r\n", client.getId());
     return true;
 }
 
