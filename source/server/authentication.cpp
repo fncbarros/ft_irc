@@ -16,11 +16,16 @@ int    Server::checkPassword(Client& client, tokenList processedMsg)
     if (password != _password)
         return replyPassMissMatch(client);
     
+    activateClient(client);
+    
+    return true;
+}
+
+void    Server::activateClient(Client& client)
+{
     replyWellcome(client);
     replyYourHost(client);
     replyCreated(client);
     replyMyInfo(client);
-
     client.setPassActive();
-    return true;
 }

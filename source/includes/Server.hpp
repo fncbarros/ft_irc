@@ -62,6 +62,7 @@ class Server
         ConnectionsList::iterator       getClient(const int fd);
         std::string                     getToken(const std::string token, tokenList processedMsg);
         int                             checkPassword(Client& client, tokenList processedMsg);
+        void                            activateClient(Client& client);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);
@@ -92,8 +93,9 @@ class Server
     public:
         void                            connectionLoop(void);
         int                             setConnection(const int port, const std::string password);
-        void                            interrupt();
         void                            setPassword(const std::string password);
+        void                            setCurrentDate(void);
+        void                            interrupt(void);
 
         // Data
     private:
