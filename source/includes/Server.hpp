@@ -27,6 +27,9 @@ const int BUFFER_SIZE = 30720;
 
 static const std::string PASSMISMATCH = "464";
 static const std::string WELLCOME = "001";
+static const std::string YOURHOST = "002";
+static const std::string CREATED = "003";
+static const std::string MYINFO = "004";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
@@ -58,7 +61,8 @@ class Server
         void                            deleteClient(const int fd);
         ConnectionsList::iterator       getClient(const int fd);
         std::string                     getToken(const std::string token, tokenList processedMsg);
-        int                             checkPassword(Client& client, tokenList processedMsg);
+        bool                             checkPassword(Client& client, tokenList processedMsg);
+        void                            activateClient(Client& client);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);
@@ -76,8 +80,11 @@ class Server
 
 
         // Reply IRC Messages
-        int                             replyPassMissMatch(Client& client);
-        int                             replyWellcome(Client& client);
+        void                             replyPassMissMatch(Client& client);
+        void                             replyWellcome(Client& client);
+        void                             replyYourHost(Client& client);
+        void                             replyCreated(Client& client);
+        void                             replyMyInfo(Client& client);
         // Auxiliary functions
         static void                     printList(const ConnectionsList& list, const int fd);
         void                            printClientList(const ClientList& list, const int fd);
@@ -86,8 +93,9 @@ class Server
     public:
         void                            connectionLoop(void);
         int                             setConnection(const int port, const std::string password);
-        void                            interrupt();
         void                            setPassword(const std::string password);
+        void                            setCurrentDate(void);
+        void                            interrupt(void);
 
         // Data
     private:
@@ -98,5 +106,6 @@ class Server
         ConnectionsList         _connections;
         ChannelsList            _channels;
         bool                    _interrupt;
+        std::string             _server_date_created;
         
 };
