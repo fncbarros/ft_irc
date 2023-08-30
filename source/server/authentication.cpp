@@ -9,15 +9,18 @@ bool Server::auth(Client& client, tokenList processedMsg)
     return true;
 }
 
-int    Server::checkPassword(Client& client, tokenList processedMsg)
+bool    Server::checkPassword(Client& client, tokenList processedMsg)
 {
     std::string password = getToken("PASS", processedMsg);
     std::cout << "["<< password << "] [" << _password << "]" << std::endl;
     if (password != _password)
-        return replyPassMissMatch(client);
+    {
+        replyPassMissMatch(client);
+        return false;
+    }
     
+    //Active client need to be moved to auth after tokenkList refactor
     activateClient(client);
-    
     return true;
 }
 
