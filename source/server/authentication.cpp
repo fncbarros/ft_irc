@@ -12,7 +12,7 @@
 
 #include <Server.hpp>
 
-bool Server::auth(Client& client, tokenList processedMsg)
+bool Server::auth(Client& client, const tokenPair& processedMsg)
 {
     if (client.isPassActive())
     {
@@ -29,9 +29,15 @@ bool Server::auth(Client& client, tokenList processedMsg)
     }
 }
 
-bool    Server::checkPassword(Client& client, tokenList processedMsg)
+bool    Server::checkPassword(Client& client, const tokenPair& processedMsg)
 {
-    std::string password = getToken("PASS", processedMsg);
+    if (client.isPassActive())
+        return true;
+    else if (processedMsg.first != "PASS")
+        return false;
+
+    const std::string& password = processedMsg.second;
+
     std::cout << "["<< password << "] [" << _password << "]" << std::endl;
     if (password != _password)
     {
@@ -39,7 +45,7 @@ bool    Server::checkPassword(Client& client, tokenList processedMsg)
         return false;
     }
 
-    //Active client need to be moved to auth after tokenkList refactor
+    // TODO: Active client need to be moved to auth after tokenkList refactor
     activateClient(client);
     return true;
 }
@@ -52,5 +58,3 @@ void    Server::activateClient(Client& client)
     replyMyInfo(client);
     client.setPassActive();
 }
-
-

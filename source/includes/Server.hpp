@@ -34,7 +34,6 @@ static const std::string MYINFO = "004";
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
-typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
 typedef std::vector<Channel> ChannelsList;
 
@@ -56,17 +55,15 @@ private:
     bool                            inspectEvent(int fd);
 
     // parser.cpp
-    tokenList                       parse(std::string buffer);
-    std::string                     getToken(const std::string token, tokenList processedMsg);
-    void                            validateToken(std::string& token) const;
+    tokenPair                       parse(std::string buffer);
 
     // authentication.cpp
-    bool                            auth(Client& client, tokenList processedMsg);
-    bool                            checkPassword(Client& client, tokenList processedMsg);
+    bool                            auth(Client& client, const tokenPair& processedMsg);
+    bool                            checkPassword(Client& client, const tokenPair& processedMsg);
     void                            activateClient(Client& client);
 
     // exec.cpp
-    void                            exec(Client& client, tokenList processedMsg);
+    void                            exec(Client& client, const tokenPair& message);
     void                            execKICK(Client& client, const std::string line);
     void                            execINVITE(Client& client, const std::string line);
     void                            execTOPIC(Client& client, const std::string line);

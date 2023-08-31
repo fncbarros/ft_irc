@@ -12,40 +12,35 @@
 
 #include <Server.hpp>
 
-void Server::exec(Client& client, tokenList processedMsg)
+void Server::exec(Client& client, const tokenPair& message)
 {
     if (!client.isPassActive())
-    {
         return ;
-    }
 
-    for (tokenList::const_iterator line = processedMsg.begin(); line != processedMsg.end(); line++)
-    {
-        if (line->first == "JOIN")
-            execJOIN(client, line->second);
-        else if(line->first == "KICK")
-            execKICK(client, line->second);
-        else if(line->first == "INVITE")
-            execINVITE(client, line->second);
-        else if(line->first == "TOPIC")
-            execTOPIC(client, line->second);
-        else if(line->first == "MODE")
-            execMODE(client, line->second);
-        else if(line->first == "USER")
-            execUSER(client, line->second);
-        else if(line->first == "NICK")
-            execNICK(client, line->second);
-        else if(line->first == "LIST")
-            execLIST(client, line->second);
-        else if(line->first == "WHO")
-            execWHO(client, line->second);
-        else if(line->first == "QUIT")
-            execQUIT(client, line->second);
-        else if(line->first == "PRIVMSG")
-            execPRIVMSG(client, line->second);
-        else
-            std::cout << line->first << " " << line->second << std::endl;
-    }
+    if (message.first == "JOIN")
+        execJOIN(client, message.second);
+    else if(message.first == "KICK")
+        execKICK(client, message.second);
+    else if(message.first == "INVITE")
+        execINVITE(client, message.second);
+    else if(message.first == "TOPIC")
+        execTOPIC(client, message.second);
+    else if(message.first == "MODE")
+        execMODE(client, message.second);
+    else if(message.first == "USER")
+        execUSER(client, message.second);
+    else if(message.first == "NICK")
+        execNICK(client, message.second);
+    else if(message.first == "LIST")
+        execLIST(client, message.second);
+    else if(message.first == "WHO")
+        execWHO(client, message.second);
+    else if(message.first == "QUIT")
+        execQUIT(client, message.second);
+    else if(message.first == "PRIVMSG")
+        execPRIVMSG(client, message.second);
+    else
+        std::cout << message.first << " " << message.second << std::endl;
 }
 
 

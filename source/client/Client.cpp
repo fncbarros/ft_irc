@@ -16,7 +16,9 @@ Client::Client(const int socket_id)
 : _socket_id(socket_id)
 , _operator(false)
 {
-    bzero(&_auth, sizeof(auth));
+    _auth.isValidNickName = false;
+    _auth.isValidPassword = false;
+    _auth.isValidUser = false;
     std::cout << "Client created: " << _socket_id << std::endl;
 }
 
@@ -58,18 +60,37 @@ bool  Client::isUserActive(void) const { return !_username.empty(); }
 bool  Client::isNickActive(void) const { return !_nickname.empty(); }
 
 bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
-// Setters
+
+bool Client::isOperator(void) const { return _operator; }
+
+bool Client::isMessageWaiting(void) const { return (_msgBuffer.find("\r\n") != std::string::npos); }
+
 void Client::setUsername(const std::string& name) { _username = name; }
 
 void Client::setNickname(const std::string& name) { _nickname = name; }
 
 void Client::setPassActive(void) { _auth.isValidPassword = true; }
+
 void Client::setUserActive(void) { _auth.isValidUser = true; }
+
 void Client::setNickActive(void) { _auth.isValidNickName = true; }
 
-// Public functions
-
-bool Client::isOperator() const
+void Client::registerBuffer(const std::string msg)
 {
-    return _operator;
+    if (msg.empty())
+        return ;
+    _msgBuffer.append(msg);
+}
+
+std::string Client::returnLine(void)
+{
+    const size_t pos(_msgBuffer.find("\r\n"));
+
+    if (pos == std::string::npos)
+        return "";
+
+    const std::string s(_msgBuffer.substr(0u, pos));
+    _msgBuffer.erase(0u, pos + 1);
+
+    return s;
 }

@@ -12,50 +12,12 @@
 
 #include <Server.hpp>
 
-tokenList Server::parse(std::string buffer)
-{
-    std::istringstream iss(buffer);
-    std::string line;
-    std::vector<std::string> strList;
-    tokenList list;   
-
-    while (std::getline(iss, line)) {
-        strList.push_back(line);
-    }
-
-    for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
-    {
-        line = *it;
-        size_t spacePosition = line.find(' ');
-
-        if (spacePosition == std::string::npos)
-           continue ;
-
-        std::string s1(line.substr(0, spacePosition));
-        std::string s2(line.substr(spacePosition + 1, (line.find('\r') - (spacePosition + 1))));
-        validateToken(s1);
-
-        list.push_back(tokenPair(s1, s2));
-    }
-
-    return list;
-}
-
-std::string     Server::getToken(const std::string token, tokenList processedMsg)
-{
-    for (tokenList::iterator it = processedMsg.begin(); it != processedMsg.end(); it++)
-    {
-        if (it->first == token)
-            return it->second;
-    }
-    return "";
-}
-
-void Server::validateToken(std::string& token) const
+void validateToken(std::string& token)
 {
     size_t i;
 
     std::string tmp = Utils::toUpper(token);
+
     for (i = 0; i < token_num; i++)
     {
         if (possible_tokens[i] == tmp)
@@ -66,4 +28,27 @@ void Server::validateToken(std::string& token) const
     }
     if (i < token_num)
         token = tmp;
+}
+
+tokenPair Server::parse(std::string buffer)
+{
+    std::istringstream iss(buffer);
+    std::string line;
+
+    std::getline(iss, line);
+
+    size_t spacePosition = line.find(' ');
+
+    // if no space within line
+    if (spacePosition == std::string::npos)
+    {
+        // TODO: return message (PRIVMSG or Error)
+        return tokenPair("", line);
+    }
+
+    std::string s1(line.substr(0, spacePosition));
+    std::string s2(line.substr(spacePosition + 1, (line.find('\r') - (spacePosition + 1))));
+    validateToken(s1);
+
+    return tokenPair(s1, s2);
 }
