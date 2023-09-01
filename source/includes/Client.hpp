@@ -18,6 +18,28 @@ typedef struct auth {
     bool    isValidPassword;
     bool    isValidUser;
     bool    isValidNickName;
+
+    auth()
+    : isValidPassword(false),
+    isValidUser(false),
+    isValidNickName(false) {}
+
+    auth(const auth& other)
+    {
+        isValidPassword = other.isValidPassword;
+        isValidUser = other.isValidUser;
+        isValidNickName = other.isValidNickName;
+    }
+
+    auth operator=(const auth& other)
+    {
+        if (this != &other)
+        {
+            *this = other;
+        }
+        return *this;
+    }
+
 } t_auth;
 
 class Client
