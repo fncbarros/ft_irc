@@ -31,9 +31,7 @@ bool Server::auth(Client& client, const tokenPair& processedMsg)
 
 bool    Server::checkPassword(Client& client, const tokenPair& processedMsg)
 {
-    if (client.isPassActive())
-        return true;
-    else if (processedMsg.first != "PASS")
+    if (processedMsg.first != "PASS")
         return false;
 
     const std::string& password = processedMsg.second;
