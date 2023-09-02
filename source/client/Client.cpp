@@ -53,9 +53,9 @@ int Client::getId(void) const { return _socket_id; }
 
 bool  Client::isPassActive(void) const { return(_auth.isValidPassword); }
 
-bool  Client::isUserActive(void) const { return(_auth.isValidPassword); }
+bool  Client::isUserActive(void) const { return(_auth.isValidUser); }
 
-bool  Client::isNickActive(void) const { return(_auth.isValidPassword); }
+bool  Client::isNickActive(void) const { return(_auth.isValidNickName); }
 
 bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
 // Setters
