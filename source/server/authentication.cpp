@@ -1,6 +1,6 @@
 #include "../includes/Server.hpp"
 
-bool Server::auth(Client& client, tokenList processedMsg)
+bool Server::auth(Client& client, tokenPair processedMsg)
 {
     if (!client.isPassActive())
         return checkPassword(client, processedMsg);
@@ -9,11 +9,12 @@ bool Server::auth(Client& client, tokenList processedMsg)
     return true;
 }
 
-int    Server::checkPassword(Client& client, tokenList processedMsg)
+int    Server::checkPassword(Client& client, tokenPair processedMsg)
 {
-    std::string password = getToken("PASS", processedMsg);
-    std::cout << "["<< password << "] [" << _password << "]" << std::endl;
-    if (password != _password)
+    if (processedMsg.first.compare("PASS"))
+        return false;
+    std::cout << "["<< processedMsg.second << "] [" << _password << "]" << std::endl;
+    if (processedMsg.second != _password)
         return replyPassMissMatch(client);
     
     std::cout << "pass correct" << std::endl;

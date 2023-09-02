@@ -7,8 +7,9 @@ tokenList Server::parse(std::string buffer)
     std::vector<std::string> strList;
     tokenList list;   
 
-    while (std::getline(iss, line))
+    while (std::getline(iss, line)) {
         strList.push_back(line);
+    }
 
     for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
     {
@@ -19,8 +20,7 @@ tokenList Server::parse(std::string buffer)
            continue ;
 
         std::string s1(line.substr(0, spacePosition));
-        std::string s2(line.substr(spacePosition + 1));
-
+        std::string s2(line.substr(spacePosition + 1, (line.find('\r') - (spacePosition + 1))));
         validateToken(s1);
 
         list.push_back(tokenPair(s1, s2));

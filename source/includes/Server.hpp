@@ -53,11 +53,11 @@ class Server
         bool                            inspectEvent(int fd);
         tokenList                       parse(std::string buffer);
         void                            validateToken(std::string& token) const;
-        bool                            auth(Client& client, tokenList processedMsg);
+        bool                            auth(Client& client, tokenPair processedMsg);
         void                            deleteClient(const int fd);
         ConnectionsList::iterator       getClient(const int fd);
         std::string                     getToken(const std::string token, tokenList processedMsg);
-        int                             checkPassword(Client& client, tokenList processedMsg);
+        int                             checkPassword(Client& client, tokenPair processedMsg);
 
         // Operation methods (exec.cpp)
         void                            exec(Client& client, tokenList processedMsg);

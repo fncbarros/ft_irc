@@ -106,6 +106,7 @@ int Server::setConnection(const int port, const std::string password)
 
 bool Server::inspectEvent(int fd)
 {
+    bool ret = true;
     if (_interrupt)
         return true;
 
@@ -120,18 +121,35 @@ bool Server::inspectEvent(int fd)
     const std::string rawMsg = readMessage(fd);
     if (rawMsg.empty())
         return false;
-    const tokenList processedMsg = parse(rawMsg);
+    tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
 
     if (client != _connections.end())
     {
-        if (!client->isPassActive())
-            return auth(*client, processedMsg);
-        else
-            exec(*client, processedMsg);
+        for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
+        {
+            std::cout << "message: " << message->first << " " << message->second << std::endl;
+            if (message != processedMsg.end())
+            {
+                if (!message->first.compare("CAP"))
+                {
+                    std::cout << "command was cap ls" << std::endl;
+                }
+                else if (!client->isValid())
+                {
+                    if (auth(*client, *message) == false)
+                    {
+                        ret = false;
+                        break;
+                    }
+                }
+                else
+                    exec(*client, processedMsg);
+            }
+        }
     } 
         
-    return true;
+    return ret;
 }
 
 
