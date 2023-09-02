@@ -1,11 +1,30 @@
 #include "../includes/Server.hpp"
 #include "../includes/common.hpp"
 
-int Server::replyPassMissMatch(Client& client)
+void    Server::replyWelcome(Client& client) const
+{
+    Utils::writeTo(":IRC42 NOTICE falmeida :Welcome to the Internet Relay Network falmeida!fbarros@IRC42\r\n", client.getId());
+}
+
+void Server::replyPassMissMatch(Client& client) const
 {
     std::cout << "Incorrect pass" << std::endl;
     Utils::writeTo(":IRC42 " + PASSMISMATCH + " * :Password incorrect\r\n", client.getId());
-    return false;
+}
+
+void    Server::replyYourHost(Client& client) const
+{
+    Utils::writeTo(":IRC42 " + YOURHOST + " falmeida :Your host is IRC42, running version 1.0\r\n", client.getId());
+}
+
+void    Server::replyCreated(Client& client) const
+{
+    Utils::writeTo(":IRC42 " + CREATED + " falmeida :This server was created " + _server_date_created + "\r\n", client.getId());
+}
+
+void    Server::replyMyInfo(Client& client) const
+{
+    Utils::writeTo(":IRC42 " + MYINFO + " falmeida IRC42 1.0 0=o\r\n", client.getId());
 }
 
 std::string    Server::readMessage(int fd) const

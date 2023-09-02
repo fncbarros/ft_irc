@@ -19,6 +19,7 @@ Client::Client(const int socket_id)
 }
 
 Client::Client(const Client& other)
+: _auth(other._auth)
 {
     _nickname = other.getNickname();
     _username = other.getUsername();

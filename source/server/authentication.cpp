@@ -12,12 +12,27 @@ bool Server::auth(Client& client, tokenPair processedMsg)
 int    Server::checkPassword(Client& client, tokenPair processedMsg)
 {
     if (processedMsg.first.compare("PASS"))
+    {
+        std::cout << "command received is not PASS" << std::endl;
         return false;
+    }
     std::cout << "["<< processedMsg.second << "] [" << _password << "]" << std::endl;
     if (processedMsg.second != _password)
-        return replyPassMissMatch(client);
+    {
+        replyPassMissMatch(client);
+        return false;
+    }
     
     std::cout << "pass correct" << std::endl;
-    client.setPassActive();
+    activateClient(client);
     return true;
+}
+
+void    Server::activateClient(Client& client)
+{
+    replyWelcome(client);
+    replyYourHost(client);
+    replyCreated(client);
+    replyMyInfo(client);
+    client.setPassActive();
 }

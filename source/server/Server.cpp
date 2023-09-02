@@ -47,6 +47,14 @@ void Server::setPassword(const std::string password)
     _password = password;
 }
 
+void    Server::setCurrentDate(void)
+{
+    time_t now = time(0);
+    _server_date_created = ctime(&now);
+    if (!_server_date_created.empty())
+        _server_date_created.resize(_server_date_created.size() - 1);
+}
+
 int Server::acceptNewConnection()
 {
     if (_interrupt)
@@ -78,6 +86,7 @@ int Server::setConnection(const int port, const std::string password)
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
 	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+    setCurrentDate();
 
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
