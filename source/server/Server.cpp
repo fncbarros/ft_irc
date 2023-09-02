@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Server.hpp"
-#include <strings.h>
+#include <Server.hpp>
 
+#include <strings.h>
 
 // Special functions
 Server::Server()
@@ -83,7 +83,7 @@ int Server::acceptNewConnection()
 
 int Server::setConnection(const int port, const std::string password)
 {
-    (void) password;
+    setPassword(password);
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
 	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
@@ -127,23 +127,25 @@ bool Server::inspectEvent(int fd)
             return true;
     }
 
-    const std::string rawMsg = readMessage(fd);
-    if (rawMsg.empty())
-        return false;
-    const tokenList processedMsg = parse(rawMsg);
-    ConnectionsList::iterator client = getClient(fd);
+    const ConnectionsList::iterator client = getClient(fd);
 
-    if (client != _connections.end())
-    {
-        if (!client->isPassActive())
-            return auth(*client, processedMsg);
-        else
-            exec(*client, processedMsg);
-    } 
-        
+    if (client == _connections.end())
+        return false;
+
+    std::string rawMsg = readMessage(fd);
+
+    // keep msg in buffer for latter parsing
+    client->registerBuffer(rawMsg);
+
+    const tokenPair processedMsg = parse(client->returnLine());
+
+    if (!client->isPassActive())
+        return auth(*client, processedMsg);
+    else
+        exec(*client, processedMsg);
+
     return true;
 }
-
 
 void Server::connectionLoop()
 {
@@ -181,3 +183,21 @@ void Server::connectionLoop()
     }
 }
 
+std::string    Server::readMessage(int fd) const
+{
+    static char buffer[BUFFER_SIZE];
+    bzero(buffer, BUFFER_SIZE);
+
+    int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
+
+    // Log
+    if (bytesReceived < 0)
+    {
+        std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
+    }
+    else
+    {
+        std::cout << "Client message received: \"" << buffer << "\"" << std::endl;
+    }
+    return buffer;
+}

@@ -26,7 +26,7 @@
 const int BUFFER_SIZE = 30720;
 
 static const std::string PASSMISMATCH = "464";
-static const std::string WELLCOME = "001";
+static const std::string WELCOME = "001";
 static const std::string YOURHOST = "002";
 static const std::string CREATED = "003";
 static const std::string MYINFO = "004";
@@ -34,78 +34,78 @@ static const std::string MYINFO = "004";
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
-typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
 typedef std::vector<Channel> ChannelsList;
 
 class Server
 {
-        // Special functions
-    public:
-         Server();
-        ~Server();
+    // Special functions
+public:
+     Server();
+    ~Server();
 
-        // Internal functions
-    private:
-        std::string                     readMessage(int fd) const;
-        void                            sendMessage(int fd, const std::string message);
-        int                             acceptNewConnection();
-        /**
-         *  Check in the connections vector the
-         * client that have the same socket_id as fd parameter and read the fd message
-        */
-        bool                            inspectEvent(int fd);
-        tokenList                       parse(std::string buffer);
-        void                            validateToken(std::string& token) const;
-        bool                            auth(Client& client, tokenList processedMsg);
-        void                            deleteClient(const int fd);
-        ConnectionsList::iterator       getClient(const int fd);
-        std::string                     getToken(const std::string token, tokenList processedMsg);
-        bool                             checkPassword(Client& client, tokenList processedMsg);
-        void                            activateClient(Client& client);
+    // Internal functions
+private:
+    std::string                     readMessage(int fd) const;
+    int                             acceptNewConnection();
+    /**
+     *  Check in the connections vector the
+     * client that have the same socket_id as fd parameter and read the fd message
+    */
+    bool                            inspectEvent(int fd);
 
-        // Operation methods (exec.cpp)
-        void                            exec(Client& client, tokenList processedMsg);
-        void                            execJOIN(Client& client, const std::string line);
-        void                            execKICK(Client& client, const std::string line);
-        void                            execINVITE(Client& client, const std::string line);
-        void                            execTOPIC(Client& client, const std::string line);
-        void                            execMODE(Client& client, const std::string line);
-        void                            execUSER(Client& client, const std::string line);
-        void                            execNICK(Client& client, const std::string line);
-        void                            execLIST(Client& client, const std::string line);
-        void                            execWHO(Client& client, const std::string line);
-        void                            execQUIT(Client& client, const std::string line);
-        void                            execPRIVMSG(Client& client, const std::string line);
+    // parser.cpp
+    tokenPair                       parse(std::string buffer);
 
+    // authentication.cpp
+    bool                            auth(Client& client, const tokenPair& processedMsg);
+    bool                            checkPassword(Client& client, const tokenPair& processedMsg);
+    void                            activateClient(Client& client);
 
-        // Reply IRC Messages
-        void                             replyPassMissMatch(Client& client);
-        void                             replyWellcome(Client& client);
-        void                             replyYourHost(Client& client);
-        void                             replyCreated(Client& client);
-        void                             replyMyInfo(Client& client);
-        // Auxiliary functions
-        static void                     printList(const ConnectionsList& list, const int fd);
-        void                            printClientList(const ClientList& list, const int fd);
-//        static void                     printList(const ChannelsList& list, int fd);
+    // exec.cpp
+    void                            exec(Client& client, const tokenPair& message);
+    void                            execKICK(Client& client, const std::string line);
+    void                            execINVITE(Client& client, const std::string line);
+    void                            execTOPIC(Client& client, const std::string line);
+    void                            execMODE(Client& client, const std::string line);
+    void                            execUSER(Client& client, const std::string line);
+    void                            execNICK(Client& client, const std::string line);
+    void                            execJOIN(Client& client, const std::string line);
+    void                            execLIST(Client& client, const std::string line);
+    void                            execWHO(Client& client, const std::string line);
+    void                            execQUIT(Client& client, const std::string line);
+    void                            execPRIVMSG(Client& client, const std::string line);
 
-    public:
-        void                            connectionLoop(void);
-        int                             setConnection(const int port, const std::string password);
-        void                            setPassword(const std::string password);
-        void                            setCurrentDate(void);
-        void                            interrupt(void);
+    // replyMessages.cpp
+    void                             replyPassMissMatch(Client& client) const;
+    void                             replyWelcome(Client& client) const;
+    void                             replyYourHost(Client& client) const;
+    void                             replyCreated(Client& client) const;
+    void                             replyMyInfo(Client& client) const;
 
-        // Data
-    private:
-        int                     _server_socket;
-        std::string             _password;
-        struct sockaddr_in      _socket_addr;
-        fd_set                  _connections_set;
-        ConnectionsList         _connections;
-        ChannelsList            _channels;
-        bool                    _interrupt;
-        std::string             _server_date_created;
-        
+    // clientManager.cpp
+    ConnectionsList::iterator       getClient(const int fd);
+    void                            deleteClient(const int fd);
+    // Auxiliary functions
+    static void                     printList(const ConnectionsList& list, const int fd);
+    static void                     printList(const ClientList& list, const int fd);
+
+public:
+    void                            connectionLoop(void);
+    int                             setConnection(const int port, const std::string password);
+    void                            setPassword(const std::string password);
+    void                            setCurrentDate(void);
+    void                            interrupt(void);
+
+    // Data
+private:
+    int                     _server_socket;
+    std::string             _password;
+    struct sockaddr_in      _socket_addr;
+    fd_set                  _connections_set;
+    ConnectionsList         _connections;
+    ChannelsList            _channels;
+    bool                    _interrupt;
+    std::string             _server_date_created;
+
 };
