@@ -20,6 +20,8 @@
 #include <netinet/in.h>
 #include <sstream>
 #include <arpa/inet.h>
+#include <fcntl.h>
+
 
 
 // Const Definitions
@@ -63,6 +65,8 @@ class Server
         std::string                     getToken(const std::string token, tokenList processedMsg);
         int                             checkPassword(Client& client, tokenPair processedMsg);
         void                            activateClient(Client& client);
+        void                            checkUser(Client& client, tokenPair processedMsg);
+
 
 
         // Operation methods (exec.cpp)

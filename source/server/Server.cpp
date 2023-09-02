@@ -93,7 +93,9 @@ int Server::setConnection(const int port, const std::string password)
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
+
 	}
+    fcntl(_server_socket, F_SETFL, O_NONBLOCK);
 
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
@@ -146,9 +148,11 @@ bool Server::inspectEvent(int fd)
                 }
                 else if (!client->isValid())
                 {
+                    std::cout << "client need to be authenticated" << std::endl;
                     if (auth(*client, *message) == false)
                     {
                         ret = false;
+                        deleteClient(client->getId());
                         break;
                     }
                 }
@@ -172,6 +176,8 @@ void Server::connectionLoop()
     FD_ZERO(&_connections_set);
     FD_SET(_server_socket, &_connections_set);
 
+    
+
     while (!_interrupt)
     {
         // the fd_set is always destroyed by the select() method
@@ -191,7 +197,6 @@ void Server::connectionLoop()
                 continue ;
             if (!inspectEvent(fd)) // Note: inspectEvent() validates clientFd
             {
-                deleteClient(fd);
                 ready_connections = _connections_set;
             }
         }
