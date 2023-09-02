@@ -195,10 +195,8 @@ void Server::connectionLoop()
             // if fd is not ready for reading, go to next one
             if (!FD_ISSET(fd, &ready_connections))
                 continue ;
-            if (!inspectEvent(fd)) // Note: inspectEvent() validates clientFd
-            {
-                ready_connections = _connections_set;
-            }
+            inspectEvent(fd); // Note: inspectEvent() validates clientFd
+            ready_connections = _connections_set;
         }
     }
 }
