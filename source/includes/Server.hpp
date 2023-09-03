@@ -32,6 +32,7 @@ static const std::string WELCOME = "001";
 static const std::string YOURHOST = "002";
 static const std::string CREATED = "003";
 static const std::string MYINFO = "004";
+static const std::string NICKCOLLISION = "433";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
@@ -86,11 +87,12 @@ private:
     void                            execPRIVMSG(Client& client, const std::string line);
 
     // replyMessages.cpp
-    void                             replyPassMissMatch(Client& client) const;
-    void                             replyWelcome(Client& client) const;
-    void                             replyYourHost(Client& client) const;
-    void                             replyCreated(Client& client) const;
-    void                             replyMyInfo(Client& client) const;
+    void                            replyPassMissMatch(Client& client) const;
+    void                            replyWelcome(Client& client) const;
+    void                            replyYourHost(Client& client) const;
+    void                            replyCreated(Client& client) const;
+    void                            replyMyInfo(Client& client) const;
+    void                            replyNickCollision(Client& client) const;
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);

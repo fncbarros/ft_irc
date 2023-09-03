@@ -25,15 +25,20 @@ void Server::replyPassMissMatch(Client& client) const
 
 void    Server::replyYourHost(Client& client) const
 {
-    Utils::writeTo(":IRC42 " + YOURHOST + " falmeida :Your host is IRC42, running version 1.0\r\n", client.getId());
+    Utils::writeTo(":IRC42 " + YOURHOST + " " + client.getNickname() + " :Your host is IRC42, running version 1.0\r\n", client.getId());
 }
 
 void    Server::replyCreated(Client& client) const
 {
-    Utils::writeTo(":IRC42 " + CREATED + " falmeida :This server was created " + _server_date_created + "\r\n", client.getId());
+    Utils::writeTo(":IRC42 " + CREATED + " " + client.getNickname() + " :This server was created " + _server_date_created + "\r\n", client.getId());
 }
 
 void    Server::replyMyInfo(Client& client) const
 {
-    Utils::writeTo(":IRC42 " + MYINFO + " falmeida IRC42 1.0 0=o\r\n", client.getId());
+    Utils::writeTo(":IRC42 " + MYINFO + " " + client.getNickname() + " IRC42 1.0 0=o\r\n", client.getId());
+}
+
+void    Server::replyNickCollision(Client& client) const
+{
+    Utils::writeTo(":IRC42 " + NICKCOLLISION + " *" + client.getNickname() + " :Nickname is already in use.\r\n", client.getId());
 }

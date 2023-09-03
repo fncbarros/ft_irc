@@ -208,6 +208,7 @@ std::string    Server::readMessage(int fd) const
     // Log
     if (bytesReceived < 0)
     {
+        std::cout << strerror(errno) << std::endl;
         std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
     }
     else

@@ -91,16 +91,6 @@ void Server::execUSER(Client& client, const std::string line)
         return ;
     }
 
-    for (ConnectionsList::iterator it = _connections.begin(); it != _connections.end(); it++)
-    {
-        if (it->getNickname() == name)
-        {
-            // send error
-            Utils::writeTo("User " + name + " already in use.\n", client.getId());
-            return ;
-        }
-    }
-
     if (client.getUsername().empty())
     {
         std::cout << "User " << name << " has been added.\n";
@@ -133,7 +123,7 @@ void Server::execNICK(Client& client, const std::string line)
         if (it->getNickname() == name)
         {
             // send error
-            Utils::writeTo("Nick " + name + " already in use.\n", client.getId());
+            replyNickCollision(client);
             return ;
         }
     }
