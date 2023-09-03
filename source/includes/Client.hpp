@@ -23,26 +23,9 @@ typedef struct auth {
     bool    isValidUser;
     bool    isValidNickName;
 
-    auth()
-    : isValidPassword(false),
-    isValidUser(false),
-    isValidNickName(false) {}
-
-    auth(const auth& other)
-    {
-        isValidPassword = other.isValidPassword;
-        isValidUser = other.isValidUser;
-        isValidNickName = other.isValidNickName;
-    }
-
-    auth operator=(const auth& other)
-    {
-        if (this != &other)
-        {
-            *this = other;
-        }
-        return *this;
-    }
+    auth();
+    auth(const auth& other);
+    auth operator=(const auth& other);
 
 } t_auth;
 

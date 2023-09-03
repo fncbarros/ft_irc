@@ -96,3 +96,26 @@ std::string Client::returnLine(void)
 //{
 //    for (std::vector<Channel>::const_iterator it = )
 //}
+
+t_auth::auth()
+: isValidPassword(false)
+, isValidUser(false)
+, isValidNickName(false)
+{
+}
+
+t_auth::auth(const auth& other)
+{
+    isValidPassword = other.isValidPassword;
+    isValidUser = other.isValidUser;
+    isValidNickName = other.isValidNickName;
+}
+
+auth t_auth::operator=(const auth& other)
+{
+    if (this != &other)
+    {
+        *this = other;
+    }
+    return *this;
+}
