@@ -50,20 +50,3 @@ std::string     Server::getToken(const std::string token, tokenList processedMsg
     }
     return "";
 }
-
-void Server::validateToken(std::string& token) const
-{
-    size_t i;
-
-    std::string tmp = Utils::toUpper(token);
-    for (i = 0; i < token_num; i++)
-    {
-        if (possible_tokens[i] == tmp)
-        {
-            tmp = possible_tokens[i];
-            break ;
-        }
-    }
-    if (i < token_num)
-        token = tmp;
-}

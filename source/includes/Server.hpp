@@ -60,7 +60,6 @@ private:
 
     // parser.cpp
     tokenList                       parse(std::string buffer);
-    void                            validateToken(std::string& token) const;
     std::string                     getToken(const std::string token, tokenList processedMsg);
 
 

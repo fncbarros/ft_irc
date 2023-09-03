@@ -138,25 +138,22 @@ bool Server::inspectEvent(int fd)
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
         std::cout << "message: " << message->first << " " << message->second << std::endl;
-        if (message != processedMsg.end())
+        if (!message->first.compare("CAP"))
         {
-            if (!message->first.compare("CAP"))
-            {
-                std::cout << "command was cap ls" << std::endl;
-            }
-            else if (!client->isValid())
-            {
-                std::cout << "client need to be authenticated" << std::endl;
-                if (auth(*client, *message) == false)
-                {
-                    ret = false;
-                    deleteClient(client->getId());
-                    break;
-                }
-            }
-            else
-                exec(*client, *message);
+            std::cout << "command was cap ls" << std::endl;
         }
+        else if (!client->isValid())
+        {
+            std::cout << "client need to be authenticated" << std::endl;
+            if (auth(*client, *message) == false)
+            {
+                ret = false;
+                deleteClient(client->getId());
+                break;
+            }
+        }
+        else
+            exec(*client, *message);
     }
 
         
