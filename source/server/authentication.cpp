@@ -62,5 +62,4 @@ void    Server::activateClient(Client& client)
     replyYourHost(client);
     replyCreated(client);
     replyMyInfo(client);
-    client.setPassActive();
 }

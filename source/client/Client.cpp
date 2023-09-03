@@ -16,6 +16,9 @@ Client::Client(const int socket_id)
 : _socket_id(socket_id)
 , _operator(false)
 {
+    _auth.isValidPassword = false;
+    _auth.isValidNickName = false;
+    _auth.isValidUser = false;
     std::cout << "Client created: " << _socket_id << std::endl;
 }
 
