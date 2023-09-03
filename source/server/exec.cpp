@@ -43,42 +43,6 @@ void Server::exec(Client& client, const tokenPair& message)
         std::cout << message.first << " " << message.second << std::endl;
 }
 
-
-void Server::execJOIN(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***JOIN: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execKICK(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***KICK: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execINVITE(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***INVITE: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execTOPIC(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***TOPIC: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execMODE(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***MODE: ";
-    std::cout << line << std::endl;
-}
-
 void Server::execUSER(Client& client, const std::string line)
 {
     // parse line
@@ -168,7 +132,7 @@ void Server::execLIST(Client& client, const std::string line)
                 break;
         }
         // list users
-        printList(it->getList(), client.getId()); // TODO: need getter for Channel
+       it->printList(client.getId());
     }
     else
     {
@@ -197,5 +161,44 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 {
     std::cout << client.getUsername() << ": ";
     std::cout << "***PRIVMSG: ";
+    std::cout << line << std::endl;
+}
+
+/**
+ * CHANNEL specific commands
+ * */
+
+void Server::execJOIN(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***JOIN: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execKICK(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***KICK: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execINVITE(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***INVITE: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execTOPIC(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***TOPIC: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execMODE(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***MODE: ";
     std::cout << line << std::endl;
 }

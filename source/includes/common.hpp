@@ -24,11 +24,17 @@
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
-#include "Channel.hpp"
 #include <string.h>
+#include <Channel.hpp>
 
+// Forward declarations
+class Channel;
+
+// Type definitions
+typedef std::vector<Channel> ChannelsList;
 
 // Const data
+//static const char eof = '/012';
 static const size_t token_num = 12;
 static const std::string possible_tokens[token_num] =
 {

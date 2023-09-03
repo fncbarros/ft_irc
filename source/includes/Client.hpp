@@ -12,8 +12,12 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <common.hpp>
 
+// Forward declarations
+class Channel;
+
+// Type definitions
 typedef struct auth {
     bool    isValidPassword;
     bool    isValidUser;
@@ -70,13 +74,11 @@ public:
     void            registerBuffer(const std::string msg);
     std::string     returnLine(void);
 
-
     // Data
 private:
-    int         _socket_id;
-    std::string _nickname;
-    std::string _username;
-    bool        _operator;
-    t_auth      _auth;
-    std::string _msgBuffer;
+    int                     _socket_id;
+    std::string             _nickname;
+    std::string             _username;
+    t_auth                  _auth;
+    std::string             _msgBuffer;
 };

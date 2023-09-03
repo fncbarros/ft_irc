@@ -21,6 +21,8 @@
 #include <sstream>
 #include <arpa/inet.h>
 
+// Forward declarations
+class Channel;
 
 // Const Definitions
 const int BUFFER_SIZE = 30720;
@@ -64,17 +66,18 @@ private:
 
     // exec.cpp
     void                            exec(Client& client, const tokenPair& message);
-    void                            execKICK(Client& client, const std::string line);
-    void                            execINVITE(Client& client, const std::string line);
-    void                            execTOPIC(Client& client, const std::string line);
-    void                            execMODE(Client& client, const std::string line);
     void                            execUSER(Client& client, const std::string line);
     void                            execNICK(Client& client, const std::string line);
-    void                            execJOIN(Client& client, const std::string line);
     void                            execLIST(Client& client, const std::string line);
     void                            execWHO(Client& client, const std::string line);
     void                            execQUIT(Client& client, const std::string line);
     void                            execPRIVMSG(Client& client, const std::string line);
+    // Channel-specific commands
+    void                            execJOIN(Client& client, const std::string line);
+    void                            execKICK(Client& client, const std::string line);
+    void                            execINVITE(Client& client, const std::string line);
+    void                            execTOPIC(Client& client, const std::string line);
+    void                            execMODE(Client& client, const std::string line);
 
     // replyMessages.cpp
     void                             replyPassMissMatch(Client& client) const;
@@ -88,7 +91,6 @@ private:
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
-    static void                     printList(const ClientList& list, const int fd);
 
 public:
     void                            connectionLoop(void);

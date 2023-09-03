@@ -15,13 +15,16 @@
 Channel::Channel(const std::string name, const Client& client)
 : _name(name)
 {
-    _clientList.push_back(&client);
+    _users.push_back(std::make_pair(&client, true));
 }
 
-Channel::~Channel ()
+Channel::~Channel()
 {
-    std::cout << "Channel " << _name << " has been removed.\n";
     // broadcast to all users
+    for (UserList::iterator it = _users.begin(); it != _users.end(); it++)
+    {
+        Utils::writeTo("Channel " + _name + " has been removed.\n", it->first->getId());
+    }
 }
 
 std::string Channel::getName() const
@@ -29,15 +32,22 @@ std::string Channel::getName() const
     return _name;
 }
 
-// TODO: return iterator to 1st element instead maybe
-// TODO: overload function to be more helpful (like returning list of Channels
-//  param Client/id/nickname is part of)
-ClientList  Channel::getList() const
+UserList Channel::getList() const
 {
-    return _clientList;
+    return _users;
 }
 
-void        Channel::addClient(const Client& client)
+void Channel::addClient(const Client& client)
 {
-    _clientList.push_back(&client);
+    _users.push_back(std::make_pair(&client, false));
+}
+
+void Channel::printList(int fd) const
+{
+    std::string nameList;
+    for (UserList::const_iterator it = _users.begin(); it != _users.end(); it++)
+    {
+        nameList += it->first->getNickname() + "\n";
+    }
+    Utils::writeTo(nameList, fd);
 }
