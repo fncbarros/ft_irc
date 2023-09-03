@@ -12,8 +12,6 @@
 
 #include <Server.hpp>
 
-#include <strings.h>
-
 // Special functions
 Server::Server()
 : _server_socket(0)
@@ -55,7 +53,6 @@ void    Server::setCurrentDate(void)
         _server_date_created.resize(_server_date_created.size() - 1);
 }
 
-
 int Server::acceptNewConnection()
 {
     if (_interrupt)
@@ -73,6 +70,7 @@ int Server::acceptNewConnection()
     }
     else
     {
+        fcntl(new_socket_connection, F_SETFL, O_NONBLOCK);
         _connections.push_back(Client(new_socket_connection));
         FD_SET(new_socket_connection, &_connections_set);
         std::cout << "new connection created" << std::endl;
@@ -94,7 +92,9 @@ int Server::setConnection(const int port, const std::string password)
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
+
 	}
+    fcntl(_server_socket, F_SETFL, O_NONBLOCK);
 
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
@@ -116,6 +116,7 @@ int Server::setConnection(const int port, const std::string password)
 
 bool Server::inspectEvent(int fd)
 {
+    bool ret = true;
     if (_interrupt)
         return true;
 
@@ -127,24 +128,36 @@ bool Server::inspectEvent(int fd)
             return true;
     }
 
-    const ConnectionsList::iterator client = getClient(fd);
+    std::string rawMsg = readMessage(fd);
+    tokenList processedMsg = parse(rawMsg);
+    ConnectionsList::iterator client = getClient(fd);
 
     if (client == _connections.end())
         return false;
 
-    std::string rawMsg = readMessage(fd);
+    for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
+    {
+        std::cout << "message: " << message->first << " " << message->second << std::endl;
+        if (!message->first.compare("CAP"))
+        {
+            std::cout << "command was cap ls" << std::endl;
+        }
+        else if (!client->isValid())
+        {
+            std::cout << "client need to be authenticated" << std::endl;
+            if (auth(*client, *message) == false)
+            {
+                ret = false;
+                deleteClient(client->getId());
+                break;
+            }
+        }
+        else
+            exec(*client, *message);
+    }
 
-    // keep msg in buffer for latter parsing
-    client->registerBuffer(rawMsg);
-
-    const tokenPair processedMsg = parse(client->returnLine());
-
-    if (!client->isPassActive())
-        return auth(*client, processedMsg);
-    else
-        exec(*client, processedMsg);
-
-    return true;
+        
+    return ret;
 }
 
 void Server::connectionLoop()
@@ -156,6 +169,8 @@ void Server::connectionLoop()
     // initialize the fd_set
     FD_ZERO(&_connections_set);
     FD_SET(_server_socket, &_connections_set);
+
+    
 
     while (!_interrupt)
     {
@@ -174,11 +189,8 @@ void Server::connectionLoop()
             // if fd is not ready for reading, go to next one
             if (!FD_ISSET(fd, &ready_connections))
                 continue ;
-            if (!inspectEvent(fd)) // Note: inspectEvent() validates clientFd
-            {
-                deleteClient(fd);
-                ready_connections = _connections_set;
-            }
+            inspectEvent(fd); // Note: inspectEvent() validates clientFd
+            ready_connections = _connections_set;
         }
     }
 }
@@ -193,6 +205,7 @@ std::string    Server::readMessage(int fd) const
     // Log
     if (bytesReceived < 0)
     {
+        std::cout << strerror(errno) << std::endl;
         std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
     }
     else

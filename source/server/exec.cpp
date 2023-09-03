@@ -91,19 +91,8 @@ void Server::execUSER(Client& client, const std::string line)
         return ;
     }
 
-    for (ConnectionsList::iterator it = _connections.begin(); it != _connections.end(); it++)
-    {
-        if (it->getNickname() == name)
-        {
-            // send error
-            Utils::writeTo("User " + name + " already in use.\n", client.getId());
-            return ;
-        }
-    }
-
     if (client.getUsername().empty())
     {
-        Utils::writeTo("User " + name + " has been added.\n", client.getId());
         std::cout << "User " << name << " has been added.\n";
     }
     else
@@ -112,6 +101,7 @@ void Server::execUSER(Client& client, const std::string line)
         std::cout << "Username " << name << " set.\n";
     }
 
+    client.setUserActive();
     client.setUsername(name);
     //parse rest??
 }
@@ -133,23 +123,24 @@ void Server::execNICK(Client& client, const std::string line)
         if (it->getNickname() == name)
         {
             // send error
-            Utils::writeTo("Nick " + name + " already in use.\n", client.getId());
+            replyNickCollision(client);
             return ;
         }
     }
 
     if (client.getNickname().empty())
     {
-        Utils::writeTo("Nick " + name + " has been added.\n", client.getId());
         std::cout << "Nick " << name << " has been added.\n";
     }
     else
     {
         Utils::writeTo("Nickname " + name + " set.\n", client.getId());
         std::cout << "Nickname " << name << " set.\n";
+
     }
 
-    client.setNickname(name);
+        client.setNickActive();
+        client.setNickname(name);
     //parse rest??
 }
 
