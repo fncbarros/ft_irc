@@ -72,6 +72,7 @@ int Server::acceptNewConnection()
     }
     else
     {
+        fcntl(new_socket_connection, F_SETFL, O_NONBLOCK);
         _connections.push_back(Client(new_socket_connection));
         FD_SET(new_socket_connection, &_connections_set);
         std::cout << "new connection created" << std::endl;
