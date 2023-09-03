@@ -36,7 +36,6 @@ bool    Server::checkPassword(Client& client, const tokenPair &processedMsg)
         std::cout << "command received is not PASS" << std::endl;
         return false;
     }
-    std::cout << "["<< processedMsg.second << "] [" << _password << "]" << std::endl;
     if (processedMsg.second != _password)
     {
         replyPassMissMatch(client);
