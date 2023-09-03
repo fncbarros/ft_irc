@@ -20,6 +20,8 @@
 #include <netinet/in.h>
 #include <sstream>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <strings.h>
 
 // Forward declarations
 class Channel;
@@ -32,10 +34,12 @@ static const std::string WELCOME = "001";
 static const std::string YOURHOST = "002";
 static const std::string CREATED = "003";
 static const std::string MYINFO = "004";
+static const std::string NICKCOLLISION = "433";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
+typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
 typedef std::vector<Channel> ChannelsList;
 
@@ -57,12 +61,17 @@ private:
     bool                            inspectEvent(int fd);
 
     // parser.cpp
-    tokenPair                       parse(std::string buffer);
+    tokenList                       parse(std::string buffer);
+    std::string                     getToken(const std::string token, tokenList processedMsg);
+
+
 
     // authentication.cpp
     bool                            auth(Client& client, const tokenPair& processedMsg);
     bool                            checkPassword(Client& client, const tokenPair& processedMsg);
+    void                            checkUser(Client& client, tokenPair processedMsg);
     void                            activateClient(Client& client);
+
 
     // exec.cpp
     void                            exec(Client& client, const tokenPair& message);
@@ -80,11 +89,12 @@ private:
     void                            execMODE(Client& client, const std::string line);
 
     // replyMessages.cpp
-    void                             replyPassMissMatch(Client& client) const;
-    void                             replyWelcome(Client& client) const;
-    void                             replyYourHost(Client& client) const;
-    void                             replyCreated(Client& client) const;
-    void                             replyMyInfo(Client& client) const;
+    void                            replyPassMissMatch(Client& client) const;
+    void                            replyWelcome(Client& client) const;
+    void                            replyYourHost(Client& client) const;
+    void                            replyCreated(Client& client) const;
+    void                            replyMyInfo(Client& client) const;
+    void                            replyNickCollision(Client& client) const;
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);

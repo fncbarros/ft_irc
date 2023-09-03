@@ -24,7 +24,6 @@ ConnectionsList::iterator Server::getClient(const int fd)
 
 void Server::deleteClient(const int fd)
 {
-
     ConnectionsList::iterator client = getClient(fd);
     if (client != _connections.end())
         _connections.erase(client);
