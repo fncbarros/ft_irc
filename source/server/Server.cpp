@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Server.hpp"
-#include <strings.h>
-
+#include <Server.hpp>
 
 // Special functions
 Server::Server()
@@ -37,12 +35,12 @@ Server::~Server()
 
 // Public functions
 
-void Server::interrupt()
+void    Server::interrupt()
 {
     _interrupt = true;
 }
 
-void Server::setPassword(const std::string password)
+void    Server::setPassword(const std::string password)
 {
     _password = password;
 }
@@ -83,7 +81,7 @@ int Server::acceptNewConnection()
 
 int Server::setConnection(const int port, const std::string password)
 {
-    (void) password;
+    setPassword(password);
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
 	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
@@ -130,42 +128,40 @@ bool Server::inspectEvent(int fd)
             return true;
     }
 
-    const std::string rawMsg = readMessage(fd);
-    if (rawMsg.empty())
-        return false;
+    std::string rawMsg = readMessage(fd);
     tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
 
-    if (client != _connections.end())
+    if (client == _connections.end())
+        return false;
+
+    for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
-        for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
+        std::cout << "message: " << message->first << " " << message->second << std::endl;
+        if (message != processedMsg.end())
         {
-            std::cout << "message: " << message->first << " " << message->second << std::endl;
-            if (message != processedMsg.end())
+            if (!message->first.compare("CAP"))
             {
-                if (!message->first.compare("CAP"))
-                {
-                    std::cout << "command was cap ls" << std::endl;
-                }
-                else if (!client->isValid())
-                {
-                    std::cout << "client need to be authenticated" << std::endl;
-                    if (auth(*client, *message) == false)
-                    {
-                        ret = false;
-                        deleteClient(client->getId());
-                        break;
-                    }
-                }
-                else
-                    exec(*client, processedMsg);
+                std::cout << "command was cap ls" << std::endl;
             }
+            else if (!client->isValid())
+            {
+                std::cout << "client need to be authenticated" << std::endl;
+                if (auth(*client, *message) == false)
+                {
+                    ret = false;
+                    deleteClient(client->getId());
+                    break;
+                }
+            }
+            else
+                exec(*client, *message);
         }
-    } 
+    }
+
         
     return ret;
 }
-
 
 void Server::connectionLoop()
 {
@@ -202,3 +198,21 @@ void Server::connectionLoop()
     }
 }
 
+std::string    Server::readMessage(int fd) const
+{
+    static char buffer[BUFFER_SIZE];
+    bzero(buffer, BUFFER_SIZE);
+
+    int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
+
+    // Log
+    if (bytesReceived < 0)
+    {
+        std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
+    }
+    else
+    {
+        std::cout << "Client message received: \"" << buffer << "\"" << std::endl;
+    }
+    return buffer;
+}

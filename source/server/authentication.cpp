@@ -1,6 +1,18 @@
-#include "../includes/Server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   authentication.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: falmeida <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
+/*   Updated: 2023/08/12 14:47:13 by falmeida         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-bool Server::auth(Client& client, tokenPair processedMsg)
+#include <Server.hpp>
+
+bool Server::auth(Client& client, const tokenPair &processedMsg)
 {
     std::cout << "isuseractive " <<  client.isUserActive() << " isnickactive " << client.isNickActive() << std::endl;
     if (!client.isPassActive())
@@ -17,7 +29,7 @@ bool Server::auth(Client& client, tokenPair processedMsg)
     return true;
 }
 
-int    Server::checkPassword(Client& client, tokenPair processedMsg)
+bool    Server::checkPassword(Client& client, const tokenPair &processedMsg)
 {
     if (processedMsg.first.compare("PASS"))
     {
