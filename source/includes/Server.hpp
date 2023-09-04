@@ -29,12 +29,19 @@ class Channel;
 // Const Definitions
 const int BUFFER_SIZE = 30720;
 
-static const std::string PASSMISMATCH = "464";
 static const std::string WELCOME = "001";
 static const std::string YOURHOST = "002";
 static const std::string CREATED = "003";
 static const std::string MYINFO = "004";
 static const std::string NICKCOLLISION = "433";
+static const std::string PASSMISMATCH = "464";
+
+static const std::string NAMREPLY = "353"; // ( '=' / '*' / '@' ) <channel> ' ' : [ '@' / '+' ] <nick> *( ' ' [ '@' / '+' ] <nick> )
+static const std::string ENDOFNAMES = "366"; // <channel> :<info>
+static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params>
+static const std::string CREATIONTIME = "329";
+static const std::string WHOSPCRPL = "354";
+static const std::string ENDOFWHO = "315";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
@@ -87,6 +94,7 @@ private:
     void                            execINVITE(Client& client, const std::string line);
     void                            execTOPIC(Client& client, const std::string line);
     void                            execMODE(Client& client, const std::string line);
+    void                            execPART(Client& client, const std::string line);
 
     // replyMessages.cpp
     void                            replyPassMissMatch(Client& client) const;
@@ -101,6 +109,8 @@ private:
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
+    //Channel related
+    ChannelsList::const_iterator    getChannel(const std::string& name)const;
 
 public:
     void                            connectionLoop(void);

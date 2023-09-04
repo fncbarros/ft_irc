@@ -20,22 +20,23 @@
 #include <string>
 #include <strings.h>
 #include <netinet/in.h>
-#include <vector>
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <vector>
+#include <map>
 #include <Channel.hpp>
 
 // Forward declarations
 class Channel;
 
 // Type definitions
-typedef std::vector<Channel> ChannelsList;
+// typedef std::map<std::string, Channel> ChannelsList;
 
 // Const data
 //static const char eof = '/012';
-static const size_t token_num = 12;
+static const size_t token_num = 13;
 static const std::string possible_tokens[token_num] =
 {
     "JOIN",
@@ -49,6 +50,7 @@ static const std::string possible_tokens[token_num] =
     "WHO",
     "QUIT",
     "PRIVMSG",
+    "PART",
 };
 
 // Utils

@@ -100,11 +100,10 @@ void Server::execNICK(Client& client, const std::string line)
     {
         Utils::writeTo("Nickname " + name + " set.\n", client.getId());
         std::cout << "Nickname " << name << " set.\n";
-
     }
 
-        client.setNickActive();
-        client.setNickname(name);
+    client.setNickActive();
+    client.setNickname(name);
     //parse rest??
 }
 
@@ -161,9 +160,23 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 
 void Server::execJOIN(Client& client, const std::string line)
 {
+    // TMP
     std::cout << client.getUsername() << ": ";
-    std::cout << "***JOIN: ";
     std::cout << line << std::endl;
+    // TMP
+
+    size_t pos(line.find('#'));
+    if (pos == std::string::npos)
+        std::cerr << "Error: join: could not find '#' token." << std::endl;
+    const std::string channelName(line.substr(pos));
+
+    ChannelsList::const_iterator it = getChannel(channelName);
+    if (it == _channels.end())
+    {
+        _channels.push_back(Channel(channelName, client));
+        Utils::writeTo( "" , client.getId());
+    }
+
 }
 
 void Server::execKICK(Client& client, const std::string line)
@@ -192,4 +205,15 @@ void Server::execMODE(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***MODE: ";
     std::cout << line << std::endl;
+}
+
+void Server::execPART(Client& client, const std::string line)
+{
+    // input: "PART #<channel> :Leaving"
+    // out:
+    // to sending client: "You have left channel #<channel> (Leaving)
+
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***PART: ";
+    std::cout << "Client " << client.getNickname() << " left channel " << line << std::endl;
 }
