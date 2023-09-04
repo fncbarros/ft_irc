@@ -16,6 +16,7 @@ Channel::Channel(const std::string name, const Client& client)
 : _name(name)
 {
     _users.push_back(std::make_pair(&client, true));
+    std::cout << "Channel " << name << " created." << std::endl;
 }
 
 Channel::~Channel()
@@ -39,7 +40,8 @@ UserList Channel::getList() const
 
 void Channel::addClient(const Client& client)
 {
-    _users.push_back(std::make_pair(&client, false));
+    if (_users.size() < _modes.limit)
+        _users.push_back(std::make_pair(&client, false));
 }
 
 void Channel::printList(int fd) const
@@ -50,4 +52,88 @@ void Channel::printList(int fd) const
         nameList += it->first->getNickname() + "\n";
     }
     Utils::writeTo(nameList, fd);
+}
+
+Channel::modes::modes()
+: invite_only(false)
+, topic_restricted(false)
+, key(std::make_pair(false, ""))
+, operator_privs(false)
+, limit(0)
+{
+}
+
+Channel::modes::modes(const modes &other)
+{
+    invite_only = other.invite_only;
+    topic_restricted = other.topic_restricted;
+    key = other.key;
+    operator_privs = other.operator_privs;
+    limit = other.limit;
+}
+
+Channel::modes& Channel::modes::operator=(const modes &other)
+{
+    if (this != &other)
+    {
+        *this = other;
+    }
+    return *this;
+}
+
+bool Channel::isInviteOnly(void) const
+{
+    return _modes.invite_only;
+}
+
+bool Channel::isTopicRetricted(void) const
+{
+    return _modes.topic_restricted;
+}
+
+bool Channel::hasKey(void) const
+{
+    return _modes.key.first;
+}
+
+bool Channel::hasOperatorPriviledges(void) const
+{
+    return _modes.operator_privs;
+}
+
+size_t Channel::limit(void) const
+{
+    return _modes.limit;
+}
+
+void Channel::setInviteOnly(const bool set)
+{
+    _modes.invite_only = set;
+}
+
+void Channel::setTopicRestriction(const bool set)
+{
+    _modes.topic_restricted = set;
+}
+
+void Channel::setKey(const std::string& key)
+{
+    _modes.key.first = true;
+    _modes.key.second = key;
+}
+
+void Channel::setNoKey(void)
+{
+    _modes.key.first = false;
+    _modes.key.second.clear();
+}
+
+void Channel::setPriviledges(const bool set)
+{
+    _modes.operator_privs = set;
+}
+
+void Channel::setLimit(const size_t limit)
+{
+    _modes.limit = limit;
 }
