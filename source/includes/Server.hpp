@@ -33,6 +33,7 @@ static const std::string YOURHOST = "002";
 static const std::string CREATED = "003";
 static const std::string MYINFO = "004";
 static const std::string NICKCOLLISION = "433";
+static const std::string NICKNOTFOUND = "401";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
@@ -92,9 +93,11 @@ private:
     void                            replyCreated(Client& client) const;
     void                            replyMyInfo(Client& client) const;
     void                            replyNickCollision(Client& client) const;
-
+    void                            replyPrivMessageNickNotFound(Client& client,  const std::string &targetNickName) const;
+    void                            replyPrivateMessage(Client& client,  Client& targetCLient, const std::string message);
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
+    ConnectionsList::iterator       getClient(const std::string &nickname);
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
