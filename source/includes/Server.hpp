@@ -36,12 +36,13 @@ static const std::string MYINFO = "004";
 static const std::string NICKCOLLISION = "433";
 static const std::string PASSMISMATCH = "464";
 
-static const std::string NAMREPLY = "353"; // ( '=' / '*' / '@' ) <channel> ' ' : [ '@' / '+' ] <nick> *( ' ' [ '@' / '+' ] <nick> )
+static const std::string NAMREPLY = "353";
 static const std::string ENDOFNAMES = "366"; // <channel> :<info>
 static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params>
 static const std::string CREATIONTIME = "329";
 static const std::string WHOSPCRPL = "354";
 static const std::string ENDOFWHO = "315";
+static const std::string NICKNOTFOUND = "401";
 // static const char *ADDRESS = "0.0.0.0";
 
 // Type Definitions
@@ -97,16 +98,19 @@ private:
     void                            execPART(Client& client, const std::string line);
 
     // replyMessages.cpp
-    void                            replyPassMissMatch(const Client& client) const;
-    void                            replyWelcome(const Client& client) const;
-    void                            replyYourHost(const Client& client) const;
-    void                            replyCreated(const Client& client) const;
-    void                            replyMyInfo(const Client& client) const;
-    void                            replyNickCollision(const Client& client) const;
+    void                            replyPassMissMatch(Client& client) const;
+    void                            replyWelcome(Client& client) const;
+    void                            replyYourHost(Client& client) const;
+    void                            replyCreated(Client& client) const;
+    void                            replyMyInfo(Client& client) const;
+    void                            replyNickCollision(Client& client) const;
+    void                            replyPrivMessageNickNotFound(Client& client,  const std::string &targetNickName) const;
+    void                            replyPrivateMessage(Client& client,  Client& targetCLient, const std::string message);
     void                            replyName(const Client& client, const Channel& channel) const;
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
+    ConnectionsList::iterator       getClient(const std::string &nickname);
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);

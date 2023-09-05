@@ -149,9 +149,21 @@ void Server::execQUIT(Client& client, const std::string line)
 
 void Server::execPRIVMSG(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***PRIVMSG: ";
-    std::cout << line << std::endl;
+    const std::string nickname(line.substr(0, line.find(' ')));
+    const std::string messageReceived(line.substr(line.find(' ') + 1));
+
+    ConnectionsList::iterator newClient = getClient(nickname);
+
+    if (newClient == _connections.end())
+        replyPrivMessageNickNotFound(client, nickname);
+    else
+    {
+       replyPrivateMessage(client, *newClient, messageReceived);
+    }
+
+    std::cout << "Private Message " << client.getNickname() << " user: [" << nickname << "] message: [" << messageReceived << "]" << std::endl;
+
+    
 }
 
 /**
