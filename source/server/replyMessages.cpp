@@ -42,3 +42,13 @@ void    Server::replyNickCollision(Client& client) const
 {
     Utils::writeTo(":IRC42 " + NICKCOLLISION + " *" + client.getNickname() + " :Nickname is already in use.\r\n", client.getId());
 }
+
+void    Server::replyPrivMessageNickNotFound(Client& client, const std::string &targetNickName) const
+{
+    Utils::writeTo(":IRC42 " + NICKNOTFOUND + " " + client.getNickname() + " " +  targetNickName + " :No such nickname\r\n", client.getId());
+}
+
+void    Server::replyPrivateMessage(Client& client, Client& targetClient,const std::string message)
+{
+    Utils::writeTo(":" + client.getNickname() + "!" + client.getUsername() + "@0.0.0.0 PRIVMSG " + targetClient.getNickname() + " " + message + "\r\n", targetClient.getId()); 
+}
