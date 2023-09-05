@@ -36,7 +36,8 @@ class Channel;
 
 // Const data
 //static const char eof = '/012';
-static const size_t token_num = 13;
+static const std::string HOST("IRC42");
+static const size_t token_num(13);
 static const std::string possible_tokens[token_num] =
 {
     "JOIN",

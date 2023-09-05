@@ -31,15 +31,14 @@ typedef struct auth {
 
 class Client
 {
-    // Special functions
 public:
     Client(const int socket_id);
     Client(const Client& other);
     ~Client();
     Client&         operator=(const Client& other);
     int             operator==(const Client& other);
+    std::string     toString(void) const;
 
-    // Public functions
     std::string     getNickname(void) const;
     std::string     getUsername(void) const;
     bool            isValid(void) const;
@@ -57,7 +56,6 @@ public:
     void            registerBuffer(const std::string msg);
     std::string     returnLine(void);
 
-    // Data
 private:
     int                     _socket_id;
     std::string             _nickname;

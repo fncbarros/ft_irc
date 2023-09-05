@@ -167,14 +167,21 @@ void Server::execJOIN(Client& client, const std::string line)
 
     size_t pos(line.find('#'));
     if (pos == std::string::npos)
-        std::cerr << "Error: join: could not find '#' token." << std::endl;
-    const std::string channelName(line.substr(pos));
+        std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
+    const std::string channelName(line.substr(pos + 1));
 
+    // look for channel
     ChannelsList::const_iterator it = getChannel(channelName);
+    
+    // if no channel, create one
     if (it == _channels.end())
     {
         _channels.push_back(Channel(channelName, client));
         Utils::writeTo( "" , client.getId());
+    }
+    else
+    {
+        // add user to channel
     }
 
 }

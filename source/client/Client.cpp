@@ -42,6 +42,12 @@ int Client::operator==(const Client& other)
     return (_socket_id == other._socket_id) && (_username == other._username);
 }
 
+std::string     Client::toString(void) const
+{
+    return (_nickname + "!" + _username + "@" + HOST);
+}
+
+
 // Getters
 std::string Client::getNickname(void) const { return _nickname; }
 

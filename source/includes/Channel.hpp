@@ -16,8 +16,7 @@
 class Client;
 
 // Type definitions
-typedef bool operator_t;
-typedef std::pair<const Client*, operator_t> User;
+typedef std::pair<const Client*, bool> User; // true if operator
 typedef std::vector<User> UserList;
 
 class Channel
