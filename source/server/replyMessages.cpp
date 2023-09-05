@@ -48,7 +48,7 @@ void    Server::replyPrivMessageNickNotFound(Client& client, const std::string &
     Utils::writeTo(":IRC42 " + NICKNOTFOUND + " " + client.getNickname() + " " +  targetNickName + " :No such nickname\r\n", client.getId());
 }
 
-void    Server::replyPrivateMessage(Client& client, Client& targetCLient,const std::string message)
+void    Server::replyPrivateMessage(Client& client, Client& targetClient,const std::string message)
 {
-    Utils::writeTo(":IRC42 PRIVMSG" + client.getNickname() + " :" + message + "\r\n", targetCLient.getId()); 
+    Utils::writeTo(":" + client.getNickname() + "!" + client.getUsername() + "@0.0.0.0 PRIVMSG " + targetClient.getNickname() + " " + message + "\r\n", targetClient.getId()); 
 }
