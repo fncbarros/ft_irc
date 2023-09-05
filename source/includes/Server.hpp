@@ -97,12 +97,13 @@ private:
     void                            execPART(Client& client, const std::string line);
 
     // replyMessages.cpp
-    void                            replyPassMissMatch(Client& client) const;
-    void                            replyWelcome(Client& client) const;
-    void                            replyYourHost(Client& client) const;
-    void                            replyCreated(Client& client) const;
-    void                            replyMyInfo(Client& client) const;
-    void                            replyNickCollision(Client& client) const;
+    void                            replyPassMissMatch(const Client& client) const;
+    void                            replyWelcome(const Client& client) const;
+    void                            replyYourHost(const Client& client) const;
+    void                            replyCreated(const Client& client) const;
+    void                            replyMyInfo(const Client& client) const;
+    void                            replyNickCollision(const Client& client) const;
+    void                            replyName(const Client& client, const Channel& channel) const;
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
