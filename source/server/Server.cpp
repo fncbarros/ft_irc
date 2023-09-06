@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:22:16 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/06 19:53:01 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,19 @@ bool Server::inspectEvent(int fd)
         std::cout << "message: " << message->first << " " << message->second << std::endl;
         if (!message->first.compare("CAP"))
         {
+            std::string capabilities;
             std::cout << "command was cap ls" << std::endl;
+            std::cout << message->second << std::endl;
+            if (!message->second.compare("LS") || !message->second.compare("LS 302"))
+                capabilities = "CAP * LS :message-tags multi-prefix";
+            else if (!message->second.compare("REQ") || !message->second.compare("REQ :multi-prefix"))
+                capabilities = "CAP * ACK :multi-prefix";
+            else if (!message->second.compare("END"))
+                capabilities = "END";
+            else
+                capabilities = "ELSE";
+            replyCAPLS(*client, capabilities);
+            break ;
         }
         else if (!client->isValid())
         {

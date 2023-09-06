@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/06 18:51:48 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <strings.h>
+#include <cstring>
 
 
 // Const Definitions
@@ -95,6 +96,7 @@ private:
     void                            replyNickCollision(Client& client) const;
     void                            replyPrivMessageNickNotFound(Client& client,  const std::string &targetNickName) const;
     void                            replyPrivateMessage(Client& client,  Client& targetCLient, const std::string message);
+    void                            replyCAPLS(Client& client, std::string capabilities) const;
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::iterator       getClient(const std::string &nickname);
