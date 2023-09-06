@@ -14,7 +14,7 @@
 
 void    Server::replyWelcome(const Client& client) const
 {
-    Utils::writeTo(":IRC42 NOTICE " + client.getNickname() + " :Welcome to the Internet Relay Network " + client.toString() + "\r\n", client.getId());
+    Utils::writeTo(":IRC42 " + WELCOME + " " + client.getNickname() + " :Welcome to the Internet Relay Network " + client.getNickname() + "!"  + client.getUsername() + "@IRC42\r\n", client.getId());
 }
 
 void Server::replyPassMissMatch(const Client& client) const
