@@ -24,7 +24,7 @@ Channel::~Channel()
     // broadcast to all users
     for (UserList::iterator it = _users.begin(); it != _users.end(); it++)
     {
-        Utils::writeTo("Channel " + _name + " has been removed.\n", it->first->getId());
+//        Utils::writeTo("Channel " + _name + " has been removed.\n", it->first->getId());
     }
 }
 

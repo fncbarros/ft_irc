@@ -154,8 +154,6 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     }
 
     std::cout << "Private Message " << client.getNickname() << " user: [" << nickname << "] message: [" << messageReceived << "]" << std::endl;
-
-    
 }
 
 /**
@@ -181,7 +179,15 @@ void Server::execJOIN(Client& client, const std::string line)
     if (it == _channels.end())
     {
         _channels.push_back(Channel(channelName, client));
-        Utils::writeTo( "" , client.getId());
+        const Channel channel(_channels.back());
+        replyName(client, channel);
+        replyEndOfNames(client, channel);
+        replyChannelMode(client, channel);
+        replyCreationTime(client, channel);
+        replyWho(client, channel);
+        replyEndOfWho(client, channel);
+
+        Utils::writeTo( "Channel " + channelName + " created\r\n", client.getId());
     }
     else
     {
