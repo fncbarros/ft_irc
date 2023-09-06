@@ -98,15 +98,20 @@ private:
     void                            execPART(Client& client, const std::string line);
 
     // replyMessages.cpp
-    void                            replyPassMissMatch(Client& client) const;
-    void                            replyWelcome(Client& client) const;
-    void                            replyYourHost(Client& client) const;
-    void                            replyCreated(Client& client) const;
-    void                            replyMyInfo(Client& client) const;
-    void                            replyNickCollision(Client& client) const;
-    void                            replyPrivMessageNickNotFound(Client& client,  const std::string &targetNickName) const;
-    void                            replyPrivateMessage(Client& client,  Client& targetCLient, const std::string message);
+    void                            replyPassMissMatch(const Client& client) const;
+    void                            replyWelcome(const Client& client) const;
+    void                            replyYourHost(const Client& client) const;
+    void                            replyCreated(const Client& client) const;
+    void                            replyMyInfo(const Client& client) const;
+    void                            replyNickCollision(const Client& client) const;
+    void                            replyPrivMessageNickNotFound(const Client& client,  const std::string &targetNickName) const;
+    void                            replyPrivateMessage(const Client& client,  const Client& targetCLient, const std::string message) const;
     void                            replyName(const Client& client, const Channel& channel) const;
+    void                            replyEndOfNames(const Client& client, const Channel& channel) const;
+    void                            replyChannelMode(const Client& client, const Channel& channel) const;
+    void                            replyCreationTime(const Client& client, const Channel& channel) const;
+    void                            replyWho(const Client& client, const Channel& channel) const;
+    void                            replyEndOfWho(const Client& client, const Channel& channel) const;
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);

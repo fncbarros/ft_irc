@@ -51,6 +51,7 @@ public:
     bool        hasKey(void) const;
     bool        hasOperatorPriviledges(void) const;
     size_t      limit(void) const;
+    bool        hasModes(void) const;
 
     void        setInviteOnly(const bool set);
     void        setTopicRestriction(const bool set);

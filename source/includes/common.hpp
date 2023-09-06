@@ -60,4 +60,5 @@ namespace Utils
     std::string toUpper(const std::string& original);
     bool        isDigit(const std::string& s);
     bool        writeTo(const std::string& s, const int fd);
+    std::string        timeToStr(void);
 } // namespace Utils

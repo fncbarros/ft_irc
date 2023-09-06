@@ -69,6 +69,7 @@ void    Server::checkUser(Client& client, tokenPair processedMsg)
 
 void    Server::activateClient(Client& client)
 {
+    replyWelcome(client);
     replyYourHost(client);
     replyCreated(client);
     replyMyInfo(client);

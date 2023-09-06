@@ -106,6 +106,11 @@ size_t Channel::limit(void) const
     return _modes.limit;
 }
 
+bool Channel::hasModes(void) const
+{
+    return (isInviteOnly() || isTopicRetricted() || hasKey() || hasOperatorPriviledges() || limit());
+}
+
 void Channel::setInviteOnly(const bool set)
 {
     _modes.invite_only = set;
