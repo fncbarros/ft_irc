@@ -130,17 +130,19 @@ void Server::execNICK(Client& client, const std::string line)
 
     if (client.getNickname().empty())
     {
+        client.setNickname(name);
         std::cout << "Nick " << name << " has been added.\n";
+
     }
     else
     {
-        Utils::writeTo("Nickname " + name + " set.\n", client.getId());
+        client.setNickname(name);
+        replyWelcome(client);
         std::cout << "Nickname " << name << " set.\n";
 
     }
 
-        client.setNickActive();
-        client.setNickname(name);
+    client.setNickActive();
     //parse rest??
 }
 
