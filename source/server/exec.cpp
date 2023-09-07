@@ -127,9 +127,18 @@ void Server::execLIST(Client& client, const std::string line)
 
 void Server::execWHO(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    (void)line;
-    std::cout << "***WHO***\n";
+    size_t pos(line.find('#'));
+    if (pos == std::string::npos)
+        std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
+    const std::string channelName(line.substr(pos + 1));
+
+    // look for channel
+    ChannelsList::const_iterator channelIt = getChannel(channelName);
+    if (channelIt == _channels.end())
+    {
+        replyWho(client, *channelIt);
+        replyEndOfWho(client, *channelIt);
+    }
 }
 
 void Server::execQUIT(Client& client, const std::string line)
@@ -180,14 +189,7 @@ void Server::execJOIN(Client& client, const std::string line)
     {
         _channels.push_back(Channel(channelName, client));
         const Channel channel(_channels.back());
-        replyName(client, channel);
-        replyEndOfNames(client, channel);
-        replyChannelMode(client, channel);
-        replyCreationTime(client, channel);
-        replyWho(client, channel);
-        replyEndOfWho(client, channel);
-
-        Utils::writeTo( "Channel " + channelName + " created\r\n", client.getId());
+        replyJoin(client, channel);
     }
     else
     {
@@ -219,9 +221,21 @@ void Server::execTOPIC(Client& client, const std::string line)
 
 void Server::execMODE(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***MODE: ";
-    std::cout << line << std::endl;
+    size_t pos(line.find('#'));
+    if (pos == std::string::npos)
+        std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
+    const std::string channelName(line.substr(pos + 1));
+
+    // look for channel
+    ChannelsList::const_iterator channelIt = getChannel(channelName);
+
+    if (channelIt != _channels.end())
+        replyChannelMode(client, *channelIt);
+
+    replyName(client, *channelIt);
+    replyEndOfNames(client, *channelIt);
+    replyChannelMode(client, *channelIt);
+    replyCreationTime(client, *channelIt);
 }
 
 void Server::execPART(Client& client, const std::string line)
