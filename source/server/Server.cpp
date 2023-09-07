@@ -138,6 +138,10 @@ bool Server::inspectEvent(int fd)
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
         std::cout << "message: " << message->first << " " << message->second << std::endl;
+        if (message->first.empty())
+        {
+            deleteClient(client->getId());
+        }
         if (!message->first.compare("CAP"))
         {
             std::cout << "command was cap ls" << std::endl;
