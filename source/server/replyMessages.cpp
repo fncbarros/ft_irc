@@ -53,6 +53,11 @@ void    Server::replyPrivateMessage(const Client& client, const Client& targetCl
     Utils::writeTo(":" + client.toString() + " PRIVMSG " + targetClient.getNickname() + " " + message + "\r\n", targetClient.getId());
 }
 
+void    Server::replyJoin(const Client& client, const Channel& channel) const
+{
+    Utils::writeTo(":" + client.toString() + " JOIN #" + channel.getName() + " * \r\n", client.getId());
+}
+
 void    Server::replyName(const Client& client, const Channel& channel) const
 {
     //  :irc.eagle.y.se 353 T-bone = #new :T-bone!timey@180.226.108.93.rev.vodafone.pt barney!barney@180.226.108.93.rev.vodafone.pt @Nico2!fbarrosdff@180.226.108.93.rev.vodafone.pt

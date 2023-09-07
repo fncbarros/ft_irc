@@ -106,6 +106,7 @@ private:
     void                            replyNickCollision(const Client& client) const;
     void                            replyPrivMessageNickNotFound(const Client& client,  const std::string &targetNickName) const;
     void                            replyPrivateMessage(const Client& client,  const Client& targetCLient, const std::string message) const;
+    void                            replyJoin(const Client& client, const Channel& channel) const;
     void                            replyName(const Client& client, const Channel& channel) const;
     void                            replyEndOfNames(const Client& client, const Channel& channel) const;
     void                            replyChannelMode(const Client& client, const Channel& channel) const;
