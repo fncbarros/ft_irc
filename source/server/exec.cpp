@@ -127,13 +127,8 @@ void Server::execLIST(Client& client, const std::string line)
 
 void Server::execWHO(Client& client, const std::string line)
 {
-    size_t pos(line.find('#'));
-    if (pos == std::string::npos)
-        std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
-    const std::string channelName(line.substr(pos + 1));
-
     // look for channel
-    ChannelsList::const_iterator channelIt = getChannel(channelName);
+    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
     if (channelIt == _channels.end())
     {
         replyWho(client, *channelIt);
@@ -171,16 +166,7 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 
 void Server::execJOIN(Client& client, const std::string line)
 {
-    // TMP
-    std::cout << client.getUsername() << ": ";
-    std::cout << line << std::endl;
-    // TMP
-
-    size_t pos(line.find('#'));
-    if (pos == std::string::npos)
-        std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
-    const std::string channelName(line.substr(pos + 1));
-
+    std::string channelName(returnChannelName(line));
     // look for channel
     ChannelsList::const_iterator it = getChannel(channelName);
     
@@ -221,13 +207,8 @@ void Server::execTOPIC(Client& client, const std::string line)
 
 void Server::execMODE(Client& client, const std::string line)
 {
-    size_t pos(line.find('#'));
-    if (pos == std::string::npos)
-        std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
-    const std::string channelName(line.substr(pos + 1));
-
     // look for channel
-    ChannelsList::const_iterator channelIt = getChannel(channelName);
+    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
 
     if (channelIt != _channels.end())
         replyChannelMode(client, *channelIt);

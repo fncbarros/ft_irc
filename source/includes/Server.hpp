@@ -122,6 +122,8 @@ private:
     static void                     printList(const ConnectionsList& list, const int fd);
     //Channel related
     ChannelsList::const_iterator    getChannel(const std::string& name)const;
+    static const std::string        returnChannelName(const std::string& line);
+
 
 public:
     void                            connectionLoop(void);
