@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <common.hpp>
+#include <ctime>
 
 namespace Utils
 {
@@ -44,5 +45,17 @@ namespace Utils
             return false;
         }
         return true;
+    }
+
+    std::string timeToStr(void)
+    {
+        time_t currentTime;
+        std::string str;
+
+        std::time(&currentTime);
+        std::stringstream ss;
+        ss << currentTime;
+        ss >> str;
+        return str;
     }
 }

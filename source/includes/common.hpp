@@ -20,16 +20,24 @@
 #include <string>
 #include <strings.h>
 #include <netinet/in.h>
-#include <vector>
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
-#include "Channel.hpp"
 #include <string.h>
+#include <vector>
+#include <map>
+#include <Channel.hpp>
 
+// Forward declarations
+class Channel;
+
+// Type definitions
+// typedef std::map<std::string, Channel> ChannelsList;
 
 // Const data
-static const size_t token_num = 12;
+//static const char eof = '/012';
+static const std::string HOST("IRC42");
+static const size_t token_num(13);
 static const std::string possible_tokens[token_num] =
 {
     "JOIN",
@@ -43,6 +51,7 @@ static const std::string possible_tokens[token_num] =
     "WHO",
     "QUIT",
     "PRIVMSG",
+    "PART",
 };
 
 // Utils
@@ -51,4 +60,5 @@ namespace Utils
     std::string toUpper(const std::string& original);
     bool        isDigit(const std::string& s);
     bool        writeTo(const std::string& s, const int fd);
+    std::string        timeToStr(void);
 } // namespace Utils

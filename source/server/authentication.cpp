@@ -36,7 +36,6 @@ bool    Server::checkPassword(Client& client, const tokenPair &processedMsg)
         std::cout << "command received is not PASS" << std::endl;
         return false;
     }
-    std::cout << "["<< processedMsg.second << "] [" << _password << "]" << std::endl;
     if (processedMsg.second != _password)
     {
         replyPassMissMatch(client);
@@ -70,6 +69,7 @@ void    Server::checkUser(Client& client, tokenPair processedMsg)
 
 void    Server::activateClient(Client& client)
 {
+    replyWelcome(client);
     replyYourHost(client);
     replyCreated(client);
     replyMyInfo(client);

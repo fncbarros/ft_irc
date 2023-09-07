@@ -43,16 +43,6 @@ void Server::deleteClient(const int fd)
 }
 
 // Static functions
-void Server::printList(const ClientList& list, const int fd)
-{
-    std::string nameList;
-    for (ClientList::const_iterator it = list.begin(); it != list.end(); it++)
-    {
-        nameList += (*it)->getNickname() + "\n";
-    }
-    Utils::writeTo(nameList, fd);
-}
-
 void Server::printList(const ConnectionsList& list, const int fd)
 {
     std::string nameList;
