@@ -114,6 +114,9 @@ private:
     void                            replyWho(const Client& client, const Channel& channel) const;
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
 
+    // communication.cpp
+    void                            channelPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
+    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::iterator       getClient(const std::string &nickname);
