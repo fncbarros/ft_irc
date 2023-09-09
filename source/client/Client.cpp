@@ -21,15 +21,17 @@ Client::Client(const int socket_id)
 Client::Client(const Client& other)
 : _auth(other._auth)
 {
-    _nickname = other.getNickname();
-    _username = other.getUsername();
-    _socket_id = other.getId();
+    *this = other;
 }
 
 Client& Client::operator=(const Client& other)
 {
     if (this != &other)
-        *this = other;
+    {
+        _nickname = other.getNickname();
+        _username = other.getUsername();
+        _socket_id = other.getId();
+    }
     return *this;
 }
 
