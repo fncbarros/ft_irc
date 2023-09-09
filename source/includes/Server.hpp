@@ -42,6 +42,10 @@ static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params
 static const std::string CREATIONTIME = "329";
 static const std::string WHOSPCRPL = "354";
 static const std::string ENDOFWHO = "315";
+static const std::string LISTSTART = "321";
+static const std::string LIST = "322";
+static const std::string LISTEND = "323";
+
 // Error codes
 static const std::string NICKNOTFOUND = "401";
 static const std::string BADJOIN = "448";
@@ -115,6 +119,9 @@ private:
     void                            replyWho(const Client& client, const Channel& channel) const;
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
     void                            replyBadJoin(const Client& client, const std::string& line) const;
+    void                            replyList(const Client& client) const;
+    void                            replyList(const Client& client, const Channel& channel) const;
+
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);

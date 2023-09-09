@@ -119,10 +119,8 @@ void Server::execLIST(Client& client, const std::string line)
     else
     {
         // list channels
+        replyList(client);
     }
-    std::cout << client.getUsername() << ": ";
-    (void)line;
-    std::cout << "***LIST***\n";
 }
 
 void Server::execWHO(Client& client, const std::string line)

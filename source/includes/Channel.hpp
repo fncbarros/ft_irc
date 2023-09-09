@@ -53,6 +53,8 @@ public:
     size_t      limit(void) const;
     bool        hasModes(void) const;
 
+    std::string getTopic(void) const;
+
     void        setInviteOnly(const bool set);
     void        setTopicRestriction(const bool set);
     void        setKey(const std::string& key);
