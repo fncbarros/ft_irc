@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replyMessages.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: falmeida <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/08/12 14:47:13 by falmeida         ###   ########.fr       */
+/*   Updated: 2023/09/09 15:15:48 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,11 @@ void    Server::replyPrivMessageNickNotFound(const Client& client, const std::st
 void    Server::replyPrivateMessage(const Client& client, const Client& targetClient,const std::string message) const
 {
     Utils::writeTo(":" + client.toString() + " PRIVMSG " + targetClient.getNickname() + " " + message + "\r\n", targetClient.getId());
+}
+
+void    Server::replyCAPLS(Client& client, std::string capabilities) const
+{
+    Utils::writeTo(":IRC42 " + capabilities + "\r\n", client.getId());
 }
 
 void    Server::replyJoin(const Client& client, const Channel& channel) const
