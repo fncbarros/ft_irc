@@ -135,7 +135,6 @@ bool Server::inspectEvent(int fd)
     if (client == _connections.end())
         return false;
 
-    std::string command(rawMsg);
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
         std::cout << "message: " << message->first << " " << message->second << std::endl;
@@ -145,8 +144,7 @@ bool Server::inspectEvent(int fd)
         }
         if (!message->first.compare("CAP"))
         {
-            execCAP(*client, command);
-            break ;
+            execCAP(*client, rawMsg);
         }
         else if (!client->isValid())
         {
