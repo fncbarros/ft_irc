@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:14:05 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ private:
     void                            execQUIT(Client& client, const std::string line);
     void                            execPRIVMSG(Client& client, const std::string line);
     // Channel-specific commands
+    void                            execCAP(Client& client, std::string command);
     void                            execJOIN(Client& client, const std::string line);
     void                            execKICK(Client& client, const std::string line);
     void                            execINVITE(Client& client, const std::string line);
@@ -114,6 +115,7 @@ private:
     void                            replyCreationTime(const Client& client, const Channel& channel) const;
     void                            replyWho(const Client& client, const Channel& channel) const;
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
+    void                            replyCAPLS(Client& client, std::string capabilities) const;
     void                            replyBadJoin(const Client& client, const std::string& line) const;
 
     // clientManager.cpp

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:22:16 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:16:35 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ bool Server::inspectEvent(int fd)
         }
         if (!message->first.compare("CAP"))
         {
-            std::cout << "command was cap ls" << std::endl;
+            execCAP(*client, rawMsg);
         }
         else if (!client->isValid())
         {

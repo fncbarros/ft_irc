@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:22:16 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:07:55 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,4 +241,16 @@ void Server::execPART(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***PART: ";
     std::cout << "Client " << client.getNickname() << " left channel " << line << std::endl;
+}
+
+void Server::execCAP(Client& client, std::string command)
+{
+    std::string capabilities;
+    if (command.find("CAP LS") != std::string::npos)
+        capabilities = "CAP * LS :cap1, cap2, cap3";
+    else if (command.find("CAP REQ") != std::string::npos)
+        capabilities = "CAP * ACK :cap1, cap2, -cap3";
+    else if (command.find("CAP END") != std::string::npos)
+        capabilities = "CAP * ACK :CAP END";
+    replyCAPLS(client, capabilities);
 }
