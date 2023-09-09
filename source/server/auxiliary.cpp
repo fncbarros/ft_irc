@@ -27,6 +27,9 @@ const std::string Server::returnChannelName(const std::string& line)
 {
     size_t pos(line.find('#'));
     if (pos == std::string::npos)
+    {
         std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
+        return (BADJOIN + line.substr(0u, line.find(' ')));
+    }
     return (line.substr(pos + 1));
 }
