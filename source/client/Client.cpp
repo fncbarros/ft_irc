@@ -14,11 +14,7 @@
 
 Client::Client(const int socket_id)
 : _socket_id(socket_id)
-, _operator(false)
 {
-    _auth.isValidPassword = false;
-    _auth.isValidNickName = false;
-    _auth.isValidUser = false;
     std::cout << "Client created: " << _socket_id << std::endl;
 }
 
@@ -28,7 +24,6 @@ Client::Client(const Client& other)
     _nickname = other.getNickname();
     _username = other.getUsername();
     _socket_id = other.getId();
-    _operator = other.isOperator();
 }
 
 Client& Client::operator=(const Client& other)
@@ -47,6 +42,12 @@ int Client::operator==(const Client& other)
     return (_socket_id == other._socket_id) && (_username == other._username);
 }
 
+std::string     Client::toString(void) const
+{
+    return (_nickname + "!" + _username + "@" + HOST);
+}
+
+
 // Getters
 std::string Client::getNickname(void) const { return _nickname; }
 
@@ -61,8 +62,6 @@ bool  Client::isUserActive(void) const { return _auth.isValidUser; }
 bool  Client::isNickActive(void) const { return _auth.isValidNickName; }
 
 bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
-
-bool Client::isOperator(void) const { return _operator; }
 
 bool Client::isMessageWaiting(void) const { return (_msgBuffer.find("\r\n") != std::string::npos); }
 
@@ -94,4 +93,32 @@ std::string Client::returnLine(void)
     _msgBuffer.erase(0u, pos + 1);
 
     return s;
+}
+
+//const Channel&  join(const std::string& channel)
+//{
+//    for (std::vector<Channel>::const_iterator it = )
+//}
+
+t_auth::auth()
+: isValidPassword(false)
+, isValidUser(false)
+, isValidNickName(false)
+{
+}
+
+t_auth::auth(const auth& other)
+{
+    isValidPassword = other.isValidPassword;
+    isValidUser = other.isValidUser;
+    isValidNickName = other.isValidNickName;
+}
+
+auth t_auth::operator=(const auth& other)
+{
+    if (this != &other)
+    {
+        *this = other;
+    }
+    return *this;
 }

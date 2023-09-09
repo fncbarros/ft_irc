@@ -38,7 +38,7 @@ fclean: clean
 
 re: fclean all
 
-debug: CXXFLAGS += -g
+debug: CXXFLAGS += -g -fno-limit-debug-info
 debug: CXX = clang++
 debug: re
 

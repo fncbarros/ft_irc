@@ -43,42 +43,6 @@ void Server::exec(Client& client, const tokenPair& message)
         std::cout << message.first << " " << message.second << std::endl;
 }
 
-
-void Server::execJOIN(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***JOIN: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execKICK(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***KICK: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execINVITE(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***INVITE: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execTOPIC(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***TOPIC: ";
-    std::cout << line << std::endl;
-}
-
-void Server::execMODE(Client& client, const std::string line)
-{
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***MODE: ";
-    std::cout << line << std::endl;
-}
-
 void Server::execUSER(Client& client, const std::string line)
 {
     // parse line
@@ -128,19 +92,10 @@ void Server::execNICK(Client& client, const std::string line)
         }
     }
 
-    if (client.getNickname().empty())
-    {
-        std::cout << "Nick " << name << " has been added.\n";
-    }
-    else
-    {
-        Utils::writeTo("Nickname " + name + " set.\n", client.getId());
-        std::cout << "Nickname " << name << " set.\n";
-
-    }
-
-        client.setNickActive();
-        client.setNickname(name);
+    client.setNickname(name);
+    replyWelcome(client);
+    client.setNickActive();
+    std::cout << "Nickname " << name << " set.\n";
     //parse rest??
 }
 
@@ -159,7 +114,7 @@ void Server::execLIST(Client& client, const std::string line)
                 break;
         }
         // list users
-        printList(it->getList(), client.getId()); // TODO: need getter for Channel
+       it->printList(client.getId());
     }
     else
     {
@@ -172,9 +127,13 @@ void Server::execLIST(Client& client, const std::string line)
 
 void Server::execWHO(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    (void)line;
-    std::cout << "***WHO***\n";
+    // look for channel
+    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
+    if (channelIt == _channels.end())
+    {
+        replyWho(client, *channelIt);
+        replyEndOfWho(client, *channelIt);
+    }
 }
 
 void Server::execQUIT(Client& client, const std::string line)
@@ -199,8 +158,76 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     }
 
     std::cout << "Private Message " << client.getNickname() << " user: [" << nickname << "] message: [" << messageReceived << "]" << std::endl;
+}
 
+/**
+ * CHANNEL specific commands
+ * */
+
+void Server::execJOIN(Client& client, const std::string line)
+{
+    std::string channelName(returnChannelName(line));
+    // look for channel
+    ChannelsList::const_iterator it = getChannel(channelName);
     
+    // if no channel, create one
+    if (it == _channels.end())
+    {
+        _channels.push_back(Channel(channelName, client));
+        const Channel channel(_channels.back());
+        replyJoin(client, channel);
+    }
+    else
+    {
+        // add user to channel
+    }
+
+}
+
+void Server::execKICK(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***KICK: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execINVITE(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***INVITE: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execTOPIC(Client& client, const std::string line)
+{
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***TOPIC: ";
+    std::cout << line << std::endl;
+}
+
+void Server::execMODE(Client& client, const std::string line)
+{
+    // look for channel
+    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
+
+    if (channelIt != _channels.end())
+        replyChannelMode(client, *channelIt);
+
+    replyName(client, *channelIt);
+    replyEndOfNames(client, *channelIt);
+    replyChannelMode(client, *channelIt);
+    replyCreationTime(client, *channelIt);
+}
+
+void Server::execPART(Client& client, const std::string line)
+{
+    // input: "PART #<channel> :Leaving"
+    // out:
+    // to sending client: "You have left channel #<channel> (Leaving)
+
+    std::cout << client.getUsername() << ": ";
+    std::cout << "***PART: ";
+    std::cout << "Client " << client.getNickname() << " left channel " << line << std::endl;
 }
 
 void Server::execCAP(Client& client, std::string command)

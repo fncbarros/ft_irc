@@ -12,47 +12,33 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <common.hpp>
 
+// Forward declarations
+class Channel;
+
+// Type definitions
 typedef struct auth {
     bool    isValidPassword;
     bool    isValidUser;
     bool    isValidNickName;
 
-    auth()
-    : isValidPassword(false),
-    isValidUser(false),
-    isValidNickName(false) {}
-
-    auth(const auth& other)
-    {
-        isValidPassword = other.isValidPassword;
-        isValidUser = other.isValidUser;
-        isValidNickName = other.isValidNickName;
-    }
-
-    auth operator=(const auth& other)
-    {
-        if (this != &other)
-        {
-            *this = other;
-        }
-        return *this;
-    }
+    auth();
+    auth(const auth& other);
+    auth operator=(const auth& other);
 
 } t_auth;
 
 class Client
 {
-    // Special functions
 public:
     Client(const int socket_id);
     Client(const Client& other);
     ~Client();
     Client&         operator=(const Client& other);
     int             operator==(const Client& other);
+    std::string     toString(void) const;
 
-    // Public functions
     std::string     getNickname(void) const;
     std::string     getUsername(void) const;
     bool            isValid(void) const;
@@ -70,13 +56,10 @@ public:
     void            registerBuffer(const std::string msg);
     std::string     returnLine(void);
 
-
-    // Data
 private:
-    int         _socket_id;
-    std::string _nickname;
-    std::string _username;
-    bool        _operator;
-    t_auth      _auth;
-    std::string _msgBuffer;
+    int                     _socket_id;
+    std::string             _nickname;
+    std::string             _username;
+    t_auth                  _auth;
+    std::string             _msgBuffer;
 };

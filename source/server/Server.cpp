@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/09 14:52:41 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/09 15:16:35 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,11 @@ bool Server::inspectEvent(int fd)
     std::string command(rawMsg);
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
+        std::cout << "message: " << message->first << " " << message->second << std::endl;
+        if (message->first.empty())
+        {
+            deleteClient(client->getId());
+        }
         if (!message->first.compare("CAP"))
         {
             execCAP(*client, command);
@@ -215,3 +220,4 @@ std::string    Server::readMessage(int fd) const
     }
     return buffer;
 }
+
