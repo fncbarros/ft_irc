@@ -150,7 +150,7 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 
     if (nickname.at(0) == '#')
     {
-        channelPrivateMessage(client, nickname, messageReceived);
+        channelPrivateMessage(client, nickname.substr(1), messageReceived);
     }
     else
     {
@@ -182,8 +182,7 @@ void Server::execJOIN(Client& client, const std::string line)
         if (it == _channels.end())
         {
             _channels.push_back(Channel(channelName, client));
-            const Channel channel(_channels.back());
-            replyJoin(client, channel);
+            replyJoin(client, _channels.back());
         }
         else
         {
@@ -218,16 +217,7 @@ void Server::execTOPIC(Client& client, const std::string line)
 
 void Server::execMODE(Client& client, const std::string line)
 {
-    // look for channel
-    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
-
-    if (channelIt != _channels.end())
-        replyChannelMode(client, *channelIt);
-
-    replyName(client, *channelIt);
-    replyEndOfNames(client, *channelIt);
-    replyChannelMode(client, *channelIt);
-    replyCreationTime(client, *channelIt);
+    std::cout << client.getId() << " " + line << std::endl;
 }
 
 void Server::execPART(Client& client, const std::string line)

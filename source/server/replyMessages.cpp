@@ -53,6 +53,16 @@ void    Server::replyPrivateMessage(const Client& client, const Client& targetCl
     Utils::writeTo(":" + client.toString() + " PRIVMSG " + targetClient.getNickname() + " " + message + "\r\n", targetClient.getId());
 }
 
+void    Server::replyChannelNotFound(const Client& client, const std::string channelName) const
+{
+    Utils::writeTo(":" + client.toString() + " " + CHANNELNOTFOUND + " " + client.getNickname() + " #" + channelName + " :No such channel\r\n", client.getId());
+}
+
+void    Server::replyChannelMessage(const Client& client,  const Client& clientSender, const std::string channelName, const std::string message) const
+{
+    Utils::writeTo(":" + clientSender.toString() + " PRIVMSG #" + channelName + " " + message + "\r\n", client.getId());
+}
+
 void    Server::replyCAPLS(Client& client, std::string capabilities) const
 {
     Utils::writeTo(":IRC42 " + capabilities + "\r\n", client.getId());
