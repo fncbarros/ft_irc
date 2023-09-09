@@ -38,10 +38,17 @@ UserList Channel::getList() const
     return _users;
 }
 
-void Channel::addClient(const Client& client)
+bool Channel::addClient(const Client& client)
 {
-    if (_users.size() < _modes.limit)
+    if (_users.size() < _modes.limit || !limit())
+    {
         _users.push_back(std::make_pair(&client, false));
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void Channel::printList(int fd) const
