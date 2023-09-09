@@ -167,19 +167,32 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 void Server::execJOIN(Client& client, const std::string line)
 {
     std::string channelName(returnChannelName(line));
-    // look for channel
-    ChannelsList::const_iterator it = getChannel(channelName);
-    
-    // if no channel, create one
-    if (it == _channels.end())
+    if (channelName.empty())
     {
-        _channels.push_back(Channel(channelName, client));
-        const Channel channel(_channels.back());
-        replyJoin(client, channel);
+        Utils::writeTo("Usage: JOIN <channel>, joins the channel", client.getId());
+    }
+    else if (channelName.find(BADJOIN) == 0u)
+    {
+        replyBadJoin(client, channelName.substr(3u));
     }
     else
     {
-        // add user to channel
+        // look for channel
+        ChannelsList::iterator it = getChannel(channelName);
+        
+        // if no channel, create one
+        if (it == _channels.end())
+        {
+            _channels.push_back(Channel(channelName, client));
+            const Channel channel(_channels.back());
+            replyJoin(client, channel);
+        }
+        else
+        {
+            // add user to channel
+            it->addClient(client);
+            replyJoin(client, *it);
+        }
     }
 
 }

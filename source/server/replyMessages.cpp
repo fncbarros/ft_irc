@@ -121,3 +121,9 @@ void    Server::replyEndOfWho(const Client& client, const Channel& channel) cons
     Utils::writeTo(":" + HOST + " " + ENDOFWHO + " " + client.getNickname() + " " + channel.getName() + " " +
                    ":End of /WHO list\r\n", client.getId());
 }
+
+void    Server::replyBadJoin(const Client& client, const std::string& line) const
+{
+    // :irc4.acc.umu.se 448 teeee . :Cannot join channel: Channel name must start with a hash mark (#)
+    Utils::writeTo(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + line + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
+}

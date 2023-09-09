@@ -42,8 +42,9 @@ static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params
 static const std::string CREATIONTIME = "329";
 static const std::string WHOSPCRPL = "354";
 static const std::string ENDOFWHO = "315";
+// Error codes
 static const std::string NICKNOTFOUND = "401";
-// static const char *ADDRESS = "0.0.0.0";
+static const std::string BADJOIN = "448";
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -115,15 +116,17 @@ private:
     void                            replyWho(const Client& client, const Channel& channel) const;
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
     void                            replyCAPLS(Client& client, std::string capabilities) const;
+    void                            replyBadJoin(const Client& client, const std::string& line) const;
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
+    ConnectionsList::const_iterator getClient(const int fd) const;
     ConnectionsList::iterator       getClient(const std::string &nickname);
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
     //Channel related
-    ChannelsList::const_iterator    getChannel(const std::string& name)const;
+    ChannelsList::iterator          getChannel(const std::string& name);
     static const std::string        returnChannelName(const std::string& line);
 
 
