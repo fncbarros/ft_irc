@@ -178,7 +178,7 @@ void Server::execJOIN(Client& client, const std::string line)
     else
     {
         // look for channel
-        ChannelsList::const_iterator it = getChannel(channelName);
+        ChannelsList::iterator it = getChannel(channelName);
         
         // if no channel, create one
         if (it == _channels.end())
@@ -190,7 +190,8 @@ void Server::execJOIN(Client& client, const std::string line)
         else
         {
             // add user to channel
-            
+            it->addClient(client);
+            replyJoin(client, *it);
         }
     }
 

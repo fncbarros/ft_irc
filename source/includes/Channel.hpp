@@ -31,7 +31,7 @@ public:
     std::string getName() const;
     UserList    getList() const;
 
-    void        addClient(const Client& client);
+    bool        addClient(const Client& client);
     void        printList(int fd) const;
 
     struct modes {

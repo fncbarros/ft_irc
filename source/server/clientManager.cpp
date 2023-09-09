@@ -22,6 +22,16 @@ ConnectionsList::iterator Server::getClient(const int fd)
     return _connections.end();
 }
 
+ConnectionsList::const_iterator Server::getClient(const int fd) const
+{
+    for (ConnectionsList::const_iterator client = _connections.begin(); client != _connections.end(); client++)
+    {
+        if (client->getId() == fd)
+            return client;
+    }
+    return _connections.end();
+}
+
 ConnectionsList::iterator Server::getClient(const std::string &nickname)
 {
     for (ConnectionsList::iterator client = _connections.begin(); client != _connections.end(); client++)

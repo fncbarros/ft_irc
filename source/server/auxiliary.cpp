@@ -12,10 +12,10 @@
 
 #include <Server.hpp>
 
-ChannelsList::const_iterator Server::getChannel(const std::string& name) const
+ChannelsList::iterator Server::getChannel(const std::string& name)
 {
-    ChannelsList::const_iterator it;
-    for (it = _channels.begin(); it != _channels.end(); it++)
+    ChannelsList::iterator it =_channels.begin();
+    for ( ; it != _channels.end(); it++)
     {
         if (it->getName() == name)
             break ;

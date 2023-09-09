@@ -118,12 +118,13 @@ private:
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
+    ConnectionsList::const_iterator getClient(const int fd) const;
     ConnectionsList::iterator       getClient(const std::string &nickname);
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
     //Channel related
-    ChannelsList::const_iterator    getChannel(const std::string& name)const;
+    ChannelsList::iterator          getChannel(const std::string& name);
     static const std::string        returnChannelName(const std::string& line);
 
 
