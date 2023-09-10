@@ -135,7 +135,7 @@ private:
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
-    ConnectionsList::const_iterator       getClient(const std::string &nickname) const;
+    ConnectionsList::const_iterator getClient(const std::string &nickname) const;
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);

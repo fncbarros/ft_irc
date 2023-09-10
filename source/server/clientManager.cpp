@@ -45,6 +45,7 @@ ConnectionsList::const_iterator Server::getClient(const std::string &nickname) c
 void Server::deleteClient(const int fd)
 {
     ConnectionsList::iterator client = getClient(fd);
+    // TODO: check if client belongs to any Channel and remove them
     if (client != _connections.end())
         _connections.erase(client);
     close(fd);

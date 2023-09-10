@@ -184,6 +184,7 @@ void Server::execJOIN(Client& client, const std::string line)
         }
         else
         {
+            // TODO: need to check if client is not channel user already
             Channel& channel(*channelIt);
             const UserList& list(channel.getList());
 
