@@ -19,6 +19,23 @@ Channel::Channel(const std::string name, const Client& client)
     std::cout << "Channel " << name << " created." << std::endl;
 }
 
+Channel::Channel(const Channel& other)
+{
+    *this = other;
+}
+
+Channel& Channel::operator=(const Channel& other)
+{
+    if (this != &other)
+    {
+        _name = other._name;
+        _topic = other._topic;
+        _modes = other._modes;
+        _users = other._users;
+    }
+    return *this;
+}
+
 Channel::~Channel()
 {
     // broadcast to all users
@@ -72,18 +89,18 @@ Channel::modes::modes()
 
 Channel::modes::modes(const modes &other)
 {
-    invite_only = other.invite_only;
-    topic_restricted = other.topic_restricted;
-    key = other.key;
-    operator_privs = other.operator_privs;
-    limit = other.limit;
+    *this = other;
 }
 
 Channel::modes& Channel::modes::operator=(const modes &other)
 {
     if (this != &other)
     {
-        *this = other;
+        invite_only = other.invite_only;
+        topic_restricted = other.topic_restricted;
+        key = other.key;
+        operator_privs = other.operator_privs;
+        limit = other.limit;
     }
     return *this;
 }

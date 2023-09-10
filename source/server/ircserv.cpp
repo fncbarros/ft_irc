@@ -26,7 +26,7 @@ void signal_handler(int signal)
 
 int main(int argc, char* argv[])
 {
-	if (argc < 3)
+	if (argc != 3)
 	{
         std::cerr << "Invalid arguments\nUsage: ./ircserv [port] [password]" << std::endl;
         return 1;

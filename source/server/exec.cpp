@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:22:16 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:07:55 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,16 +146,14 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     const std::string nickname(line.substr(0, line.find(' ')));
     const std::string messageReceived(line.substr(line.find(' ') + 1));
 
-    ConnectionsList::iterator newClient = getClient(nickname);
-
-    if (newClient == _connections.end())
-        replyPrivMessageNickNotFound(client, nickname);
+    if (nickname.at(0) == '#')
+    {
+        channelPrivateMessage(client, nickname.substr(1), messageReceived);
+    }
     else
     {
-       replyPrivateMessage(client, *newClient, messageReceived);
+        clientPrivateMessage(client, nickname, messageReceived);
     }
-
-    std::cout << "Private Message " << client.getNickname() << " user: [" << nickname << "] message: [" << messageReceived << "]" << std::endl;
 }
 
 /**
@@ -182,8 +180,7 @@ void Server::execJOIN(Client& client, const std::string line)
         if (it == _channels.end())
         {
             _channels.push_back(Channel(channelName, client));
-            const Channel channel(_channels.back());
-            replyJoin(client, channel);
+            replyJoin(client, _channels.back());
         }
         else
         {
@@ -218,16 +215,7 @@ void Server::execTOPIC(Client& client, const std::string line)
 
 void Server::execMODE(Client& client, const std::string line)
 {
-    // look for channel
-    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
-
-    if (channelIt != _channels.end())
-        replyChannelMode(client, *channelIt);
-
-    replyName(client, *channelIt);
-    replyEndOfNames(client, *channelIt);
-    replyChannelMode(client, *channelIt);
-    replyCreationTime(client, *channelIt);
+    std::cout << client.getId() << " " + line << std::endl;
 }
 
 void Server::execPART(Client& client, const std::string line)
@@ -239,4 +227,16 @@ void Server::execPART(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***PART: ";
     std::cout << "Client " << client.getNickname() << " left channel " << line << std::endl;
+}
+
+void Server::execCAP(Client& client, std::string command)
+{
+    std::string capabilities;
+    if (command.find("CAP LS") != std::string::npos)
+        capabilities = "CAP * LS :cap1, cap2, cap3";
+    else if (command.find("CAP REQ") != std::string::npos)
+        capabilities = "CAP * ACK :cap1, cap2, -cap3";
+    else if (command.find("CAP END") != std::string::npos)
+        capabilities = "CAP * ACK :CAP END";
+    replyCAPLS(client, capabilities);
 }

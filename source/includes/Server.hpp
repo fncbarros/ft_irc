@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:14:05 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ static const std::string LISTEND = "323";
 
 // Error codes
 static const std::string NICKNOTFOUND = "401";
+static const std::string CHANNELNOTFOUND = "403";
 static const std::string BADJOIN = "448";
 
 // Type Definitions
@@ -95,6 +96,7 @@ private:
     void                            execQUIT(Client& client, const std::string line);
     void                            execPRIVMSG(Client& client, const std::string line);
     // Channel-specific commands
+    void                            execCAP(Client& client, std::string command);
     void                            execJOIN(Client& client, const std::string line);
     void                            execKICK(Client& client, const std::string line);
     void                            execINVITE(Client& client, const std::string line);
@@ -118,11 +120,17 @@ private:
     void                            replyCreationTime(const Client& client, const Channel& channel) const;
     void                            replyWho(const Client& client, const Channel& channel) const;
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
+    void                            replyCAPLS(Client& client, std::string capabilities) const;
     void                            replyBadJoin(const Client& client, const std::string& line) const;
     void                            replyList(const Client& client) const;
     void                            replyList(const Client& client, const Channel& channel) const;
+    void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string channelName, const std::string message) const;
+    void                            replyChannelNotFound(const Client& client, const std::string channelName) const;
 
 
+    // communication.cpp
+    void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
+    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
