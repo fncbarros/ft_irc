@@ -23,6 +23,17 @@ ChannelsList::iterator Server::getChannel(const std::string& name)
     return it;
 }
 
+ChannelsList::const_iterator Server::getChannel(const std::string& name) const
+{
+    ChannelsList::const_iterator it =_channels.begin();
+    for ( ; it != _channels.end(); it++)
+    {
+        if (it->getName() == name)
+            break ;
+    }
+    return it;
+}
+
 const std::string Server::returnChannelName(const std::string& line)
 {
     size_t pos(line.find('#'));
