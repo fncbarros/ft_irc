@@ -143,18 +143,12 @@ void    Server::replyList(const Client& client) const
     // :irc.example.com 322 MyNickname #channel 42 :Channel topic
     // :irc.example.com 323 MyNickname :End of /LIST
 
-    std::stringstream ss;
-    ss << _channels.size();
-    std::string numberOfChannels;
-    ss >> numberOfChannels;
+    std::string numberOfChannels = Utils::numToStr(_channels.size());
 
     Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
     for (ChannelsList::const_iterator it = _channels.begin(); it != _channels.end(); it++)
     {
-        std::string numberOfUsers;
-        ss.clear();
-        ss << it->getList().size();
-        ss >> numberOfUsers;
+        std::string numberOfUsers = Utils::numToStr(it->getList().size());
 
         Utils::writeTo(":" + HOST + " " + LIST + " " + client.getNickname() + " #" + it->getName() + " " + numberOfUsers + ":" + it->getTopic() + "\r\n", client.getId());
     }

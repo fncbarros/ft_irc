@@ -28,6 +28,8 @@
 #include <map>
 #include <Channel.hpp>
 
+#include "utils.tpp"
+
 // Forward declarations
 class Channel;
 
@@ -54,11 +56,11 @@ static const std::string possible_tokens[token_num] =
     "PART",
 };
 
-// Utils
+// utils.cpp
 namespace Utils
 {
     std::string toUpper(const std::string& original);
     bool        isDigit(const std::string& s);
     bool        writeTo(const std::string& s, const int fd);
-    std::string        timeToStr(void);
+    std::string timeToStr(void);
 } // namespace Utils
