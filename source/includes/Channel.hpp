@@ -30,11 +30,11 @@ public:
     ~Channel ();
 
     // Getters
-    std::string getName() const;
-    UserList    getList() const;
+    std::string     getName() const;
+    const UserList& getList() const;
 
-    bool        addClient(const Client& client);
-    void        printList(int fd) const;
+    bool            addClient(const Client& client);
+    void            printList(int fd) const;
 
     struct modes {
         bool invite_only;

@@ -50,7 +50,7 @@ std::string Channel::getName() const
     return _name;
 }
 
-UserList Channel::getList() const
+const UserList& Channel::getList() const
 {
     return _users;
 }

@@ -139,10 +139,6 @@ void    Server::replyBadJoin(const Client& client, const std::string& line) cons
 
 void    Server::replyList(const Client& client) const
 {
-    // :irc.example.com 321 MyNickname :Channel list - 10 channels
-    // :irc.example.com 322 MyNickname #channel 42 :Channel topic
-    // :irc.example.com 323 MyNickname :End of /LIST
-
     std::string numberOfChannels = Utils::numToStr(_channels.size());
 
     Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());

@@ -174,19 +174,31 @@ void Server::execJOIN(Client& client, const std::string line)
     else
     {
         // look for channel
-        ChannelsList::iterator it = getChannel(channelName);
+        ChannelsList::iterator channelIt = getChannel(channelName);
         
         // if no channel, create one
-        if (it == _channels.end())
+        if (channelIt == _channels.end())
         {
             _channels.push_back(Channel(channelName, client));
             replyJoin(client, _channels.back());
         }
         else
         {
+            Channel& channel(*channelIt);
+            const UserList& list(channel.getList());
+
             // add user to channel
-            it->addClient(client);
-            replyJoin(client, *it);
+            channel.addClient(client);
+            replyJoin(client, channel);
+
+            // Broadcast to all channel users
+            for (UserList::const_iterator userIt = list.begin(); userIt != list.end(); userIt++)
+            {
+                const Client& user(*(userIt->first));
+                //  :pipo!francisco@C82870:FB7641:E1092C:42BAE0:IP JOIN #test * :realname
+                Utils::writeTo(":" + client.toString() + " JOIN #" + channel.getName() + " *:realname\r\n", user.getId());
+                Utils::writeTo( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
+            }
         }
     }
 
