@@ -44,6 +44,7 @@ static const std::string WHOSPCRPL = "354";
 static const std::string ENDOFWHO = "315";
 // Error codes
 static const std::string NICKNOTFOUND = "401";
+static const std::string CHANNELNOTFOUND = "403";
 static const std::string BADJOIN = "448";
 
 // Type Definitions
@@ -117,7 +118,13 @@ private:
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
     void                            replyCAPLS(Client& client, std::string capabilities) const;
     void                            replyBadJoin(const Client& client, const std::string& line) const;
+    void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string channelName, const std::string message) const;
+    void                            replyChannelNotFound(const Client& client, const std::string channelName) const;
 
+
+    // communication.cpp
+    void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
+    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;

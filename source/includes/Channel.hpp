@@ -25,6 +25,8 @@ public:
     // Special functions
     Channel();
     Channel (const std::string name, const Client& client);
+    Channel(const Channel& other);
+    Channel& operator=(const Channel& other);
     ~Channel ();
 
     // Getters
