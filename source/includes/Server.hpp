@@ -52,9 +52,10 @@ typedef std::pair<std::string, std::string> tokenPair;
 typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
 typedef std::vector<Channel> ChannelsList;
-
 class Server
 {
+    typedef void (Server::*exec_ptr)(Client&, const std::string);
+    typedef std::map<std::string, exec_ptr>  CommandMap;
     // Special functions
 public:
      Server();
@@ -84,6 +85,7 @@ private:
 
 
     // exec.cpp
+public:
     void                            exec(Client& client, const tokenPair& message);
     void                            execUSER(Client& client, const std::string line);
     void                            execNICK(Client& client, const std::string line);
@@ -100,6 +102,7 @@ private:
     void                            execMODE(Client& client, const std::string line);
     void                            execPART(Client& client, const std::string line);
 
+private:
     // replyMessages.cpp
     void                            replyPassMissMatch(const Client& client) const;
     void                            replyWelcome(const Client& client) const;
@@ -154,5 +157,6 @@ private:
     ChannelsList            _channels;
     bool                    _interrupt;
     std::string             _server_date_created;
+    CommandMap              _commands;
 
 };
