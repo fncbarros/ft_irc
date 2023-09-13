@@ -88,26 +88,7 @@ void Server::execNICK(Client& client, const std::string line)
 
 void Server::execLIST(Client& client, const std::string line)
 {
-    const std::string token = line.substr(0u, line.find(' ')); // TODO: check if find returned npos
-
-    // parse line
-    if (token[0] == '#')
-    {
-        ChannelsList::const_iterator it;
-        // lookup channel
-        for ( it = _channels.begin(); it != _channels.end(); it++)
-        {
-            if (token.substr(1u, token.size() - 1) == it->getName())
-                break;
-        }
-        // list users
-       it->printList(client.getId());
-    }
-    else
-    {
-        // list channels
-        replyList(client);
-    }
+    replyList(client);
 }
 
 void Server::execWHO(Client& client, const std::string line)
