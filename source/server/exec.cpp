@@ -17,30 +17,17 @@ void Server::exec(Client& client, const tokenPair& message)
     if (!client.isPassActive())
         return ;
 
-    if (message.first == "JOIN")
-        execJOIN(client, message.second);
-    else if(message.first == "KICK")
-        execKICK(client, message.second);
-    else if(message.first == "INVITE")
-        execINVITE(client, message.second);
-    else if(message.first == "TOPIC")
-        execTOPIC(client, message.second);
-    else if(message.first == "MODE")
-        execMODE(client, message.second);
-    else if(message.first == "USER")
-        execUSER(client, message.second);
-    else if(message.first == "NICK")
-        execNICK(client, message.second);
-    else if(message.first == "LIST")
-        execLIST(client, message.second);
-    else if(message.first == "WHO")
-        execWHO(client, message.second);
-    else if(message.first == "QUIT")
-        execQUIT(client, message.second);
-    else if(message.first == "PRIVMSG")
-        execPRIVMSG(client, message.second);
+    CommandMap::iterator itCommand = _commands.find(message.first);
+    
+    if (itCommand != _commands.end())
+    {
+        exec_ptr command = itCommand->second;
+        (this->*command)(client, message.second);
+    } 
     else
+    {
         std::cout << message.first << " " << message.second << std::endl;
+    }
 }
 
 void Server::execUSER(Client& client, const std::string line)
