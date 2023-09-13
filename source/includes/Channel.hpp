@@ -16,25 +16,26 @@
 class Client;
 
 // Type definitions
-typedef std::pair<const Client*, bool> User; // true if operator
-typedef std::vector<User> UserList;
+// typedef std::pair<const Client*, bool> User; // true if operator
+// typedef std::vector<User> UserList;
+typedef std::map<int, const Client*> ClientMap;
 
 class Channel
 {
 public:
     // Special functions
     Channel();
-    Channel (const std::string name, const Client& client);
+    Channel (const std::string name, const Client* client);
     Channel(const Channel& other);
     Channel& operator=(const Channel& other);
     ~Channel ();
 
     // Getters
     std::string getName() const;
-    UserList    getList() const;
+    ClientMap getClients() const;
 
     bool        addClient(const Client& client);
-    void        printList(int fd) const;
+    void        printList(int fd) const; // DEBUG
 
     struct modes {
         bool invite_only;
@@ -61,11 +62,12 @@ public:
     void        setNoKey(void);
     void        setPriviledges(const bool set);
     void        setLimit(const size_t limit);
+    void        deleteClient(const int fd);
 
     // Data
 private:
     std::string     _name;
     std::string     _topic;
     struct modes    _modes;
-    UserList        _users;
+    ClientMap       _clientsMap;
 };

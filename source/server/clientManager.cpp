@@ -44,6 +44,10 @@ ConnectionsList::iterator Server::getClient(const std::string &nickname)
 
 void Server::deleteClient(const int fd)
 {
+    for (ChannelsList::iterator itChannel = _channels.begin(); itChannel != _channels.end(); itChannel++)
+    {
+        itChannel->deleteClient(fd);
+    }
     ConnectionsList::iterator client = getClient(fd);
     if (client != _connections.end())
         _connections.erase(client);
