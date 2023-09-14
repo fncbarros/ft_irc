@@ -88,6 +88,7 @@ void Server::execNICK(Client& client, const std::string line)
 
 void Server::execLIST(Client& client, const std::string line)
 {
+    (void)line;
     replyList(client);
 }
 
@@ -147,23 +148,23 @@ void Server::execJOIN(Client& client, const std::string line)
         // if no channel, create one
         if (channelIt == _channels.end())
         {
-            _channels.push_back(Channel(channelName, client));
+            _channels.push_back(Channel(channelName, &client));
             replyJoin(client, _channels.back());
         }
         else
         {
             // TODO: need to check if client is not channel user already
             Channel& channel(*channelIt);
-            const UserList& list(channel.getList());
+            const ClientMap list(channel.getClients());
 
             // add user to channel
             channel.addClient(client);
             replyJoin(client, channel);
 
             // Broadcast to all channel users
-            for (UserList::const_iterator userIt = list.begin(); userIt != list.end(); userIt++)
+            for (ClientMap::const_iterator clientIt = list.begin(); clientIt != list.end(); clientIt++)
             {
-                const Client& user(*(userIt->first));
+                const Client& user(*(clientIt->second));
                 //  :pipo!francisco@C82870:FB7641:E1092C:42BAE0:IP JOIN #test * :realname
                 Utils::writeTo(":" + client.toString() + " JOIN #" + channel.getName() + " *:realname\r\n", user.getId());
                 Utils::writeTo( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
