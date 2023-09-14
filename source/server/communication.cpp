@@ -13,13 +13,12 @@ void    Server::channelPrivateMessage(const Client& client, const std::string& c
     else
     {
         std::cout << client.getNickname() << std::endl;
-        UserList channelclients = channel->getList();
-        UserList::iterator itclient;
-        for (itclient = channelclients.begin(); itclient != channelclients.end(); itclient++)
+        ClientMap clientMap = channel->getClients();
+        for(ClientMap::iterator itClient = clientMap.begin(); itClient != clientMap.end(); itClient++)
         {
-            if (itclient->first != &client)
+            if (itClient->second != &client)
             {
-                replyChannelMessage(*itclient->first, client, channel->getName(), message);
+                replyChannelMessage(*itClient->second, client, channel->getName(), message);
             }
         }
     }

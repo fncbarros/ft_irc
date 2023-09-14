@@ -12,10 +12,10 @@
 
 #include <Channel.hpp>
 
-Channel::Channel(const std::string name, const Client& client)
+Channel::Channel(const std::string name, const Client* client)
 : _name(name)
 {
-    _users.push_back(std::make_pair(&client, true));
+    _clientsMap.insert(std::make_pair(client->getId(), client));
     std::cout << "Channel " << name << " created." << std::endl;
 }
 
@@ -31,18 +31,14 @@ Channel& Channel::operator=(const Channel& other)
         _name = other._name;
         _topic = other._topic;
         _modes = other._modes;
-        _users = other._users;
+        _clientsMap = other._clientsMap;
     }
     return *this;
 }
 
 Channel::~Channel()
 {
-    // broadcast to all users
-    for (UserList::iterator it = _users.begin(); it != _users.end(); it++)
-    {
-//        Utils::writeTo("Channel " + _name + " has been removed.\n", it->first->getId());
-    }
+    // TODO: broadcast to server?
 }
 
 std::string Channel::getName() const
@@ -50,30 +46,36 @@ std::string Channel::getName() const
     return _name;
 }
 
-UserList Channel::getList() const
+ClientMap Channel::getClients() const
 {
-    return _users;
+    return _clientsMap;
 }
 
 bool Channel::addClient(const Client& client)
 {
-    if (_users.size() < _modes.limit || !limit())
-    {
-        _users.push_back(std::make_pair(&client, false));
-        return true;
-    }
-    else
+    if (_clientsMap.size() == _modes.limit)
     {
         return false;
     }
+    else if (_clientsMap.find(client.getId()) != _clientsMap.end())
+    {
+        return false;
+    }
+    else
+    {
+        _clientsMap.insert(std::make_pair(client.getId(), &client));
+        return true;
+    }
+
 }
 
 void Channel::printList(int fd) const
 {
     std::string nameList;
-    for (UserList::const_iterator it = _users.begin(); it != _users.end(); it++)
+
+    for (ClientMap::const_iterator it = _clientsMap.begin(); it != _clientsMap.end(); it++)
     {
-        nameList += it->first->getNickname() + "\n";
+        nameList += it->second->getNickname() + "\n";
     }
     Utils::writeTo(nameList, fd);
 }
@@ -165,4 +167,12 @@ void Channel::setPriviledges(const bool set)
 void Channel::setLimit(const size_t limit)
 {
     _modes.limit = limit;
+}
+
+void Channel::deleteClient(const int fd)
+{
+    if (_clientsMap.erase(fd) > 0)
+    {
+        //TODO: broadcast to all clients in the channel
+    }
 }

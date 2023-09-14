@@ -82,10 +82,13 @@ void    Server::replyName(const Client& client, const Channel& channel) const
     Utils::writeTo(":" + HOST + " " + NAMREPLY + " " + client.getNickname() + " = #" + channel.getName() + " :@", client.getId());
 
     // list users
-    const UserList list = channel.getList();
-    for (UserList::const_iterator it = list.begin(); it != list.end(); it++)
-        Utils::writeTo(it->first->toString() + " ", client.getId());
+    const ClientMap map = channel.getClients();
+    for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
+    {
+        Utils::writeTo(it->second->toString() + " ", client.getId());
+    }
     Utils::writeTo("\r\n", client.getId());
+  
 }
 
 void    Server::replyEndOfNames(const Client& client, const Channel& channel) const

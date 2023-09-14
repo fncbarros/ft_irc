@@ -168,7 +168,7 @@ void Server::execJOIN(Client& client, const std::string line)
         // if no channel, create one
         if (it == _channels.end())
         {
-            _channels.push_back(Channel(channelName, client));
+            _channels.push_back(Channel(channelName, &client));
             replyJoin(client, _channels.back());
         }
         else
