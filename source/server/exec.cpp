@@ -176,9 +176,28 @@ void Server::execJOIN(Client& client, const std::string line)
 
 void Server::execKICK(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***KICK: ";
-    std::cout << line << std::endl;
+    // 441 (not on channel)
+    // 403 (no such channel)
+    // 401 (no such nick/channel)
+    const int clientId(client.getId());
+
+    if (line.empty())
+    {
+        Utils::writeTo("Usage: KICK <nick> [reason], kicks the nick from the current channel (needs chanop)", clientId);
+    }
+
+    const std::string channelName(returnChannelName(line));
+    ChannelsList::const_iterator channel = getChannel(channelName);
+    std::cout << "Channel Name: " << channelName << std::endl;
+    if (channel == _channels.end())
+    {
+        replyNoSuchChannel(client);
+        return ;
+    }
+
+
+    // const std::string userNick();
+
 }
 
 void Server::execINVITE(Client& client, const std::string line)
