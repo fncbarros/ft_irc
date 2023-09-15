@@ -160,3 +160,11 @@ void    Server::replyList(const Client& client, const Channel& channel) const
     (void)client;
     // Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
 }
+
+void    Server::replyNoSuchChannel(const Client& client) const
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    Utils::writeTo(HOST + " " + NOSUCHCHANNEL + " " + nick + " " + HOST + " :No such channel\r\n", id);
+}
+

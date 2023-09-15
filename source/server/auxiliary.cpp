@@ -42,5 +42,5 @@ const std::string Server::returnChannelName(const std::string& line)
         std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
         return (BADJOIN + line.substr(0u, line.find(' ')));
     }
-    return (line.substr(pos + 1));
+    return (line.substr(pos + 1, line.find(" " - 1)));
 }

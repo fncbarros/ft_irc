@@ -27,29 +27,30 @@
 class Channel;
 
 // Const Definitions
-const int BUFFER_SIZE = 30720;
+const int BUFFER_SIZE(30720);
 
-static const std::string WELCOME = "001";
-static const std::string YOURHOST = "002";
-static const std::string CREATED = "003";
-static const std::string MYINFO = "004";
-static const std::string NICKCOLLISION = "433";
-static const std::string PASSMISMATCH = "464";
+static const std::string WELCOME("001");
+static const std::string YOURHOST("002");
+static const std::string CREATED("003");
+static const std::string MYINFO("004");
+static const std::string NICKCOLLISION("433");
+static const std::string PASSMISMATCH("464");
 
-static const std::string NAMREPLY = "353";
-static const std::string ENDOFNAMES = "366"; // <channel> :<info>
-static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params>
-static const std::string CREATIONTIME = "329";
-static const std::string WHOSPCRPL = "354";
-static const std::string ENDOFWHO = "315";
-static const std::string LISTSTART = "321";
-static const std::string LIST = "322";
-static const std::string LISTEND = "323";
+static const std::string NAMREPLY("353");
+static const std::string ENDOFNAMES("366"); // <channel> :<info>
+static const std::string CHANNELMODEIS("324"); // <channel> <mode> <mode_params>
+static const std::string CREATIONTIME("329");
+static const std::string WHOSPCRPL("354");
+static const std::string ENDOFWHO("315");
+static const std::string LISTSTART("321");
+static const std::string LIST("322");
+static const std::string LISTEND("323");
 
 // Error codes
-static const std::string NICKNOTFOUND = "401";
-static const std::string CHANNELNOTFOUND = "403";
-static const std::string BADJOIN = "448";
+static const std::string NICKNOTFOUND("401");
+static const std::string CHANNELNOTFOUND("403");
+static const std::string BADJOIN("448");
+static const std::string NOSUCHCHANNEL("403");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -129,7 +130,7 @@ private:
     void                            replyBadJoin(const Client& client, const std::string& line) const;
     void                            replyList(const Client& client) const;
     void                            replyList(const Client& client, const Channel& channel) const;
-
+    void                            replyNoSuchChannel(const Client& client) const;
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
