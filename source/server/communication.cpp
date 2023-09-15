@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   communication.cpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: falmeida <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
+/*   Updated: 2023/08/12 14:47:13 by falmeida         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <Server.hpp>
 
 void    Server::channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message)
@@ -24,9 +36,9 @@ void    Server::channelPrivateMessage(const Client& client, const std::string& c
     }
 }
 
-void    Server::clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message)
+void    Server::clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message) const
 {
-    ConnectionsList::iterator newClient = getClient(nickname);
+    ConnectionsList::const_iterator newClient = getClient(nickname);
 
     if (newClient == _connections.end())
     {

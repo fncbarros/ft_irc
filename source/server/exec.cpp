@@ -88,28 +88,8 @@ void Server::execNICK(Client& client, const std::string line)
 
 void Server::execLIST(Client& client, const std::string line)
 {
-    const std::string token = line.substr(0u, line.find(' ')); // TODO: check if find returned npos
-
-    // parse line
-    if (token[0] == '#')
-    {
-        ChannelsList::const_iterator it;
-        // lookup channel
-        for ( it = _channels.begin(); it != _channels.end(); it++)
-        {
-            if (token.substr(1u, token.size() - 1) == it->getName())
-                break;
-        }
-        // list users
-       it->printList(client.getId());
-    }
-    else
-    {
-        // list channels
-    }
-    std::cout << client.getUsername() << ": ";
     (void)line;
-    std::cout << "***LIST***\n";
+    replyList(client);
 }
 
 void Server::execWHO(Client& client, const std::string line)
@@ -163,19 +143,32 @@ void Server::execJOIN(Client& client, const std::string line)
     else
     {
         // look for channel
-        ChannelsList::iterator it = getChannel(channelName);
+        ChannelsList::iterator channelIt = getChannel(channelName);
         
         // if no channel, create one
-        if (it == _channels.end())
+        if (channelIt == _channels.end())
         {
             _channels.push_back(Channel(channelName, &client));
             replyJoin(client, _channels.back());
         }
         else
         {
+            // TODO: need to check if client is not channel user already
+            Channel& channel(*channelIt);
+            const ClientMap list(channel.getClients());
+
             // add user to channel
-            it->addClient(client);
-            replyJoin(client, *it);
+            channel.addClient(client);
+            replyJoin(client, channel);
+
+            // Broadcast to all channel users
+            for (ClientMap::const_iterator clientIt = list.begin(); clientIt != list.end(); clientIt++)
+            {
+                const Client& user(*(clientIt->second));
+                //  :pipo!francisco@C82870:FB7641:E1092C:42BAE0:IP JOIN #test * :realname
+                Utils::writeTo(":" + client.toString() + " JOIN #" + channel.getName() + " *:realname\r\n", user.getId());
+                Utils::writeTo( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
+            }
         }
     }
 

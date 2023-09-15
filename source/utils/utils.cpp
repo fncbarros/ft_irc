@@ -53,9 +53,6 @@ namespace Utils
         std::string str;
 
         std::time(&currentTime);
-        std::stringstream ss;
-        ss << currentTime;
-        ss >> str;
-        return str;
+        return numToStr(currentTime);
     }
 }

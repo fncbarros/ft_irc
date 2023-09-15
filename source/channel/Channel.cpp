@@ -137,6 +137,11 @@ bool Channel::hasModes(void) const
     return (isInviteOnly() || isTopicRetricted() || hasKey() || hasOperatorPriviledges() || limit());
 }
 
+std::string Channel::getTopic(void) const
+{
+    return _topic;
+}
+
 void Channel::setInviteOnly(const bool set)
 {
     _modes.invite_only = set;

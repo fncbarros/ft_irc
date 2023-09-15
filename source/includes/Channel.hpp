@@ -16,8 +16,6 @@
 class Client;
 
 // Type definitions
-// typedef std::pair<const Client*, bool> User; // true if operator
-// typedef std::vector<User> UserList;
 typedef std::map<int, const Client*> ClientMap;
 
 class Channel
@@ -32,7 +30,7 @@ public:
 
     // Getters
     std::string getName() const;
-    ClientMap getClients() const;
+    ClientMap   getClients() const;
 
     bool        addClient(const Client& client);
     void        printList(int fd) const; // DEBUG
@@ -55,6 +53,8 @@ public:
     bool        hasOperatorPriviledges(void) const;
     size_t      limit(void) const;
     bool        hasModes(void) const;
+
+    std::string getTopic(void) const;
 
     void        setInviteOnly(const bool set);
     void        setTopicRestriction(const bool set);

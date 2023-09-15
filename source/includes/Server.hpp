@@ -42,6 +42,10 @@ static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params
 static const std::string CREATIONTIME = "329";
 static const std::string WHOSPCRPL = "354";
 static const std::string ENDOFWHO = "315";
+static const std::string LISTSTART = "321";
+static const std::string LIST = "322";
+static const std::string LISTEND = "323";
+
 // Error codes
 static const std::string NICKNOTFOUND = "401";
 static const std::string CHANNELNOTFOUND = "403";
@@ -112,31 +116,35 @@ private:
     void                            replyNickCollision(const Client& client) const;
     void                            replyPrivMessageNickNotFound(const Client& client,  const std::string &targetNickName) const;
     void                            replyPrivateMessage(const Client& client,  const Client& targetCLient, const std::string message) const;
-    void                            replyJoin(const Client& client, const Channel& channel) const;
     void                            replyName(const Client& client, const Channel& channel) const;
+    void                            replyChannelNotFound(const Client& client, const std::string channelName) const;
+    void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string channelName, const std::string message) const;
+    void                            replyCAPLS(Client& client, std::string capabilities) const;
+    void                            replyJoin(const Client& client, const Channel& channel) const;
     void                            replyEndOfNames(const Client& client, const Channel& channel) const;
     void                            replyChannelMode(const Client& client, const Channel& channel) const;
     void                            replyCreationTime(const Client& client, const Channel& channel) const;
     void                            replyWho(const Client& client, const Channel& channel) const;
     void                            replyEndOfWho(const Client& client, const Channel& channel) const;
-    void                            replyCAPLS(Client& client, std::string capabilities) const;
     void                            replyBadJoin(const Client& client, const std::string& line) const;
-    void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string channelName, const std::string message) const;
-    void                            replyChannelNotFound(const Client& client, const std::string channelName) const;
+    void                            replyList(const Client& client) const;
+    void                            replyList(const Client& client, const Channel& channel) const;
 
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
-    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
+    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message) const;
+
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
-    ConnectionsList::iterator       getClient(const std::string &nickname);
+    ConnectionsList::const_iterator getClient(const std::string &nickname) const;
     void                            deleteClient(const int fd);
     // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
     //Channel related
     ChannelsList::iterator          getChannel(const std::string& name);
+    ChannelsList::const_iterator          getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
 
 

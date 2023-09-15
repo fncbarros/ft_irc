@@ -137,6 +137,26 @@ void    Server::replyEndOfWho(const Client& client, const Channel& channel) cons
 
 void    Server::replyBadJoin(const Client& client, const std::string& line) const
 {
-    // :irc4.acc.umu.se 448 teeee . :Cannot join channel: Channel name must start with a hash mark (#)
     Utils::writeTo(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + line + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
+}
+
+void    Server::replyList(const Client& client) const
+{
+    std::string numberOfChannels = Utils::numToStr(_channels.size());
+
+    Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel :Users Name\r\n" , client.getId());
+    for (ChannelsList::const_iterator it = _channels.begin(); it != _channels.end(); it++)
+    {
+        std::string numberOfUsers = Utils::numToStr(it->getClients().size());
+
+        Utils::writeTo(":" + HOST + " " + LIST + " " + client.getNickname() + " #" + it->getName() + " " + numberOfUsers + " :" + it->getTopic() + "\r\n", client.getId());
+    }
+    Utils::writeTo(":" + HOST + " " + LISTEND + " " + client.getNickname() + " :End of /LIST\r\n", client.getId());
+}
+
+void    Server::replyList(const Client& client, const Channel& channel) const
+{
+    (void)channel;
+    (void)client;
+    // Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
 }

@@ -28,14 +28,12 @@
 #include <map>
 #include <Channel.hpp>
 
+#include "utils.tpp"
+
 // Forward declarations
 class Channel;
 
-// Type definitions
-// typedef std::map<std::string, Channel> ChannelsList;
-
 // Const data
-//static const char eof = '/012';
 static const std::string HOST("IRC42");
 static const size_t token_num(13);
 static const std::string possible_tokens[token_num] =
@@ -54,11 +52,11 @@ static const std::string possible_tokens[token_num] =
     "PART",
 };
 
-// Utils
+// utils.cpp
 namespace Utils
 {
     std::string toUpper(const std::string& original);
     bool        isDigit(const std::string& s);
     bool        writeTo(const std::string& s, const int fd);
-    std::string        timeToStr(void);
+    std::string timeToStr(void);
 } // namespace Utils

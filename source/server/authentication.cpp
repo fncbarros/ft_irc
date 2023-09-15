@@ -53,7 +53,6 @@ void    Server::checkUser(Client& client, tokenPair processedMsg)
     {
         std::cout << "executing nick" << std::endl;
         execNICK(client, processedMsg.second);
-        
     }
     else if (!processedMsg.first.compare("USER"))
     {
@@ -63,6 +62,7 @@ void    Server::checkUser(Client& client, tokenPair processedMsg)
     else
     {
         std::cout << "Invalid Command" << std::endl;
+        // TODO: reply RPL_TRYAGAIN (263) or ERR_NOTREGISTERED (451)
     }
 }
 
