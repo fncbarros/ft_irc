@@ -158,7 +158,7 @@ void    Server::replyNoSuchChannel(const Client& client) const
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    Utils::writeTo(HOST + " " + NOSUCHCHANNEL + " " + nick + " " + HOST + " :No such channel\r\n", id);
+    Utils::writeTo(":" + HOST + " " + NOSUCHCHANNEL + " " + nick + " " + HOST + " :No such channel\r\n", id);
 }
 
 void    Server::replyNoSuchNick(const Client& client, const std::string& str) const
@@ -166,19 +166,28 @@ void    Server::replyNoSuchNick(const Client& client, const std::string& str) co
     // :irc.eagle.y.se 401 lillllla new :No such nick/channel
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    Utils::writeTo(HOST + " " + NOSUCHNICK + " " + nick + " " + str + " :No such nick/channel\r\n", id);
+    Utils::writeTo(":" + HOST + " " + NOSUCHNICK + " " + nick + " " + str + " :No such nick/channel\r\n", id);
 }
 
 void    Server::replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName)
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    Utils::writeTo(HOST + " " + USERNOTINCHANNEL + " " + nick + " " + userNick + " #" + channelName + " :They aren't on that channel\r\n", id);
+    Utils::writeTo(":" + HOST + " " + USERNOTINCHANNEL + " " + nick + " " + userNick + " #" + channelName + " :They aren't on that channel\r\n", id);
 }
 
 void    Server::replyNoPriviledges(const Client& client, const std::string& reply)
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    Utils::writeTo(HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
+    Utils::writeTo(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
+}
+
+void    Server::replyKick(const Client& client, const Channel& channel, const std::string& userNick, const std::string& reason)
+{
+    //  312 <nick> <channel> <target> :<comment>
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    const std::string channelName(channel.getName());
+    Utils::writeTo(":" + HOST + " " + KICK + " " + nick + " " + channelName + " " + userNick + " :" + reason + "\r\n", id);
 }

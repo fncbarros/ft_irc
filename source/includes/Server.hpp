@@ -54,6 +54,7 @@ static const std::string NOSUCHCHANNEL("403");
 static const std::string NOSUCHNICK("401");
 static const std::string USERNOTINCHANNEL("441");
 static const std::string CHANOPRIVSNEEDED("482");
+static const std::string KICK("312");
 
 
 // Type Definitions
@@ -139,6 +140,7 @@ private:
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& reply);
+    void                            replyKick(const Client& client, const Channel& channel, const std::string& userNick, const std::string& reason);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

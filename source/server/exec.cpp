@@ -176,10 +176,6 @@ void Server::execJOIN(Client& client, const std::string line)
 
 void Server::execKICK(Client& client, const std::string line)
 {
-    // 482 (not channel operator)
-
-
-
     const size_t pos(line.find('#'));
     const std::string channelName((pos != std::string::npos) ? line.substr(pos + 1, line.find(" ") - 1) : "");
     const std::string userNick(line.substr(line.find_first_not_of(" ", pos + channelName.size() + 1) , line.find(" ")));
@@ -210,7 +206,7 @@ void Server::execKICK(Client& client, const std::string line)
             else
             {
                 // reply
-                // send client removed
+                replyKick(client, *channelIt, userNick, " ");
                 channelIt->deleteClient(id);
             }
             return ;
