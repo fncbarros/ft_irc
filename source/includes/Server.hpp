@@ -45,10 +45,13 @@ static const std::string ENDOFWHO = "315";
 static const std::string LISTSTART = "321";
 static const std::string LIST = "322";
 static const std::string LISTEND = "323";
+static const std::string INVITING = "341";
 
 // Error codes
 static const std::string NICKNOTFOUND = "401";
+static const std::string CLIENTNOTONCHANNEL = "401";
 static const std::string CHANNELNOTFOUND = "403";
+static const std::string CLIENTONCHANNEL = "443";
 static const std::string BADJOIN = "448";
 
 // Type Definitions
@@ -129,6 +132,11 @@ private:
     void                            replyBadJoin(const Client& client, const std::string& line) const;
     void                            replyList(const Client& client) const;
     void                            replyList(const Client& client, const Channel& channel) const;
+    void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget) const;
+    void                            replyNotOnChannelError(const Client& client, const std::string& channelName) const;
+    void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
+    void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
+    void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName) const;
 
 
     // communication.cpp

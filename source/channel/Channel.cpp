@@ -69,6 +69,11 @@ bool Channel::addClient(const Client& client)
 
 }
 
+bool    Channel::isClientInChannel(int fd) const
+{
+    return (_clientsMap.find(fd) == _clientsMap.end()) ? false : true;
+}
+
 void Channel::printList(int fd) const
 {
     std::string nameList;

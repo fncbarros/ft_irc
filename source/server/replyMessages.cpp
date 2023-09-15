@@ -160,3 +160,28 @@ void    Server::replyList(const Client& client, const Channel& channel) const
     (void)client;
     // Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
 }
+
+void    Server::replyNoSuchNickError(const Client& client, const std::string& nickTarget) const
+{
+    Utils::writeTo(":" + HOST + " " + NICKNOTFOUND + " " + client.getNickname() + " " + nickTarget + " :No such nick/channel\r\n", client.getId());
+}
+
+void    Server::replyNotOnChannelError(const Client& client, const std::string& channelName) const
+{
+    Utils::writeTo(":" + HOST + " " + CLIENTNOTONCHANNEL + " " + client.getNickname() + " #" + channelName + " :You're not on that channel\r\n", client.getId());
+}
+
+void    Server::replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const
+{
+    Utils::writeTo(":" + HOST + " " + CLIENTONCHANNEL + " " + client.getNickname() + " " + nickTarget + " #" + channelName + " :is already on channel\r\n", client.getId());
+}
+
+void    Server::replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName) const
+{
+    Utils::writeTo(":" + HOST + " " + INVITING + " " + client.getNickname() + " " + nickTarget + " :#" + channelName + "\r\n", client.getId());
+}
+
+void    Server::replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName) const
+{
+    Utils::writeTo(":" + client.toString() + " INVITE " + clientTarget.getNickname() + " :#" + channelName + "\r\n", clientTarget.getId());
+}
