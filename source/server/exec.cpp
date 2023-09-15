@@ -177,27 +177,45 @@ void Server::execJOIN(Client& client, const std::string line)
 void Server::execKICK(Client& client, const std::string line)
 {
     // 441 (not on channel)
-    // 403 (no such channel)
     // 401 (no such nick/channel)
-    const int clientId(client.getId());
 
-    if (line.empty())
-    {
-        Utils::writeTo("Usage: KICK <nick> [reason], kicks the nick from the current channel (needs chanop)", clientId);
-    }
+    const size_t pos(line.find('#'));
+    const std::string channelName((pos != std::string::npos) ? line.substr(pos + 1, line.find(" ") - 1) : "");
 
-    const std::string channelName(returnChannelName(line));
-    ChannelsList::const_iterator channel = getChannel(channelName);
+    ChannelsList::iterator channelIt = getChannel(channelName);
     std::cout << "Channel Name: " << channelName << std::endl;
-    if (channel == _channels.end())
+    if (channelIt == _channels.end())
     {
         replyNoSuchChannel(client);
         return ;
     }
 
+    const std::string userNick(line.substr(line.find_first_not_of(" ", pos + channelName.size() + 1) , line.find(" ")));
+    std::cout << "User nick: " << userNick << std::endl;
 
-    // const std::string userNick();
+    const ConnectionsList::const_iterator clientIt(getClient(userNick));
+    if (clientIt != _connections.end())
+    {
+        const int id(clientIt->getId());
 
+        const ClientMap map = channelIt->getClients();
+        ClientMap::const_iterator userIt(map.find(id));
+        if (userIt != map.end())
+        {
+            // TODO: check permissions to kick
+            if (!channelIt->hasOperatorPriviledges())
+            {
+                // reply no priviledges
+            }
+            else
+            {
+                channelIt->deleteClient(id);
+                // reply client removed
+            }
+            return ;
+        }
+    }
+    // replyNoSuchClient
 }
 
 void Server::execINVITE(Client& client, const std::string line)

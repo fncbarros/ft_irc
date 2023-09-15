@@ -34,6 +34,7 @@ ChannelsList::const_iterator Server::getChannel(const std::string& name) const
     return it;
 }
 
+// For JOIN only
 const std::string Server::returnChannelName(const std::string& line)
 {
     size_t pos(line.find('#'));
