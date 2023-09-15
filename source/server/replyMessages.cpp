@@ -154,13 +154,6 @@ void    Server::replyList(const Client& client) const
     Utils::writeTo(":" + HOST + " " + LISTEND + " " + client.getNickname() + " :End of /LIST\r\n", client.getId());
 }
 
-void    Server::replyList(const Client& client, const Channel& channel) const
-{
-    (void)channel;
-    (void)client;
-    // Utils::writeTo(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
-}
-
 void    Server::replyNoSuchChannel(const Client& client) const
 {
     const int id(client.getId());
@@ -168,3 +161,17 @@ void    Server::replyNoSuchChannel(const Client& client) const
     Utils::writeTo(HOST + " " + NOSUCHCHANNEL + " " + nick + " " + HOST + " :No such channel\r\n", id);
 }
 
+void    Server::replyNoSuchNick(const Client& client, const std::string& str) const
+{
+    // :irc.eagle.y.se 401 lillllla new :No such nick/channel
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    Utils::writeTo(HOST + " " + NOSUCHNICK + " " + nick + " " + str + " :No such nick/channel\r\n", id);
+}
+
+void    Server::replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    Utils::writeTo(HOST + " " + USERNOTINCHANNEL + " " + nick + " " + userNick + " #" + channelName + " :They aren't on that channel\r\n", id);
+}

@@ -18,12 +18,12 @@ void Server::exec(Client& client, const tokenPair& message)
         return ;
 
     CommandMap::iterator itCommand = _commands.find(message.first);
-    
+
     if (itCommand != _commands.end())
     {
         exec_ptr command = itCommand->second;
         (this->*command)(client, message.second);
-    } 
+    }
     else
     {
         std::cout << message.first << " " << message.second << std::endl;
@@ -144,7 +144,7 @@ void Server::execJOIN(Client& client, const std::string line)
     {
         // look for channel
         ChannelsList::iterator channelIt = getChannel(channelName);
-        
+
         // if no channel, create one
         if (channelIt == _channels.end())
         {
@@ -176,9 +176,7 @@ void Server::execJOIN(Client& client, const std::string line)
 
 void Server::execKICK(Client& client, const std::string line)
 {
-    // 441 (not on channel)
-    // 401 (no such nick/channel)
-
+    // 482 (not channel operator)
     const size_t pos(line.find('#'));
     const std::string channelName((pos != std::string::npos) ? line.substr(pos + 1, line.find(" ") - 1) : "");
 
@@ -202,20 +200,24 @@ void Server::execKICK(Client& client, const std::string line)
         ClientMap::const_iterator userIt(map.find(id));
         if (userIt != map.end())
         {
-            // TODO: check permissions to kick
             if (!channelIt->hasOperatorPriviledges())
             {
                 // reply no priviledges
             }
             else
             {
+                // reply
+                // send client removed
                 channelIt->deleteClient(id);
-                // reply client removed
             }
             return ;
         }
+        else
+        {
+            replyNotInChannel(client, userNick, channelName);
+        }
     }
-    // replyNoSuchClient
+    replyNoSuchNick(client, userNick);
 }
 
 void Server::execINVITE(Client& client, const std::string line)

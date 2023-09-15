@@ -51,6 +51,10 @@ static const std::string NICKNOTFOUND("401");
 static const std::string CHANNELNOTFOUND("403");
 static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
+static const std::string NOSUCHNICK("401");
+static const std::string USERNOTINCHANNEL("441");
+
+
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -131,6 +135,8 @@ private:
     void                            replyList(const Client& client) const;
     void                            replyList(const Client& client, const Channel& channel) const;
     void                            replyNoSuchChannel(const Client& client) const;
+    void                            replyNoSuchNick(const Client& client, const std::string& str) const;
+    void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
@@ -145,7 +151,7 @@ private:
     static void                     printList(const ConnectionsList& list, const int fd);
     //Channel related
     ChannelsList::iterator          getChannel(const std::string& name);
-    ChannelsList::const_iterator          getChannel(const std::string& name) const;
+    ChannelsList::const_iterator    getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
 
 
