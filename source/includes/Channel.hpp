@@ -33,6 +33,7 @@ public:
     ClientMap   getClients() const;
 
     bool        addClient(const Client& client);
+    bool        isClientInChannel(int fd) const;
     void        printList(int fd) const; // DEBUG
 
     struct modes {

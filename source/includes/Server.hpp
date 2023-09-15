@@ -45,14 +45,17 @@ static const std::string ENDOFWHO("315");
 static const std::string LISTSTART("321");
 static const std::string LIST("322");
 static const std::string LISTEND("323");
+static const std::string INVITING("341");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
+static const std::string NOSUCHNICK("401");
 static const std::string CHANNELNOTFOUND("403");
+static const std::string CLIENTONCHANNEL("443");
 static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
-static const std::string NOSUCHNICK("401");
 static const std::string USERNOTINCHANNEL("441");
+static const std::string CLIENTNOTONCHANNEL("441");
 static const std::string CHANOPRIVSNEEDED("482");
 static const std::string KICK("312");
 
@@ -138,9 +141,14 @@ private:
     void                            replyNoSuchChannel(const Client& client) const;
     void                            replyNoSuchNick(const Client& client, const std::string& str) const;
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
-    void                            replyNoPriviledges(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& reply);
     void                            replyKick(const Client& client, const Channel& channel, const std::string& userNick, const std::string& reason);
+    void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget) const;
+    void                            replyNotOnChannelError(const Client& client, const std::string& channelName) const;
+    void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
+    void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
+    void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName) const;
+
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

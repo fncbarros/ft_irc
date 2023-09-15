@@ -225,9 +225,31 @@ void Server::execKICK(Client& client, const std::string line)
 
 void Server::execINVITE(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***INVITE: ";
-    std::cout << line << std::endl;
+    const std::string nickTarget(line.substr(0, line.find('#') - 1));
+    const std::string channelTarget(line.substr(line.find('#') + 1));
+
+    ConnectionsList::const_iterator clientTargetIt = getClient(nickTarget);
+    ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
+
+    //TODO: ERR_NEEDMOREPARAMS (461)
+    if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
+    {
+        replyNoSuchNickError(client, nickTarget);
+    }
+    else if (!channelTargetIt->isClientInChannel(client.getId()))
+    {
+        replyNotOnChannelError(client, channelTargetIt->getName());
+    }
+    else if (channelTargetIt->isClientInChannel(clientTargetIt->getId()))
+    {
+        replyClientTargetOnChannel(client, clientTargetIt->getNickname(), channelTargetIt->getName());
+    }
+    //TODO: ERR_CHANOPRIVSNEEDED (482): Sent when the user does not have sufficient privileges (channel operator status) to invite users to the specified channel.
+    else
+    {
+        replyInviting(client, nickTarget, channelTargetIt->getName());
+        replyInvitingReceived(client, *clientTargetIt, channelTargetIt->getName());
+    }
 }
 
 void Server::execTOPIC(Client& client, const std::string line)
