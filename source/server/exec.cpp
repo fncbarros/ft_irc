@@ -177,21 +177,22 @@ void Server::execJOIN(Client& client, const std::string line)
 void Server::execKICK(Client& client, const std::string line)
 {
     // 482 (not channel operator)
+
+
+
     const size_t pos(line.find('#'));
     const std::string channelName((pos != std::string::npos) ? line.substr(pos + 1, line.find(" ") - 1) : "");
+    const std::string userNick(line.substr(line.find_first_not_of(" ", pos + channelName.size() + 1) , line.find(" ")));
 
     ChannelsList::iterator channelIt = getChannel(channelName);
-    std::cout << "Channel Name: " << channelName << std::endl;
     if (channelIt == _channels.end())
     {
         replyNoSuchChannel(client);
         return ;
     }
 
-    const std::string userNick(line.substr(line.find_first_not_of(" ", pos + channelName.size() + 1) , line.find(" ")));
-    std::cout << "User nick: " << userNick << std::endl;
-
     const ConnectionsList::const_iterator clientIt(getClient(userNick));
+
     if (clientIt != _connections.end())
     {
         const int id(clientIt->getId());
@@ -202,7 +203,9 @@ void Server::execKICK(Client& client, const std::string line)
         {
             if (!channelIt->hasOperatorPriviledges())
             {
-                // reply no priviledges
+                const std::string reply("#" + channelName + " :You're not channel operator\r\n");
+                Utils::writeTo(reply, client.getId());
+                replyNoPriviledges(client, reply);
             }
             else
             {
@@ -215,9 +218,13 @@ void Server::execKICK(Client& client, const std::string line)
         else
         {
             replyNotInChannel(client, userNick, channelName);
+            return ;
         }
     }
-    replyNoSuchNick(client, userNick);
+    else
+    {
+        replyNoSuchNick(client, userNick);
+    }
 }
 
 void Server::execINVITE(Client& client, const std::string line)

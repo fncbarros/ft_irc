@@ -53,7 +53,7 @@ static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
 static const std::string NOSUCHNICK("401");
 static const std::string USERNOTINCHANNEL("441");
-
+static const std::string CHANOPRIVSNEEDED("482");
 
 
 // Type Definitions
@@ -137,6 +137,8 @@ private:
     void                            replyNoSuchChannel(const Client& client) const;
     void                            replyNoSuchNick(const Client& client, const std::string& str) const;
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
+    void                            replyNoPriviledges(const Client& client, const std::string& userNick, const std::string& channelName);
+    void                            replyNoPriviledges(const Client& client, const std::string& reply);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

@@ -175,3 +175,10 @@ void    Server::replyNotInChannel(const Client& client, const std::string& userN
     const std::string nick(client.getNickname());
     Utils::writeTo(HOST + " " + USERNOTINCHANNEL + " " + nick + " " + userNick + " #" + channelName + " :They aren't on that channel\r\n", id);
 }
+
+void    Server::replyNoPriviledges(const Client& client, const std::string& reply)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    Utils::writeTo(HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
+}
