@@ -32,7 +32,10 @@ Channel& Channel::operator=(const Channel& other)
         _name = other._name;
         _topic = other._topic;
         _modes = other._modes;
-        _clientsMap = other._clientsMap;
+        for (ClientMap::const_iterator it = other._clientsMap.begin(); it != other._clientsMap.end(); it++)
+        {
+            _clientsMap[it->first] = it->second;
+        }
     }
     return *this;
 }
