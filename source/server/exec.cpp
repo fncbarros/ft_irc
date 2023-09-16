@@ -295,6 +295,9 @@ void Server::execPART(Client& client, const std::string line)
     else
     {
         ChannelsList::iterator channelIter(getChannel(channelName));
+        std::getline(iss >> std::ws, reason);
+        if (reason[0] == ':')
+            reason.erase(0, 1);
 
         if (!channelIter->isClientInChannel(id))
         {
@@ -305,7 +308,14 @@ void Server::execPART(Client& client, const std::string line)
             Utils::writeTo("You have left channel #<" + channelName + "> (" + reason + ")\r\n", id);
             replyPart(client, channelName);
             channelIter->deleteClient(id);
-            // TODO: reply all channel memebers
+
+            // reply all channel memebers
+            ClientMap map = channelIter->getClients();
+            for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
+            {
+                Utils::writeTo(client.getNickname() + "(" + client.toString() + ") has left (" + reason + ")\r\n", it->second->getId());
+            }
+            // user2 (user@IRC4Fun-jjcum1.rev.vodafone.pt) has left ("reason")
         }
     }
     
