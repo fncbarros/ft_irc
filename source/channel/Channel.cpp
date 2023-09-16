@@ -184,6 +184,7 @@ void Channel::deleteClient(const int fd)
 {
     if (_clientsMap.erase(fd) > 0)
     {
+        removeOperator(fd);
         //TODO: broadcast to all clients in the channel
     }
 }
