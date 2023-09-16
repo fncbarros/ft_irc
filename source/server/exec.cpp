@@ -191,7 +191,7 @@ void Server::execKICK(Client& client, const std::string line)
 {
     const size_t hashPos(line.find('#'));
     const std::string channelName((hashPos != std::string::npos) ? line.substr(hashPos + 1, line.find(" ") - 1) : "");
-    const std::string userNick(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1) , line.find(" ")));
+    const std::string userNick(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1) , line.find(" ") + 1));
     const std::string reason(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1 + userNick.size())));
     const ConnectionsList::const_iterator clientIter(getClient(userNick));
     ChannelsList::iterator channelIter(getChannel(channelName));
