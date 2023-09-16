@@ -17,6 +17,7 @@ Channel::Channel(const std::string name, const Client* client)
 {
     _clientsMap.insert(std::make_pair(client->getId(), client));
     std::cout << "Channel " << name << " created." << std::endl;
+    addOperator(client->getId());
 }
 
 Channel::Channel(const Channel& other)
@@ -185,4 +186,19 @@ void Channel::deleteClient(const int fd)
     {
         //TODO: broadcast to all clients in the channel
     }
+}
+
+void    Channel::addOperator(const int fd)
+{
+    _operators.insert(fd);
+}
+
+void    Channel::removeOperator(const int fd)
+{
+    _operators.erase(fd);
+}
+
+bool    Channel::isOperator(const int fd)
+{
+    return (_operators.find(fd) != _operators.end());
 }

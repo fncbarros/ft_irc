@@ -13,6 +13,8 @@
 #pragma once
 
 #include <Client.hpp>
+#include <set>
+
 class Client;
 
 // Type definitions
@@ -64,6 +66,9 @@ public:
     void        setPriviledges(const bool set);
     void        setLimit(const size_t limit);
     void        deleteClient(const int fd);
+    void        addOperator(const int fd);
+    void        removeOperator(const int fd);
+    bool        isOperator(const int fd);
 
     // Data
 private:
@@ -71,4 +76,6 @@ private:
     std::string     _topic;
     struct modes    _modes;
     ClientMap       _clientsMap;
+    std::set<int>   _operators;
+
 };

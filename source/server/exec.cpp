@@ -176,50 +176,41 @@ void Server::execJOIN(Client& client, const std::string line)
 
 void Server::execKICK(Client& client, const std::string line)
 {
-    const size_t pos(line.find('#'));
-    const std::string channelName((pos != std::string::npos) ? line.substr(pos + 1, line.find(" ") - 1) : "");
-    const std::string userNick(line.substr(line.find_first_not_of(" ", pos + channelName.size() + 1) , line.find(" ")));
-
+    const size_t hashPos(line.find('#'));
+    const std::string channelName((hashPos != std::string::npos) ? line.substr(hashPos + 1, line.find(" ") - 1) : "");
+    const std::string userNick(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1) , line.find(" ")));
+    const ConnectionsList::const_iterator clientIt(getClient(userNick));
     ChannelsList::iterator channelIt = getChannel(channelName);
+
     if (channelIt == _channels.end())
     {
         replyNoSuchChannel(client);
-        return ;
     }
-
-    const ConnectionsList::const_iterator clientIt(getClient(userNick));
-
-    if (clientIt != _connections.end())
+    else if (clientIt == _connections.end())
     {
-        const int id(clientIt->getId());
-
-        const ClientMap map = channelIt->getClients();
-        ClientMap::const_iterator userIt(map.find(id));
-        if (userIt != map.end())
-        {
-            if (!channelIt->hasOperatorPriviledges())
-            {
-                const std::string reply("#" + channelName + " :You're not channel operator\r\n");
-                Utils::writeTo(reply, client.getId());
-                replyNoPriviledges(client, reply);
-            }
-            else
-            {
-                // reply
-                replyKick(client, *channelIt, userNick, " ");
-                channelIt->deleteClient(id);
-            }
-            return ;
-        }
-        else
-        {
-            replyNotInChannel(client, userNick, channelName);
-            return ;
-        }
+        replyNoSuchNick(client, userNick);
     }
     else
     {
-        replyNoSuchNick(client, userNick);
+        const int kickerId(clientIt->getId());
+        const ClientMap map = channelIt->getClients();
+        ClientMap::const_iterator userIt(map.find(kickerId));
+
+        if (userIt == map.end())
+        {
+            replyNotInChannel(client, userNick, channelName);
+        }
+        else if (!channelIt->isOperator(kickerId))
+        {
+            const std::string reply("#" + channelName + " :You're not channel operator\r\n");
+            Utils::writeTo(reply, client.getId());
+            replyNoPriviledges(client, reply);
+        }
+        else
+        {
+            replyKick(client, *channelIt, userNick, "");
+            channelIt->deleteClient(kickerId);
+        }
     }
 }
 
