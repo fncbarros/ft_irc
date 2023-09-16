@@ -179,28 +179,29 @@ void Server::execKICK(Client& client, const std::string line)
     const size_t hashPos(line.find('#'));
     const std::string channelName((hashPos != std::string::npos) ? line.substr(hashPos + 1, line.find(" ") - 1) : "");
     const std::string userNick(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1) , line.find(" ")));
-    const ConnectionsList::const_iterator clientIt(getClient(userNick));
-    ChannelsList::iterator channelIt = getChannel(channelName);
+    const std::string reason(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1 + userNick.size())));
+    const ConnectionsList::const_iterator clientIter(getClient(userNick));
+    ChannelsList::iterator channelIter(getChannel(channelName));
 
-    if (channelIt == _channels.end())
+    if (channelIter == _channels.end())
     {
         replyNoSuchChannel(client);
     }
-    else if (clientIt == _connections.end())
+    else if (clientIter == _connections.end())
     {
         replyNoSuchNick(client, userNick);
     }
     else
     {
-        const int kickerId(clientIt->getId());
-        const ClientMap map = channelIt->getClients();
-        ClientMap::const_iterator userIt(map.find(kickerId));
+        const int kickerId(client.getId());
+        const int userId(clientIter->getId());
 
-        if (userIt == map.end())
+        // if user is not in channel
+        if (!channelIter->isInChannel(userId))
         {
             replyNotInChannel(client, userNick, channelName);
         }
-        else if (!channelIt->isOperator(kickerId))
+        else if (!channelIter->isOperator(kickerId))
         {
             const std::string reply("#" + channelName + " :You're not channel operator\r\n");
             Utils::writeTo(reply, client.getId());
@@ -208,8 +209,9 @@ void Server::execKICK(Client& client, const std::string line)
         }
         else
         {
-            replyKick(client, *channelIt, userNick, "");
-            channelIt->deleteClient(kickerId);
+            replyKick(client, *channelIter, userNick, reason);
+            channelIter->deleteClient(userId);
+            Utils::writeTo("You were kicked from #" + channelName + " by " + client.getNickname() + "(" + reason + ")\r\n", userId);
         }
     }
 }

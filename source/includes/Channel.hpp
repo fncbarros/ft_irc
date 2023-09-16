@@ -56,6 +56,8 @@ public:
     bool        hasOperatorPriviledges(void) const;
     size_t      limit(void) const;
     bool        hasModes(void) const;
+    bool        isOperator(const int fd) const;
+    bool        isInChannel(const int fd) const;
 
     std::string getTopic(void) const;
 
@@ -68,7 +70,6 @@ public:
     void        deleteClient(const int fd);
     void        addOperator(const int fd);
     void        removeOperator(const int fd);
-    bool        isOperator(const int fd);
 
     // Data
 private:

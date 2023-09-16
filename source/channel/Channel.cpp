@@ -36,6 +36,7 @@ Channel& Channel::operator=(const Channel& other)
         {
             _clientsMap[it->first] = it->second;
         }
+        _operators = other._operators;
     }
     return *this;
 }
@@ -146,6 +147,16 @@ bool Channel::hasModes(void) const
     return (isInviteOnly() || isTopicRetricted() || hasKey() || hasOperatorPriviledges() || limit());
 }
 
+bool    Channel::isOperator(const int fd) const
+{
+    return (_operators.find(fd) != _operators.end());
+}
+
+bool    Channel::isInChannel(const int fd) const
+{
+    return (_clientsMap.find(fd) != _clientsMap.end());
+}
+
 std::string Channel::getTopic(void) const
 {
     return _topic;
@@ -202,7 +213,3 @@ void    Channel::removeOperator(const int fd)
     _operators.erase(fd);
 }
 
-bool    Channel::isOperator(const int fd)
-{
-    return (_operators.find(fd) != _operators.end());
-}
