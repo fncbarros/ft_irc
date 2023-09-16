@@ -112,16 +112,29 @@ void Server::execQUIT(Client& client, const std::string line)
 
 void Server::execPRIVMSG(Client& client, const std::string line)
 {
-    const std::string nickname(line.substr(0, line.find(' ')));
-    const std::string messageReceived(line.substr(line.find(' ') + 1));
+    std::string token(line.substr(0, line.find(' ')));
+    const std::string message(line.substr(line.find(' ') + 1));
 
-    if (nickname.at(0) == '#')
+    if (token.at(0) == '#')
     {
-        channelPrivateMessage(client, nickname.substr(1), messageReceived);
+        token.erase(0, 1); // remove '#'
+        ChannelsList::const_iterator channelIt(getChannel(token));
+        if (channelIt == _channels.end())
+        {
+            /// some reply
+        }
+        else if (channelIt->isInChannel(client.getId()) == false)
+        {
+            // some other reply
+        }
+        else
+        {
+            channelPrivateMessage(client, token, message);
+        }
     }
     else
     {
-        clientPrivateMessage(client, nickname, messageReceived);
+        clientPrivateMessage(client, token, message);
     }
 }
 
