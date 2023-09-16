@@ -36,7 +36,7 @@ void    Server::channelPrivateMessage(const Client& client, const std::string& c
     }
 }
 
-void    Server::clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message) const
+void    Server::clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message)
 {
     ConnectionsList::const_iterator newClient = getClient(nickname);
 

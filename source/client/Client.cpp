@@ -77,6 +77,8 @@ void Client::setUserActive(void) { _auth.isValidUser = true; }
 
 void Client::setNickActive(void) { _auth.isValidNickName = true; }
 
+void Client::setMessage(const std::string& msg) { _replyMessages.push_back(msg); }
+
 void Client::registerBuffer(const std::string msg)
 {
     if (msg.empty())
@@ -95,6 +97,15 @@ std::string Client::returnLine(void)
     _msgBuffer.erase(0u, pos + 1);
 
     return s;
+}
+
+void    Client::replyMessage(void)
+{
+    if (!_replyMessages.empty())
+    {
+        Utils::writeTo(_replyMessages.begin()->c_str(), _socket_id);
+        _replyMessages.erase(_replyMessages.begin());
+    }
 }
 
 //const Channel&  join(const std::string& channel)
