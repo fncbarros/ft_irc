@@ -58,6 +58,7 @@ static const std::string USERNOTINCHANNEL("441");
 static const std::string CLIENTNOTONCHANNEL("441");
 static const std::string CHANOPRIVSNEEDED("482");
 static const std::string KICK("312");
+static const std::string NOTONCHANNEL("442");
 
 
 // Type Definitions
@@ -148,6 +149,8 @@ private:
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
     void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
     void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName) const;
+    void                            replyNotOnChannel(const Client& client, const std::string& channelName) const;
+    void                            replyPart(const Client& client, const std::string& channelName) const;
 
 
     // communication.cpp
@@ -165,7 +168,7 @@ private:
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
-
+    bool                            channelExists(const std::string& name) const;
 
 public:
     void                            connectionLoop(void);

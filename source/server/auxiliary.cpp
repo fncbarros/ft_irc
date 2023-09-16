@@ -45,3 +45,9 @@ const std::string Server::returnChannelName(const std::string& line)
     }
     return (line.substr(pos + 1, line.find(" " - 1)));
 }
+
+bool    Server::channelExists(const std::string& name) const
+{
+    const ChannelsList::const_iterator it(getChannel(name));
+    return (it !=_channels.end());
+}

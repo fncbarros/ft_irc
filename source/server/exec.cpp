@@ -272,13 +272,43 @@ void Server::execMODE(Client& client, const std::string line)
 
 void Server::execPART(Client& client, const std::string line)
 {
-    // input: "PART #<channel> :Leaving"
-    // out:
-    // to sending client: "You have left channel #<channel> (Leaving)
+    const int id(client.getId());
+    std::istringstream iss(line);
+    std::string channelName;
+    std::string reason;
 
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***PART: ";
-    std::cout << "Client " << client.getNickname() << " left channel " << line << std::endl;
+    iss >> channelName;
+
+    if (channelName.empty() || channelName[0] != '#')
+    {
+        Utils::writeTo("Usage: PART [<channel>] [<reason>], leaves the channel, by default the current one", id);
+        return ;
+    }
+
+    channelName.erase(0, 1);
+    
+    if (!channelExists(channelName))
+    {
+        replyNoSuchChannel(client);
+        Utils::writeTo(channelName + " :No such channel\r\n", id);
+    }
+    else
+    {
+        ChannelsList::iterator channelIter(getChannel(channelName));
+
+        if (!channelIter->isClientInChannel(id))
+        {
+            replyNotOnChannel(client, channelName);
+        }
+        else
+        {
+            Utils::writeTo("You have left channel #<" + channelName + "> (" + reason + ")\r\n", id);
+            replyPart(client, channelName);
+            channelIter->deleteClient(id);
+            // TODO: reply all channel memebers
+        }
+    }
+    
 }
 
 void Server::execCAP(Client& client, std::string command)

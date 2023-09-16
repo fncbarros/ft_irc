@@ -211,3 +211,16 @@ void    Server::replyInvitingReceived(const Client& client, const Client& client
 {
     Utils::writeTo(":" + client.toString() + " INVITE " + clientTarget.getNickname() + " :#" + channelName + "\r\n", clientTarget.getId());
 }
+
+void    Server::replyNotOnChannel(const Client& client, const std::string& channelName) const
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    Utils::writeTo(client.toString() + " " + NOTONCHANNEL + " " + nick + " " + "#" + channelName + " :You're not on that channel\r\n", id);
+}
+
+void    Server::replyPart(const Client& client, const std::string& channelName) const
+{
+    const int id(client.getId());
+    Utils::writeTo(":" + client.toString() + " PART #" + channelName, id);
+}
