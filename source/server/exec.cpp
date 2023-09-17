@@ -189,43 +189,70 @@ void Server::execJOIN(Client& client, const std::string line)
 
 void Server::execKICK(Client& client, const std::string line)
 {
-    const size_t hashPos(line.find('#'));
-    const std::string channelName((hashPos != std::string::npos) ? line.substr(hashPos + 1, line.find(" ") - 1) : "");
-    const std::string userNick(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1) , line.find(" ") + 1));
-    const std::string reason(line.substr(line.find_first_not_of(" ", hashPos + channelName.size() + 1 + userNick.size())));
-    const ConnectionsList::const_iterator clientIter(getClient(userNick));
-    ChannelsList::iterator channelIter(getChannel(channelName));
+    std::istringstream iss(line);
+    std::string channelName;
+    std::string userNick;
+    std::string reason;
+    const int kickerId(client.getId());
+    const std::string kickerNick(client.getNickname());
 
-    if (channelIter == _channels.end())
+    iss >> channelName;
+
+    if (channelName[0] != '#')
     {
         replyNoSuchChannel(client);
+        return ;
     }
-    else if (clientIter == _connections.end())
+
+    channelName.erase(0, 1);
+    ChannelsList::iterator channelIter(getChannel(channelName));
+
+    if(channelIter == _channels.end())
+    {
+        replyNoSuchChannel(client);
+        return ;
+    }
+
+    iss >> userNick;
+    const ConnectionsList::const_iterator channelUserIter(getClient(userNick));
+    std::getline(iss >> std::ws, reason);
+    if (reason[0] == ':')
+        reason.erase(0, 1);
+    if (reason.empty())
+        reason = kickerNick;
+
+    if (channelUserIter == _connections.end())
     {
         replyNoSuchNick(client, userNick);
+        return ;
     }
-    else
-    {
-        const int kickerId(client.getId());
-        const int userId(clientIter->getId());
 
-        // if user is not in channel
-        if (!channelIter->isInChannel(userId))
+    const int userId(channelUserIter->getId());
+
+    // if client or channel user are not in channel
+    if (!channelIter->isInChannel(userId) || !channelIter->isInChannel(kickerId))
+    {
+        replyNotInChannel(client, userNick, channelName);
+    }
+    else if (!channelIter->isOperator(kickerId))
+    {
+        const std::string reply("#" + channelName + " :You're not channel operator\r\n");
+        Utils::writeTo(reply, kickerId);
+        replyNoPriviledges(client, reply);
+    }
+    else // Kick
+    {
+        const ClientMap& map = channelIter->getClients();
+        for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
         {
-            replyNotInChannel(client, userNick, channelName);
+            replyKick(*it->second, client, *channelIter, userNick, reason);
+            if (it->second != &(*channelUserIter))
+            {
+                Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, it->second->getId());
+            }
         }
-        else if (!channelIter->isOperator(kickerId))
-        {
-            const std::string reply("#" + channelName + " :You're not channel operator\r\n");
-            Utils::writeTo(reply, client.getId());
-            replyNoPriviledges(client, reply);
-        }
-        else
-        {
-            replyKick(client, *channelIter, userNick, reason);
-            channelIter->deleteClient(userId);
-            Utils::writeTo("You were kicked from #" + channelName + " by " + client.getNickname() + "(" + reason + ")\r\n", userId);
-        }
+        channelIter->deleteClient(userId);
+        Utils::writeTo("You were kicked from #" + channelName + " by " + kickerNick + " (" + reason + ")\r\n", userId);
     }
 }
 

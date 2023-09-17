@@ -51,7 +51,7 @@ std::string Channel::getName() const
     return _name;
 }
 
-ClientMap Channel::getClients() const
+const ClientMap& Channel::getClients() const
 {
     return _clientsMap;
 }
@@ -199,7 +199,6 @@ void Channel::deleteClient(const int fd)
     if (_clientsMap.erase(fd) > 0)
     {
         removeOperator(fd);
-        //TODO: broadcast to all clients in the channel
     }
 }
 

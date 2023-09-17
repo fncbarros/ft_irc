@@ -145,7 +145,7 @@ private:
     void                            replyNoSuchNick(const Client& client, const std::string& str) const;
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& reply);
-    void                            replyKick(const Client& client, const Channel& channel, const std::string& userNick, const std::string& reason);
+    void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
     void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget) const;
     void                            replyNotOnChannelError(const Client& client, const std::string& channelName) const;
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
