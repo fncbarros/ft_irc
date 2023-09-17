@@ -217,9 +217,42 @@ void Server::execTOPIC(Client& client, const std::string line)
     std::cout << line << std::endl;
 }
 
+std::ostringstream  parseModes(std::istringstream& iss)
+{
+    std::ostringstream oss;
+
+    // iss >> mode;
+    // iss >> params;
+    
+    return oss;
+}
+
+// void    processModes()
+
 void Server::execMODE(Client& client, const std::string line)
 {
-    std::cout << client.getId() << " " + line << std::endl;
+    std::istringstream iss(line);
+    std::string channelName;
+    std::string mode;
+    std::string params;
+
+    iss >> channelName;
+
+    if (channelName.empty() || mode.empty())
+    {
+        // reply
+        return ;
+    }
+
+    // TODO: might need to check for other symbols ('&','+','!')
+    if (channelName[0] != '#')
+        // reply
+    channelName.erase(0, 1);
+
+    std::ostringstream oss(parseModes(iss));
+    std::string tmp;
+    while ((oss >> tmp) !=)
+
 }
 
 void Server::execPART(Client& client, const std::string line)

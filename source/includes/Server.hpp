@@ -46,6 +46,8 @@ static const std::string LISTSTART = "321";
 static const std::string LIST = "322";
 static const std::string LISTEND = "323";
 static const std::string INVITING = "341";
+static const std::string CHANNELMODEIS("324");
+static const std::string CREATIONTIME("329");
 
 // Error codes
 static const std::string NICKNOTFOUND = "401";
@@ -53,6 +55,9 @@ static const std::string CLIENTNOTONCHANNEL = "401";
 static const std::string CHANNELNOTFOUND = "403";
 static const std::string CLIENTONCHANNEL = "443";
 static const std::string BADJOIN = "448";
+static const std::string UNKNOWNCOMMAND("421");
+static const std::string NEEDMOREPARAMS("461");
+static const std::string CHANOPRIVSNEEDED("482");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
