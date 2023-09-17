@@ -144,8 +144,9 @@ private:
     void                            replyNoSuchChannel(const Client& client) const;
     void                            replyNoSuchNick(const Client& client, const std::string& str) const;
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
-    void                            replyNoPriviledges(const Client& client, const std::string& reply);
+    void                            replyNoPriviledges(const Client& client, const std::string& channelName);
     void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
+    void                            replyBroadcastKick(const int id, const std::string& kickerNick, const std::string& userNick, const std::string& channelName, const std::string& reason);
     void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget) const;
     void                            replyNotOnChannelError(const Client& client, const std::string& channelName) const;
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
@@ -153,7 +154,11 @@ private:
     void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName) const;
     void                            replyNotOnChannel(const Client& client, const std::string& channelName) const;
     void                            replyPart(const Client& client, const std::string& channelName) const;
-
+    void                            replyYouWereKicked(const int id, const std::string& channelName, const std::string& kickerNick, const std::string& reason);
+    void                            replyPartUsage(const int id);
+    void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
+    void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
+    void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

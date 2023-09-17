@@ -235,9 +235,7 @@ void Server::execKICK(Client& client, const std::string line)
     }
     else if (!channelIter->isOperator(kickerId))
     {
-        const std::string reply("#" + channelName + " :You're not channel operator\r\n");
-        Utils::writeTo(reply, kickerId);
-        replyNoPriviledges(client, reply);
+        replyNoPriviledges(client, channelName);
     }
     else // Kick
     {
@@ -247,12 +245,12 @@ void Server::execKICK(Client& client, const std::string line)
             replyKick(*it->second, client, *channelIter, userNick, reason);
             if (it->second != &(*channelUserIter))
             {
-                Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, it->second->getId());
+                replyBroadcastKick(it->second->getId(), kickerNick, userNick, channelName, reason);
             }
         }
         channelIter->deleteClient(userId);
-        Utils::writeTo("You were kicked from #" + channelName + " by " + kickerNick + " (" + reason + ")\r\n", userId);
     }
+    replyYouWereKicked(userId, channelName, kickerNick, reason);
 }
 
 void Server::execINVITE(Client& client, const std::string line)
@@ -307,7 +305,7 @@ void Server::execPART(Client& client, const std::string line)
 
     if (channelName.empty() || channelName[0] != '#')
     {
-        Utils::writeTo("Usage: PART [<channel>] [<reason>], leaves the channel, by default the current one", id);
+        replyPartUsage(id);
         return ;
     }
 
@@ -316,7 +314,7 @@ void Server::execPART(Client& client, const std::string line)
     if (!channelExists(channelName))
     {
         replyNoSuchChannel(client);
-        Utils::writeTo(channelName + " :No such channel\r\n", id);
+        replyNoSuchChannelSimple(id, channelName);
     }
     else
     {
@@ -331,7 +329,7 @@ void Server::execPART(Client& client, const std::string line)
         }
         else
         {
-            Utils::writeTo("You have left channel #<" + channelName + "> (" + reason + ")\r\n", id);
+            replyYouLeftChannel(id, channelName, reason);
 
             // reply all channel memebers
             ClientMap map = channelIter->getClients();
@@ -339,7 +337,7 @@ void Server::execPART(Client& client, const std::string line)
             {
                 // send a notice to everyone except for client sending command
                 if (it->second != &client)
-                    Utils::writeTo(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", it->second->getId());
+                    replyBroadcastUserLeft(it->second->getId(), client, reason);
                 
                 replyPart(client, channelName);
             }
