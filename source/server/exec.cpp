@@ -141,7 +141,6 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 /**
  * CHANNEL specific commands
  * */
-
 void Server::execJOIN(Client& client, const std::string line)
 {
     std::string channelName(returnChannelName(line));
@@ -168,7 +167,7 @@ void Server::execJOIN(Client& client, const std::string line)
         {
             // TODO: need to check if client is not channel user already
             Channel& channel(*channelIt);
-            const ClientMap list(channel.getClients());
+            const ClientMap& list(channel.getClients());
 
             // add user to channel
             channel.addClient(client);
@@ -236,9 +235,7 @@ void Server::execKICK(Client& client, const std::string line)
     }
     else if (!channelIter->isOperator(kickerId))
     {
-        const std::string reply("#" + channelName + " :You're not channel operator\r\n");
-        Utils::writeTo(reply, kickerId);
-        replyNoPriviledges(client, reply);
+        replyNoPriviledges(client, channelName);
     }
     else // Kick
     {
@@ -248,12 +245,12 @@ void Server::execKICK(Client& client, const std::string line)
             replyKick(*it->second, client, *channelIter, userNick, reason);
             if (it->second != &(*channelUserIter))
             {
-                Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, it->second->getId());
+                replyBroadcastKick(it->second->getId(), kickerNick, userNick, channelName, reason);
             }
         }
         channelIter->deleteClient(userId);
-        Utils::writeTo("You were kicked from #" + channelName + " by " + kickerNick + " (" + reason + ")\r\n", userId);
     }
+    replyYouWereKicked(userId, channelName, kickerNick, reason);
 }
 
 void Server::execINVITE(Client& client, const std::string line)
@@ -299,13 +296,55 @@ void Server::execMODE(Client& client, const std::string line)
 
 void Server::execPART(Client& client, const std::string line)
 {
-    // input: "PART #<channel> :Leaving"
-    // out:
-    // to sending client: "You have left channel #<channel> (Leaving)
+    const int id(client.getId());
+    std::istringstream iss(line);
+    std::string channelName;
+    std::string reason;
 
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***PART: ";
-    std::cout << "Client " << client.getNickname() << " left channel " << line << std::endl;
+    iss >> channelName;
+
+    if (channelName.empty() || channelName[0] != '#')
+    {
+        replyPartUsage(id);
+        return ;
+    }
+
+    channelName.erase(0, 1);
+    
+    if (!channelExists(channelName))
+    {
+        replyNoSuchChannel(client);
+        replyNoSuchChannelSimple(id, channelName);
+    }
+    else
+    {
+        ChannelsList::iterator channelIter(getChannel(channelName));
+        std::getline(iss >> std::ws, reason);
+        if (reason[0] == ':')
+            reason.erase(0, 1);
+
+        if (!channelIter->isClientInChannel(id))
+        {
+            replyNotOnChannel(client, channelName);
+        }
+        else
+        {
+            replyYouLeftChannel(id, channelName, reason);
+
+            // reply all channel memebers
+            ClientMap map = channelIter->getClients();
+            for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
+            {
+                // send a notice to everyone except for client sending command
+                if (it->second != &client)
+                    replyBroadcastUserLeft(it->second->getId(), client, reason);
+                
+                replyPart(client, channelName);
+            }
+            channelIter->deleteClient(id);
+        }
+    }
+    
 }
 
 void Server::execCAP(Client& client, std::string command)
