@@ -17,6 +17,7 @@ Channel::Channel(const std::string name, const Client* client)
 {
     _clientsMap.insert(std::make_pair(client->getId(), client));
     std::cout << "Channel " << name << " created." << std::endl;
+    addOperator(client->getId());
 }
 
 Channel::Channel(const Channel& other)
@@ -31,7 +32,11 @@ Channel& Channel::operator=(const Channel& other)
         _name = other._name;
         _topic = other._topic;
         _modes = other._modes;
-        _clientsMap = other._clientsMap;
+        for (ClientMap::const_iterator it = other._clientsMap.begin(); it != other._clientsMap.end(); it++)
+        {
+            _clientsMap[it->first] = it->second;
+        }
+        _operators = other._operators;
     }
     return *this;
 }
@@ -46,7 +51,7 @@ std::string Channel::getName() const
     return _name;
 }
 
-ClientMap Channel::getClients() const
+const ClientMap& Channel::getClients() const
 {
     return _clientsMap;
 }
@@ -142,6 +147,16 @@ bool Channel::hasModes(void) const
     return (isInviteOnly() || isTopicRetricted() || hasKey() || hasOperatorPriviledges() || limit());
 }
 
+bool    Channel::isOperator(const int fd) const
+{
+    return (_operators.find(fd) != _operators.end());
+}
+
+bool    Channel::isInChannel(const int fd) const
+{
+    return (_clientsMap.find(fd) != _clientsMap.end());
+}
+
 std::string Channel::getTopic(void) const
 {
     return _topic;
@@ -183,6 +198,17 @@ void Channel::deleteClient(const int fd)
 {
     if (_clientsMap.erase(fd) > 0)
     {
-        //TODO: broadcast to all clients in the channel
+        removeOperator(fd);
     }
 }
+
+void    Channel::addOperator(const int fd)
+{
+    _operators.insert(fd);
+}
+
+void    Channel::removeOperator(const int fd)
+{
+    _operators.erase(fd);
+}
+
