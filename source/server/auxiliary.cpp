@@ -34,6 +34,7 @@ ChannelsList::const_iterator Server::getChannel(const std::string& name) const
     return it;
 }
 
+// For JOIN only
 const std::string Server::returnChannelName(const std::string& line)
 {
     size_t pos(line.find('#'));
@@ -42,5 +43,11 @@ const std::string Server::returnChannelName(const std::string& line)
         std::cerr << "Error: join: could not find '#' token." << std::endl; // TODO: reply error
         return (BADJOIN + line.substr(0u, line.find(' ')));
     }
-    return (line.substr(pos + 1));
+    return (line.substr(pos + 1, line.find(" " - 1)));
+}
+
+bool    Server::channelExists(const std::string& name) const
+{
+    const ChannelsList::const_iterator it(getChannel(name));
+    return (it !=_channels.end());
 }
