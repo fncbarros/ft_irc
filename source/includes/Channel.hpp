@@ -25,18 +25,18 @@ class Channel
 public:
     // Special functions
     Channel();
-    Channel (const std::string name, const Client* client);
+    Channel(const std::string name, const Client* client);
     Channel(const Channel& other);
     Channel& operator=(const Channel& other);
-    ~Channel ();
+    ~Channel();
 
     // Getters
-    std::string getName() const;
-    ClientMap   getClients() const;
+    std::string         getName() const;
+    const ClientMap&    getClients() const;
 
-    bool        addClient(const Client& client);
-    bool        isClientInChannel(int fd) const;
-    void        printList(int fd) const; // DEBUG
+    bool                addClient(const Client& client);
+    bool                isClientInChannel(int fd) const;
+    void                printList(int fd) const; // DEBUG
 
     struct modes {
         bool invite_only;
@@ -50,26 +50,26 @@ public:
         modes& operator=(const modes& other);
     };
 
-    bool        isInviteOnly(void) const;
-    bool        isTopicRetricted(void) const;
-    bool        hasKey(void) const;
-    bool        hasOperatorPriviledges(void) const;
-    size_t      limit(void) const;
-    bool        hasModes(void) const;
-    bool        isOperator(const int fd) const;
-    bool        isInChannel(const int fd) const;
+    bool                isInviteOnly(void) const;
+    bool                isTopicRetricted(void) const;
+    bool                hasKey(void) const;
+    bool                hasOperatorPriviledges(void) const;
+    size_t              limit(void) const;
+    bool                hasModes(void) const;
+    bool                isOperator(const int fd) const;
+    bool                isInChannel(const int fd) const;
 
-    std::string getTopic(void) const;
+    std::string         getTopic(void) const;
 
-    void        setInviteOnly(const bool set);
-    void        setTopicRestriction(const bool set);
-    void        setKey(const std::string& key);
-    void        setNoKey(void);
-    void        setPriviledges(const bool set);
-    void        setLimit(const size_t limit);
-    void        deleteClient(const int fd);
-    void        addOperator(const int fd);
-    void        removeOperator(const int fd);
+    void                setInviteOnly(const bool set);
+    void                setTopicRestriction(const bool set);
+    void                setKey(const std::string& key);
+    void                setNoKey(void);
+    void                setPriviledges(const bool set);
+    void                setLimit(const size_t limit);
+    void                deleteClient(const int fd);
+    void                addOperator(const int fd);
+    void                removeOperator(const int fd);
 
     // Data
 private:

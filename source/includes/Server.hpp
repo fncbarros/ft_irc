@@ -28,6 +28,7 @@ class Channel;
 
 // Const Definitions
 const int BUFFER_SIZE(30720);
+const std::string EOL("\r\n");
 
 static const std::string WELCOME("001");
 static const std::string YOURHOST("002");
@@ -142,7 +143,7 @@ private:
     void                            replyNoSuchNick(const Client& client, const std::string& str) const;
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& reply);
-    void                            replyKick(const Client& client, const Channel& channel, const std::string& userNick, const std::string& reason);
+    void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
     void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget) const;
     void                            replyNotOnChannelError(const Client& client, const std::string& channelName) const;
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
@@ -165,7 +166,7 @@ private:
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
-
+    bool                            channelExists(const std::string& name) const;
 
 public:
     void                            connectionLoop(void);

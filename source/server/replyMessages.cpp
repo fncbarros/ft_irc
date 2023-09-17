@@ -179,12 +179,13 @@ void    Server::replyNoPriviledges(const Client& client, const std::string& repl
     Utils::writeTo(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
 }
 
-void    Server::replyKick(const Client& client, const Channel& channel, const std::string& userNick, const std::string& reason)
+void    Server::replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason)
 {
     const int id(client.getId());
-    const std::string nick(client.getNickname());
+    const std::string nick(kicker.getNickname());
     const std::string channelName(channel.getName());
-    Utils::writeTo(":" + HOST + " " + KICK + " " + nick + " " + channelName + " " + userNick + " :" + reason + "\r\n", id);
+    Utils::writeTo(":" + kicker.toString() + " " + KICK + " #" + channelName + " " + userNick + " :" + nick + " " + userNick, id);
+    Utils::writeTo(":" + (reason.empty() ? nick : reason) + EOL, id);
 }
 
 void    Server::replyNoSuchNickError(const Client& client, const std::string& nickTarget) const
