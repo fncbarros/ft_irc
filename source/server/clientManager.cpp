@@ -53,7 +53,8 @@ void Server::deleteClient(const int fd)
     if (client != _connections.end())
         _connections.erase(client);
     close(fd);
-    FD_CLR(fd, &_connections_set);
+    FD_CLR(fd, &_connections_set_read);
+    FD_CLR(fd, &_connections_set_write);
     std::cout << "Client deleted" << std::endl;
 }
 

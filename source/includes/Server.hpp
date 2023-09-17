@@ -60,16 +60,19 @@ static const std::string NOSUCHCHANNEL("403");
 static const std::string USERNOTINCHANNEL("441");
 static const std::string CLIENTNOTONCHANNEL("441");
 static const std::string KICK("312");
+static const std::string NOTONCHANNEL("442");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
 typedef std::vector<tokenPair> tokenList;
 typedef std::vector<Client> ConnectionsList;
 typedef std::vector<Channel> ChannelsList;
+
 class Server
 {
     typedef void (Server::*exec_ptr)(Client&, const std::string);
     typedef std::map<std::string, exec_ptr>  CommandMap;
+
     // Special functions
 public:
      Server();
@@ -118,42 +121,50 @@ public:
 
 private:
     // replyMessages.cpp
-    void                            replyPassMissMatch(const Client& client) const;
-    void                            replyWelcome(const Client& client) const;
-    void                            replyYourHost(const Client& client) const;
-    void                            replyCreated(const Client& client) const;
-    void                            replyMyInfo(const Client& client) const;
-    void                            replyNickCollision(const Client& client) const;
-    void                            replyPrivMessageNickNotFound(const Client& client,  const std::string &targetNickName) const;
-    void                            replyPrivateMessage(const Client& client,  const Client& targetCLient, const std::string message) const;
-    void                            replyName(const Client& client, const Channel& channel) const;
-    void                            replyChannelNotFound(const Client& client, const std::string channelName) const;
-    void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string channelName, const std::string message) const;
-    void                            replyCAPLS(Client& client, std::string capabilities) const;
-    void                            replyJoin(const Client& client, const Channel& channel) const;
-    void                            replyEndOfNames(const Client& client, const Channel& channel) const;
-    void                            replyChannelMode(const Client& client, const Channel& channel) const;
-    void                            replyCreationTime(const Client& client, const Channel& channel) const;
-    void                            replyWho(const Client& client, const Channel& channel) const;
-    void                            replyEndOfWho(const Client& client, const Channel& channel) const;
-    void                            replyBadJoin(const Client& client, const std::string& line) const;
-    void                            replyList(const Client& client) const;
-    void                            replyList(const Client& client, const Channel& channel) const;
-    void                            replyNoSuchChannel(const Client& client) const;
-    void                            replyNoSuchNick(const Client& client, const std::string& str) const;
+    void                            addMessage(const std::string& message, int fd);
+    void                            replyPassMissMatch(const Client& client);
+    void                            replyWelcome(const Client& client);
+    void                            replyYourHost(const Client& client);
+    void                            replyCreated(const Client& client);
+    void                            replyMyInfo(const Client& client);
+    void                            replyNickCollision(const Client& client);
+    void                            replyPrivMessageNickNotFound(const Client& client, const std::string& targetNickName);
+    void                            replyPrivateMessage(const Client& client,  const Client& targetCLient, const std::string& message);
+    void                            replyName(const Client& client, const Channel& channel);
+    void                            replyChannelNotFound(const Client& client, const std::string& channelName);
+    void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
+    void                            replyCAPLS(Client& client, std::string capabilities);
+    void                            replyJoin(const Client& client, const Channel& channel);
+    void                            replyEndOfNames(const Client& client, const Channel& channel);
+    void                            replyChannelMode(const Client& client, const Channel& channel);
+    void                            replyCreationTime(const Client& client, const Channel& channel);
+    void                            replyWho(const Client& client, const Channel& channel);
+    void                            replyEndOfWho(const Client& client, const Channel& channel);
+    void                            replyBadJoin(const Client& client, const std::string& line);
+    void                            replyList(const Client& client);
+    void                            replyList(const Client& client, const Channel& channel);
+    void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget);
+    void                            replyNotOnChannelError(const Client& client, const std::string& channelName);
+    void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName);
+    void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName);
+    void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName);
+    void                            replyNoSuchChannel(const Client& client);
+    void                            replyNoSuchNick(const Client& client, const std::string& str);
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
-    void                            replyNoPriviledges(const Client& client, const std::string& reply);
+    void                            replyNoPriviledges(const Client& client, const std::string& channelName);
     void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
-    void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget) const;
-    void                            replyNotOnChannelError(const Client& client, const std::string& channelName) const;
-    void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
-    void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName) const;
-    void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName) const;
-
+    void                            replyBroadcastKick(const int id, const std::string& kickerNick, const std::string& userNick, const std::string& channelName, const std::string& reason);
+    void                            replyNotOnChannel(const Client& client, const std::string& channelName);
+    void                            replyPart(const Client& client, const std::string& channelName);
+    void                            replyYouWereKicked(const int id, const std::string& channelName, const std::string& kickerNick, const std::string& reason);
+    void                            replyPartUsage(const int id);
+    void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
+    void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
+    void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
-    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message) const;
+    void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
@@ -180,7 +191,8 @@ private:
     int                     _server_socket;
     std::string             _password;
     struct sockaddr_in      _socket_addr;
-    fd_set                  _connections_set;
+    fd_set                  _connections_set_read;
+    fd_set                  _connections_set_write;
     ConnectionsList         _connections;
     ChannelsList            _channels;
     bool                    _interrupt;
