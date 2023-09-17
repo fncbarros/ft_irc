@@ -141,7 +141,6 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 /**
  * CHANNEL specific commands
  * */
-
 void Server::execJOIN(Client& client, const std::string line)
 {
     std::string channelName(returnChannelName(line));
@@ -168,7 +167,7 @@ void Server::execJOIN(Client& client, const std::string line)
         {
             // TODO: need to check if client is not channel user already
             Channel& channel(*channelIt);
-            const ClientMap list(channel.getClients());
+            const ClientMap& list(channel.getClients());
 
             // add user to channel
             channel.addClient(client);
