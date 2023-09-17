@@ -194,6 +194,7 @@ void Server::execKICK(Client& client, const std::string line)
     std::string userNick;
     std::string reason;
     const int kickerId(client.getId());
+    const std::string kickerNick(client.getNickname());
 
     iss >> channelName;
 
@@ -215,6 +216,10 @@ void Server::execKICK(Client& client, const std::string line)
     iss >> userNick;
     const ConnectionsList::const_iterator channelUserIter(getClient(userNick));
     std::getline(iss >> std::ws, reason);
+    if (reason[0] == ':')
+        reason.erase(0, 1);
+    if (reason.empty())
+        reason = kickerNick;
 
     if (channelUserIter == _connections.end())
     {
@@ -243,12 +248,11 @@ void Server::execKICK(Client& client, const std::string line)
             replyKick(*it->second, client, *channelIter, userNick, reason);
             if (it->second != &(*channelUserIter))
             {
-                Utils::writeTo(client.getNickname() + " has kicked " + userNick + " from #" + channelName, it->second->getId());
-                Utils::writeTo("(" + (reason.empty() ? client.getNickname() : reason) + ")\r\n", it->second->getId());
+                Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, it->second->getId());
             }
         }
         channelIter->deleteClient(userId);
-        Utils::writeTo("You were kicked from #" + channelName + " by " + client.getNickname() + "(" + reason + ")\r\n", userId);
+        Utils::writeTo("You were kicked from #" + channelName + " by " + kickerNick + " (" + reason + ")\r\n", userId);
     }
 }
 

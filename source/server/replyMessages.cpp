@@ -184,8 +184,7 @@ void    Server::replyKick(const Client& client, const Client& kicker, const Chan
     const int id(client.getId());
     const std::string nick(kicker.getNickname());
     const std::string channelName(channel.getName());
-    Utils::writeTo(":" + kicker.toString() + " " + KICK + " #" + channelName + " " + userNick + " :" + nick + " " + userNick, id);
-    Utils::writeTo(":" + (reason.empty() ? nick : reason) + EOL, id);
+    Utils::writeTo(":" + kicker.toString() + " " + "KICK" + " #" + channelName + " " + userNick + " :" + reason + EOL, id);
 }
 
 void    Server::replyNoSuchNickError(const Client& client, const std::string& nickTarget) const
