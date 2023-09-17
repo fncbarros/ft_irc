@@ -306,16 +306,18 @@ void Server::execPART(Client& client, const std::string line)
         else
         {
             Utils::writeTo("You have left channel #<" + channelName + "> (" + reason + ")\r\n", id);
-            replyPart(client, channelName);
-            channelIter->deleteClient(id);
 
             // reply all channel memebers
             ClientMap map = channelIter->getClients();
             for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
             {
-                Utils::writeTo(client.getNickname() + "(" + client.toString() + ") has left (" + reason + ")\r\n", it->second->getId());
+                // send a notice to everyone except for client sending command
+                if (it->second != &client)
+                    Utils::writeTo(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", it->second->getId());
+                
+                replyPart(client, channelName);
             }
-            // user2 (user@IRC4Fun-jjcum1.rev.vodafone.pt) has left ("reason")
+            channelIter->deleteClient(id);
         }
     }
     

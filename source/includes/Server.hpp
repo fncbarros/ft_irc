@@ -28,6 +28,7 @@ class Channel;
 
 // Const Definitions
 const int BUFFER_SIZE(30720);
+const std::string EOL("\r\n");
 
 static const std::string WELCOME("001");
 static const std::string YOURHOST("002");
@@ -70,6 +71,7 @@ class Server
 {
     typedef void (Server::*exec_ptr)(Client&, const std::string);
     typedef std::map<std::string, exec_ptr>  CommandMap;
+
     // Special functions
 public:
      Server();

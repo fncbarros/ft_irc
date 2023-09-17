@@ -222,5 +222,5 @@ void    Server::replyNotOnChannel(const Client& client, const std::string& chann
 void    Server::replyPart(const Client& client, const std::string& channelName) const
 {
     const int id(client.getId());
-    Utils::writeTo(":" + client.toString() + " PART #" + channelName, id);
+    Utils::writeTo(":" + client.toString() + " PART #" + channelName + "\r\n", id);
 }
