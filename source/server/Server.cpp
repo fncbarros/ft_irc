@@ -85,7 +85,8 @@ int Server::acceptNewConnection()
     {
         fcntl(new_socket_connection, F_SETFL, O_NONBLOCK);
         _connections.push_back(Client(new_socket_connection));
-        FD_SET(new_socket_connection, &_connections_set);
+        FD_SET(new_socket_connection, &_connections_set_read);
+        FD_SET(new_socket_connection, &_connections_set_write);
         std::cout << "new connection created" << std::endl;
     }
 
@@ -179,21 +180,24 @@ bool Server::inspectEvent(int fd)
 
 void Server::connectionLoop()
 {
-    fd_set ready_connections;
-    // timeval time;
-    // time.tv_sec = 0;
-    // time.tv_usec = 500;
+    fd_set ready_connections_read, ready_connections_write;
+    timeval time;
+    time.tv_sec = 0;
+    time.tv_usec = 500;
     // initialize the fd_set
-    FD_ZERO(&_connections_set);
-    FD_SET(_server_socket, &_connections_set);
+    FD_ZERO(&_connections_set_read);
+    FD_ZERO(&_connections_set_write);
+    FD_SET(_server_socket, &_connections_set_read);
+    FD_SET(_server_socket, &_connections_set_write);
 
     
 
     while (!_interrupt)
     {
         // the fd_set is always destroyed by the select() method
-        ready_connections = _connections_set;
-        int ret = select(FD_SETSIZE, &ready_connections, NULL, NULL, NULL);
+        ready_connections_read = _connections_set_read;
+        ready_connections_write = _connections_set_write;
+        int ret = select(FD_SETSIZE, &ready_connections_read, &ready_connections_write, NULL, &time);
         if (ret < 0)
         {
             std::cout << "Select error: " << strerror(errno) << std::endl;
@@ -204,10 +208,24 @@ void Server::connectionLoop()
         for (int fd = 3; fd < FD_SETSIZE; fd++)
         {
             // if fd is not ready for reading, go to next one
-            if (!FD_ISSET(fd, &ready_connections))
+            if (!FD_ISSET(fd, &ready_connections_read))
                 continue ;
             inspectEvent(fd); // Note: inspectEvent() validates clientFd
-            ready_connections = _connections_set;
+            ready_connections_read = _connections_set_read;
+            ready_connections_write = _connections_set_write;
+        }
+
+        for (int fd = 3; fd < FD_SETSIZE; fd++)
+        {
+            // if fd is not ready for reading, go to next one
+            if (!FD_ISSET(fd, &ready_connections_write))
+                continue ;
+            
+            ConnectionsList::iterator client = getClient(fd);
+            if (client != _connections.end())
+            {
+                client->replyMessage();
+            }
         }
     }
 }

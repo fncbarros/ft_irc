@@ -54,12 +54,15 @@ public:
     void            setUserActive(void);
     void            setNickActive(void);
     void            registerBuffer(const std::string msg);
+    void            setMessage(const std::string& msg);
+    void            replyMessage();
     std::string     returnLine(void);
 
 private:
-    int                     _socket_id;
-    std::string             _nickname;
-    std::string             _username;
-    t_auth                  _auth;
-    std::string             _msgBuffer;
+    int                         _socket_id;
+    std::string                 _nickname;
+    std::string                 _username;
+    t_auth                      _auth;
+    std::string                 _msgBuffer;
+    std::vector<std::string>    _replyMessages;
 };
