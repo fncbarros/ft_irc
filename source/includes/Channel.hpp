@@ -28,6 +28,19 @@ public:
     Channel& operator=(const Channel& other);
     ~Channel ();
 
+    // modes type
+    struct modes {
+        bool        invite_only;
+        bool        topic_restricted;
+        std::string key;
+        bool        operator_privs;
+        size_t      limit;
+
+        modes();
+        modes(const modes& other);
+        modes& operator=(const modes& other);
+    };
+
     // Getters
     std::string getName() const;
     ClientMap   getClients() const;
@@ -36,17 +49,6 @@ public:
     bool        isClientInChannel(int fd) const;
     void        printList(int fd) const; // DEBUG
 
-    struct modes {
-        bool invite_only;
-        bool topic_restricted;
-        std::pair<bool, std::string> key;
-        bool operator_privs;
-        size_t limit;
-
-        modes();
-        modes(const modes& other);
-        modes& operator=(const modes& other);
-    };
 
     bool        isInviteOnly(void) const;
     bool        isTopicRetricted(void) const;

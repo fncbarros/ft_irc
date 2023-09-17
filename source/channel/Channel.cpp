@@ -85,33 +85,6 @@ void Channel::printList(int fd) const
     Utils::writeTo(nameList, fd);
 }
 
-Channel::modes::modes()
-: invite_only(false)
-, topic_restricted(false)
-, key(std::make_pair(false, ""))
-, operator_privs(false)
-, limit(0)
-{
-}
-
-Channel::modes::modes(const modes &other)
-{
-    *this = other;
-}
-
-Channel::modes& Channel::modes::operator=(const modes &other)
-{
-    if (this != &other)
-    {
-        invite_only = other.invite_only;
-        topic_restricted = other.topic_restricted;
-        key = other.key;
-        operator_privs = other.operator_privs;
-        limit = other.limit;
-    }
-    return *this;
-}
-
 bool Channel::isInviteOnly(void) const
 {
     return _modes.invite_only;
@@ -124,7 +97,7 @@ bool Channel::isTopicRetricted(void) const
 
 bool Channel::hasKey(void) const
 {
-    return _modes.key.first;
+    return !_modes.key.empty();
 }
 
 bool Channel::hasOperatorPriviledges(void) const
@@ -159,14 +132,12 @@ void Channel::setTopicRestriction(const bool set)
 
 void Channel::setKey(const std::string& key)
 {
-    _modes.key.first = true;
-    _modes.key.second = key;
+    _modes.key = key;
 }
 
 void Channel::setNoKey(void)
 {
-    _modes.key.first = false;
-    _modes.key.second.clear();
+    _modes.key.clear();
 }
 
 void Channel::setPriviledges(const bool set)
@@ -185,4 +156,34 @@ void Channel::deleteClient(const int fd)
     {
         //TODO: broadcast to all clients in the channel
     }
+}
+
+/**
+ * modes functions
+*/
+Channel::modes::modes()
+: invite_only(false)
+, topic_restricted(false)
+, key("")
+, operator_privs(false)
+, limit(0)
+{
+}
+
+Channel::modes::modes(const modes &other)
+{
+    *this = other;
+}
+
+Channel::modes& Channel::modes::operator=(const modes &other)
+{
+    if (this != &other)
+    {
+        invite_only = other.invite_only;
+        topic_restricted = other.topic_restricted;
+        key = other.key;
+        operator_privs = other.operator_privs;
+        limit = other.limit;
+    }
+    return *this;
 }
