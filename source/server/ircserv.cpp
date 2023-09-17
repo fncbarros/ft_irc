@@ -20,7 +20,7 @@ Server server;
 
 void signal_handler(int signal)
 {
-	if (signal == SIGINT)
+	if (signal == SIGINT || signal == SIGQUIT)
 		server.interrupt();
 }
 
@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
     }
 
 	std::signal(SIGINT, signal_handler);
+	std::signal(SIGQUIT, signal_handler);
 
 	if (server.setConnection(std::atoi(argv[1]), argv[2]) > 0)
 	{

@@ -27,32 +27,39 @@
 class Channel;
 
 // Const Definitions
-const int BUFFER_SIZE = 30720;
+const int BUFFER_SIZE(30720);
+const std::string EOL("\r\n");
 
-static const std::string WELCOME = "001";
-static const std::string YOURHOST = "002";
-static const std::string CREATED = "003";
-static const std::string MYINFO = "004";
-static const std::string NICKCOLLISION = "433";
-static const std::string PASSMISMATCH = "464";
+static const std::string WELCOME("001");
+static const std::string YOURHOST("002");
+static const std::string CREATED("003");
+static const std::string MYINFO("004");
+static const std::string NICKCOLLISION("433");
+static const std::string PASSMISMATCH("464");
 
-static const std::string NAMREPLY = "353";
-static const std::string ENDOFNAMES = "366"; // <channel> :<info>
-static const std::string CHANNELMODEIS = "324"; // <channel> <mode> <mode_params>
-static const std::string CREATIONTIME = "329";
-static const std::string WHOSPCRPL = "354";
-static const std::string ENDOFWHO = "315";
-static const std::string LISTSTART = "321";
-static const std::string LIST = "322";
-static const std::string LISTEND = "323";
-static const std::string INVITING = "341";
+static const std::string NAMREPLY("353");
+static const std::string ENDOFNAMES("366"); // <channel> :<info>
+static const std::string CHANNELMODEIS("324"); // <channel> <mode> <mode_params>
+static const std::string CREATIONTIME("329");
+static const std::string WHOSPCRPL("354");
+static const std::string ENDOFWHO("315");
+static const std::string LISTSTART("321");
+static const std::string LIST("322");
+static const std::string LISTEND("323");
+static const std::string INVITING("341");
 
 // Error codes
-static const std::string NICKNOTFOUND = "401";
-static const std::string CLIENTNOTONCHANNEL = "401";
-static const std::string CHANNELNOTFOUND = "403";
-static const std::string CLIENTONCHANNEL = "443";
-static const std::string BADJOIN = "448";
+static const std::string NICKNOTFOUND("401");
+static const std::string NOSUCHNICK("401");
+static const std::string CHANNELNOTFOUND("403");
+static const std::string CLIENTONCHANNEL("443");
+static const std::string BADJOIN("448");
+static const std::string NOSUCHCHANNEL("403");
+static const std::string USERNOTINCHANNEL("441");
+static const std::string CLIENTNOTONCHANNEL("441");
+static const std::string CHANOPRIVSNEEDED("482");
+static const std::string KICK("312");
+
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -139,6 +146,14 @@ private:
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName);
     void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName);
     void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName);
+    void                            replyNoSuchChannel(const Client& client);
+    void                            replyNoSuchNick(const Client& client, const std::string& str);
+    void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
+    void                            replyNoPriviledges(const Client& client, const std::string& reply);
+    void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
+
+
+
 
 
     // communication.cpp
@@ -156,7 +171,7 @@ private:
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
-
+    bool                            channelExists(const std::string& name) const;
 
 public:
     void                            connectionLoop(void);

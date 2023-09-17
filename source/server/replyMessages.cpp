@@ -85,7 +85,6 @@ void    Server::replyJoin(const Client& client, const Channel& channel)
 
 void    Server::replyName(const Client& client, const Channel& channel)
 {
-    //  :irc.eagle.y.se 353 T-bone = #new :T-bone!timey@180.226.108.93.rev.vodafone.pt barney!barney@180.226.108.93.rev.vodafone.pt @Nico2!fbarrosdff@180.226.108.93.rev.vodafone.pt
     // ( '=' / '*' / '@' ) <channel> ' ' : [ '@' / '+' ] <nick> *( ' ' [ '@' / '+' ] <nick> )
 
     // first half
@@ -132,7 +131,6 @@ void    Server::replyCreationTime(const Client& client, const Channel& channel)
 void    Server::replyWho(const Client& client, const Channel& channel)
 {
     // :<server_name> 354 <nick> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>
-    // :irc.example.com 354 MyNickname #example User1 host.server.com OtherUser +i :1 John Doe
     // TODO: figure out second half of reply
     addMessage( ":" + HOST + " " + WHOSPCRPL + " " + client.getNickname() + " " + channel.getName() + " "
             +  client.getUsername() + " " +  HOST + " " + /* <server>  <nick> <flags> :<hopcount> <realname> */
@@ -169,6 +167,42 @@ void    Server::replyList(const Client& client, const Channel& channel)
     (void)channel;
     (void)client;
     // addMessage(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
+}
+
+void    Server::replyNoSuchChannel(const Client& client)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(":" + HOST + " " + NOSUCHCHANNEL + " " + nick + " " + HOST + " :No such channel\r\n", id);
+}
+
+void    Server::replyNoSuchNick(const Client& client, const std::string& str)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(":" + HOST + " " + NOSUCHNICK + " " + nick + " " + str + " :No such nick/channel\r\n", id);
+}
+
+void    Server::replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(":" + HOST + " " + USERNOTINCHANNEL + " " + nick + " " + userNick + " #" + channelName + " :They aren't on that channel\r\n", id);
+}
+
+void    Server::replyNoPriviledges(const Client& client, const std::string& reply)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
+}
+
+void    Server::replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason)
+{
+    const int id(client.getId());
+    const std::string nick(kicker.getNickname());
+    const std::string channelName(channel.getName());
+    Utils::writeTo(":" + kicker.toString() + " " + "KICK" + " #" + channelName + " " + userNick + " :" + reason + EOL, id);
 }
 
 void    Server::replyNoSuchNickError(const Client& client, const std::string& nickTarget)

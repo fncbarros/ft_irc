@@ -18,12 +18,12 @@ void Server::exec(Client& client, const tokenPair& message)
         return ;
 
     CommandMap::iterator itCommand = _commands.find(message.first);
-    
+
     if (itCommand != _commands.end())
     {
         exec_ptr command = itCommand->second;
         (this->*command)(client, message.second);
-    } 
+    }
     else
     {
         std::cout << message.first << " " << message.second << std::endl;
@@ -112,16 +112,29 @@ void Server::execQUIT(Client& client, const std::string line)
 
 void Server::execPRIVMSG(Client& client, const std::string line)
 {
-    const std::string nickname(line.substr(0, line.find(' ')));
-    const std::string messageReceived(line.substr(line.find(' ') + 1));
+    std::string token(line.substr(0, line.find(' ')));
+    const std::string message(line.substr(line.find(' ') + 1));
 
-    if (nickname.at(0) == '#')
+    if (token.at(0) == '#')
     {
-        channelPrivateMessage(client, nickname.substr(1), messageReceived);
+        token.erase(0, 1); // remove '#'
+        ChannelsList::const_iterator channelIt(getChannel(token));
+        if (channelIt == _channels.end())
+        {
+            /// some reply
+        }
+        else if (channelIt->isInChannel(client.getId()) == false)
+        {
+            // some other reply
+        }
+        else
+        {
+            channelPrivateMessage(client, token, message);
+        }
     }
     else
     {
-        clientPrivateMessage(client, nickname, messageReceived);
+        clientPrivateMessage(client, token, message);
     }
 }
 
@@ -144,7 +157,7 @@ void Server::execJOIN(Client& client, const std::string line)
     {
         // look for channel
         ChannelsList::iterator channelIt = getChannel(channelName);
-        
+
         // if no channel, create one
         if (channelIt == _channels.end())
         {
@@ -176,9 +189,71 @@ void Server::execJOIN(Client& client, const std::string line)
 
 void Server::execKICK(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***KICK: ";
-    std::cout << line << std::endl;
+    std::istringstream iss(line);
+    std::string channelName;
+    std::string userNick;
+    std::string reason;
+    const int kickerId(client.getId());
+    const std::string kickerNick(client.getNickname());
+
+    iss >> channelName;
+
+    if (channelName[0] != '#')
+    {
+        replyNoSuchChannel(client);
+        return ;
+    }
+
+    channelName.erase(0, 1);
+    ChannelsList::iterator channelIter(getChannel(channelName));
+
+    if(channelIter == _channels.end())
+    {
+        replyNoSuchChannel(client);
+        return ;
+    }
+
+    iss >> userNick;
+    const ConnectionsList::const_iterator channelUserIter(getClient(userNick));
+    std::getline(iss >> std::ws, reason);
+    if (reason[0] == ':')
+        reason.erase(0, 1);
+    if (reason.empty())
+        reason = kickerNick;
+
+    if (channelUserIter == _connections.end())
+    {
+        replyNoSuchNick(client, userNick);
+        return ;
+    }
+
+    const int userId(channelUserIter->getId());
+
+    // if client or channel user are not in channel
+    if (!channelIter->isInChannel(userId) || !channelIter->isInChannel(kickerId))
+    {
+        replyNotInChannel(client, userNick, channelName);
+    }
+    else if (!channelIter->isOperator(kickerId))
+    {
+        const std::string reply("#" + channelName + " :You're not channel operator\r\n");
+        Utils::writeTo(reply, kickerId);
+        replyNoPriviledges(client, reply);
+    }
+    else // Kick
+    {
+        const ClientMap& map = channelIter->getClients();
+        for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
+        {
+            replyKick(*it->second, client, *channelIter, userNick, reason);
+            if (it->second != &(*channelUserIter))
+            {
+                Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, it->second->getId());
+            }
+        }
+        channelIter->deleteClient(userId);
+        Utils::writeTo("You were kicked from #" + channelName + " by " + kickerNick + " (" + reason + ")\r\n", userId);
+    }
 }
 
 void Server::execINVITE(Client& client, const std::string line)
