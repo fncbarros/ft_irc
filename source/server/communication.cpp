@@ -16,7 +16,7 @@ void    Server::channelPrivateMessage(const Client& client, const std::string& c
 {
     std::cout << "Private Message " << client.getNickname() << " user: [" << channelname << "] message: [" << message << "]" << std::endl;
     
-    ChannelsList::iterator channel = getChannel(channelname);
+    ChannelsList::const_iterator channel = getChannel(channelname);
 
     if (channel == _channels.end())
     {
@@ -25,8 +25,8 @@ void    Server::channelPrivateMessage(const Client& client, const std::string& c
     else
     {
         std::cout << client.getNickname() << std::endl;
-        ClientMap clientMap = channel->getClients();
-        for(ClientMap::iterator itClient = clientMap.begin(); itClient != clientMap.end(); itClient++)
+        const ClientMap& clientMap = channel->getClients();
+        for(ClientMap::const_iterator itClient = clientMap.begin(); itClient != clientMap.end(); itClient++)
         {
             if (itClient->second != &client)
             {

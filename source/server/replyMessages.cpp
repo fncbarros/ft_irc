@@ -190,11 +190,13 @@ void    Server::replyNotInChannel(const Client& client, const std::string& userN
     addMessage(":" + HOST + " " + USERNOTINCHANNEL + " " + nick + " " + userNick + " #" + channelName + " :They aren't on that channel\r\n", id);
 }
 
-void    Server::replyNoPriviledges(const Client& client, const std::string& reply)
+void    Server::replyNoPriviledges(const Client& client, const std::string& channelName)
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    addMessage(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
+    const std::string reply("#" + channelName + " :You're not channel operator\r\n");
+    Utils::writeTo(reply, id);
+    Utils::writeTo(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
 }
 
 void    Server::replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason)
@@ -203,6 +205,11 @@ void    Server::replyKick(const Client& client, const Client& kicker, const Chan
     const std::string nick(kicker.getNickname());
     const std::string channelName(channel.getName());
     Utils::writeTo(":" + kicker.toString() + " " + "KICK" + " #" + channelName + " " + userNick + " :" + reason + EOL, id);
+}
+
+void    Server::replyBroadcastKick(const int id, const std::string& kickerNick, const std::string& userNick, const std::string& channelName, const std::string& reason)
+{
+    Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, id);
 }
 
 void    Server::replyNoSuchNickError(const Client& client, const std::string& nickTarget)
@@ -229,3 +236,42 @@ void    Server::replyInvitingReceived(const Client& client, const Client& client
 {
     addMessage(":" + client.toString() + " INVITE " + clientTarget.getNickname() + " :#" + channelName + "\r\n", clientTarget.getId());
 }
+
+void    Server::replyNotOnChannel(const Client& client, const std::string& channelName)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(client.toString() + " " + NOTONCHANNEL + " " + nick + " " + "#" + channelName + " :You're not on that channel\r\n", id);
+}
+
+void    Server::replyPart(const Client& client, const std::string& channelName)
+{
+    const int id(client.getId());
+    addMessage(":" + client.toString() + " PART #" + channelName + "\r\n", id);
+}
+
+void    Server::replyYouWereKicked(const int id, const std::string& channelName, const std::string& kickerNick, const std::string& reason)
+{
+        addMessage("You were kicked from #" + channelName + " by " + kickerNick + " (" + reason + ")\r\n", id);
+}
+
+void    Server::replyPartUsage(const int id)
+{
+    addMessage("Usage: PART [<channel>] [<reason>], leaves the channel, by default the current one", id);
+}
+
+void    Server::replyNoSuchChannelSimple(const int id, const std::string& channelName)
+{
+    addMessage(channelName + " :No such channel\r\n", id);
+}
+
+void    Server::replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason)
+{
+    addMessage("You have left channel #<" + channelName + "> (" + reason + ")\r\n", id);
+}
+
+void    Server::replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason)
+{
+    addMessage(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", id);
+}
+
