@@ -38,8 +38,12 @@ fclean: clean
 
 re: fclean all
 
-debug: CXXFLAGS += -g -fno-limit-debug-info
-debug: CXX = clang++
+debug: CXXFLAGS += -g
 debug: re
+clang-debug: CXX = clang++
+clang-debug: CXXFLAGS += -fno-limit-debug-info
+clang-debug: debug
+ASAN: CXXFLAGS += -fsanitize=address
+ASAN: re
 
 .PHONY: all, clean, fclean, re, debug

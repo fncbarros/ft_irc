@@ -12,12 +12,15 @@
 
 #include <Channel.hpp>
 
-Channel::Channel(const std::string name, const Client* client)
+Channel::Channel()
+{
+    // ...
+}
+
+Channel::Channel(const std::string name)
 : _name(name)
 {
-    _clientsMap.insert(std::make_pair(client->getId(), client));
     std::cout << "Channel " << name << " created." << std::endl;
-    addOperator(client->getId());
 }
 
 Channel::Channel(const Channel& other)
@@ -56,9 +59,9 @@ const ClientMap& Channel::getClients() const
     return _clientsMap;
 }
 
-bool Channel::addClient(const Client& client)
+bool Channel::addClient(const Client& client, const bool chanop)
 {
-    if (_clientsMap.size() == _modes.limit)
+    if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
     {
         return false;
     }
@@ -69,6 +72,8 @@ bool Channel::addClient(const Client& client)
     else
     {
         _clientsMap.insert(std::make_pair(client.getId(), &client));
+        if (chanop)
+            addOperator(client.getId());
         return true;
     }
 

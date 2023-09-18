@@ -25,7 +25,7 @@ class Channel
 public:
     // Special functions
     Channel();
-    Channel(const std::string name, const Client* client);
+    Channel(const std::string name);
     Channel(const Channel& other);
     Channel& operator=(const Channel& other);
     ~Channel();
@@ -34,7 +34,7 @@ public:
     std::string         getName() const;
     const ClientMap&    getClients() const;
 
-    bool                addClient(const Client& client);
+    bool                addClient(const Client& client, const bool chanop = false);
     bool                isClientInChannel(int fd) const;
     void                printList(int fd) const; // DEBUG
 
