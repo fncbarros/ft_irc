@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <Server.hpp>
+#include <cstdlib>
 
 void Server::exec(Client& client, const tokenPair& message)
 {
@@ -183,7 +184,6 @@ void Server::execJOIN(Client& client, const std::string line)
             }
         }
     }
-
 }
 
 void Server::execKICK(Client& client, const std::string line)
@@ -289,28 +289,144 @@ void Server::execTOPIC(Client& client, const std::string line)
     std::cout << line << std::endl;
 }
 
+
 void Server::execMODE(Client& client, const std::string line)
 {
+    // TODO: might need to check for other symbols ('&','+','!')
     (void)client;
 
     std::istringstream iss(line);
     std::string channelName;
-    std::string mode;
+    std::queue<std::string> modes;
     std::string params;
 
-    iss >> channelName;
+    while (!iss.eof())
+    {
+        std::string tmp;
+        iss >> tmp;
+        
+        if (tmp[0] == '#')
+        {
+            if (!channelName.empty())
+                // reply
+            channelName = tmp.substr(1);
+        }
+        else
+        {
+            modes.push(tmp);
+        }
+    }
 
-    if (channelName.empty() || mode.empty())
+    if (channelName.empty())
+    {
+        // reply
+        return ;
+    }
+    if (!channelExists(channelName))
     {
         // reply
         return ;
     }
 
-    // TODO: might need to check for other symbols ('&','+','!')
-    if (channelName[0] != '#')
-        // reply
-    channelName.erase(0, 1);
+    Channel& channel = *(getChannel(channelName));
 
+    if (!channel.isInChannel(client.getId()))
+    {
+        // reply
+        return ;
+    }
+    if (!channel.isOperator(client.getId()))
+    {
+        // reply
+        return ;
+    }
+
+    // TODO: check if client is operator
+    // i, t, k, o, l
+    while (!modes.empty())
+    {
+        const std::string token = modes.front();
+        modes.pop();
+        bool status;
+
+        if (token.at(0) == '+')
+        {
+            status = true;
+        }
+        else if (token.at(0) == '-')
+        {
+            status = false;
+        }
+        else
+        {
+            // reply
+            continue ;
+        }
+
+        // TODO: replies based on result?????
+
+        if (token.at(1) == 'i')
+        {
+            channel.setInviteOnly(status);
+        }
+        else if (token.at(1) == 't')
+        {
+            channel.setTopicRestriction(status); // -----------------------------> Need to change to list of operators [!!!!!!!!!!!!!!!!!!!]
+        }
+        else if (token.at(1) == 'k')
+        {
+            const std::string newKey(modes.front());
+            modes.pop();
+            status ? channel.setKey(newKey) : channel.setNoKey();
+        }
+        else if (token.at(1) == 'o')
+        {
+            const std::string user(modes.front());
+            modes.pop();
+
+            ConnectionsList::const_iterator clientIt = getClient(user);
+            if (clientIt == _connections.end())
+            {
+                // reply
+                // return ?
+            }
+            else if (!channel.isInChannel(clientIt->getId()))
+            {
+                // reply
+                // return ?
+            }
+            else
+            {
+                const int id(clientIt->getId());
+                status ? channel.addOperator(id) : channel.removeOperator(id);
+            }
+
+        }
+        else if (token.at(1) == 'l') // see syntax further
+        {
+            if (status)
+            {
+                const int limit(std::atoi(modes.front().c_str())); // TODO: remove atoi [!!!!!!!!!!!!!!!]
+                if (limit < 1)
+                {
+                    // reply
+                }
+                else
+                {
+                    channel.setLimit(static_cast<size_t>(limit));
+                }
+            }
+            else
+            {
+                channel.setLimit(0);
+            }
+        }
+        else
+        {
+            // reply
+            // return ??
+        }
+    }
 }
 
 void Server::execPART(Client& client, const std::string line)

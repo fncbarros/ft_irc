@@ -51,7 +51,6 @@ public:
     bool                isClientInChannel(int fd) const;
     void                printList(int fd) const; // DEBUG
 
-
     bool                isInviteOnly(void) const;
     bool                isTopicRetricted(void) const;
     bool                hasKey(void) const;
