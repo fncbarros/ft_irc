@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/09 15:14:05 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/18 16:07:56 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,7 @@ private:
     void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
+    void                            replyTopic(const Client& client, const std::string& channelTopic);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/09 15:07:55 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/18 15:50:44 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,6 +287,27 @@ void Server::execTOPIC(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***TOPIC: ";
     std::cout << line << std::endl;
+
+    const std::string channelTarget(line.substr(1, line.find(' ') - 1));
+    const std::string channelTopic(line.substr(line.find(' ') + 1, line.size()));
+    std::cout << channelTarget << std::endl;
+    std::cout << channelTopic << std::endl;
+    ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
+    if (channelTargetIt == _channels.end())
+    {
+        std::cout << "channel" << std::endl;
+        replyChannelNotFound(client, channelTarget);// ERR_NOSUCHCHANNEL (Código 403)
+    }
+    if (!channelTargetIt->isClientInChannel(client.getId()))
+    {
+        std::cout << "aqui" << std::endl;
+        replyNotOnChannelError(client, channelTargetIt->getName());// RPL_NOTONCHANNEL (Código 442)
+    }
+    else
+    {
+        std::cout << "aqui2" << std::endl;
+        replyTopic(client, channelTopic); // RPL_TOPIC (Código 332)
+    }
 }
 
 void Server::execMODE(Client& client, const std::string line)
