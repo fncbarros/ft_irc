@@ -117,8 +117,15 @@ public:
     void                            execKICK(Client& client, const std::string line);
     void                            execINVITE(Client& client, const std::string line);
     void                            execTOPIC(Client& client, const std::string line);
-    void                            execMODE(Client& client, const std::string line);
     void                            execPART(Client& client, const std::string line);
+
+    // modes.cpp
+    void                            execMODE(Client& client, const std::string line);
+    bool                            isChannelValid(const std::string& name) const;
+    void                            parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client);
+    void                            processOperator(Channel& channel, const std::string& user, const bool status);
+    void                            processLimit(const std::string arg, Channel& channel, const bool status);
+
 
 private:
     // replyMessages.cpp
@@ -170,10 +177,13 @@ private:
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
+
+    // Auxiliary functions
     ConnectionsList::const_iterator getClient(const std::string &nickname) const;
     void                            deleteClient(const int fd);
-    // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
+
+
     //Channel related
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
