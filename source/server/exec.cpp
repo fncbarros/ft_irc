@@ -26,7 +26,7 @@ void Server::exec(Client& client, const tokenPair& message)
     }
     else
     {
-        std::cout << message.first << " " << message.second << std::endl;
+        replyNoChannelJoined(client);
     }
 }
 
@@ -80,8 +80,9 @@ void Server::execNICK(Client& client, const std::string line)
     }
 
     client.setNickname(name);
-    replyWelcome(client);
     client.setNickActive();
+    if (client.isValid())
+        replyWelcome(client);
     std::cout << "Nickname " << name << " set.\n";
     //parse rest??
 }
