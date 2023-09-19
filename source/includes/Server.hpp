@@ -125,7 +125,7 @@ public:
     void                            parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client);
     void                            processOperator(Channel& channel, const std::string& user, const bool status);
     void                            processLimit(const std::string arg, Channel& channel, const bool status);
-
+    void                            replyChannelModeIs(const Client& client, const Channel& channel);
 
 private:
     // replyMessages.cpp

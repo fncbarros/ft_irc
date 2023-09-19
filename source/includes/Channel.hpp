@@ -59,6 +59,7 @@ public:
     bool                hasModes(void) const;
     bool                isOperator(const int fd) const;
     bool                isInChannel(const int fd) const;
+    std::string         returnModes(void) const;
 
     std::string         getTopic(void) const;
 

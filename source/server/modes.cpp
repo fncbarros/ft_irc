@@ -13,6 +13,15 @@
 #include <Server.hpp>
 #include <cstdlib>
 
+void Server::replyChannelModeIs(const Client& client, const Channel& channel)
+{
+	const int id(client.getId());
+	const std::string nick(client.getNickname());
+	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes(), id);
+}
+
+// :DOMAIN 329 nick #channel :timeStamp
+
 void Server::execMODE(Client& client, const std::string line)
 {
     // TODO: might need to check for other symbols ('&','+','!')
@@ -44,7 +53,12 @@ void Server::execMODE(Client& client, const std::string line)
     {
         // reply
     }
-    else
+    else if (modes.empty())
+	{
+		replyChannelModeIs(client, channel);
+		replyCreationTime(client, channel);
+	}
+	else
     {
         parseModes(modes, channel, client);
     }
@@ -162,7 +176,7 @@ void Server::processLimit(const std::string arg, Channel& channel, const bool st
 	}
 	if (status)
 	{
-		const int limit(std::atoi(arg.c_str())); // TODO: remove atoi [!!!!!!!!!!!!!!!]
+		const int limit(std::atoi(arg.c_str())); // TODO: remove atoi [!!!!!!!!!!!]
 		if (limit < 1)
 		{
 			// reply

@@ -135,6 +135,24 @@ bool    Channel::isInChannel(const int fd) const
     return (_clientsMap.find(fd) != _clientsMap.end());
 }
 
+std::string Channel::returnModes(void) const
+{
+    std::string modes("+");
+    
+    if (!hasModes())
+        return "";
+    if (isInviteOnly())
+        modes += "i";
+    if (isTopicRetricted())
+        modes += "t";
+    if (hasKey())
+        modes += "k";
+    if (limit() > 0)
+        modes += "l";
+    return modes;
+}
+
+
 std::string Channel::getTopic(void) const
 {
     return _topic;
