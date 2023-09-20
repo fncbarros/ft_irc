@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/20 16:26:19 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/20 16:34:53 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,6 @@ void Server::execTOPIC(Client& client, const std::string line)
     }
     else if (channelTargetIt == _channels.end())
     {
-        std::cout << "channel" << std::endl;
         replyChannelNotFound(client, channelTarget);// ERR_NOSUCHCHANNEL (Código 403)
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
@@ -317,7 +316,6 @@ void Server::execTOPIC(Client& client, const std::string line)
         std::cout << "aqui2" << std::endl;
         replyTopic(client, channelTopic); // RPL_TOPIC (Código 332)
     }
-    //FAZER SOBRE 331 -> RPL_NOTOPIC
 }
 
 void Server::execMODE(Client& client, const std::string line)
