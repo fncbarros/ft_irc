@@ -269,7 +269,7 @@ void Server::execINVITE(Client& client, const std::string line)
     //TODO: ERR_NEEDMOREPARAMS (461)
     if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
     {
-        replyNoSuchNickError(client, nickTarget);
+        replyNoSuchNick(client, nickTarget);
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
     {
@@ -310,7 +310,7 @@ void Server::execPART(Client& client, const std::string line)
     }
 
     channelName.erase(0, 1);
-    
+
     if (!channelExists(channelName))
     {
         replyNoSuchChannel(client);

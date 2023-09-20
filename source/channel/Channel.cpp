@@ -63,6 +63,7 @@ bool Channel::addClient(const Client& client, const bool chanop)
 {
     if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
     {
+        // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
         return false;
     }
     else if (_clientsMap.find(client.getId()) != _clientsMap.end())
@@ -138,9 +139,7 @@ bool    Channel::isInChannel(const int fd) const
 std::string Channel::returnModes(void) const
 {
     std::string modes("+");
-    
-    if (!hasModes())
-        return "";
+
     if (isInviteOnly())
         modes += "i";
     if (isTopicRetricted())

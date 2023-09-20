@@ -176,13 +176,6 @@ void    Server::replyNoSuchChannel(const Client& client)
     addMessage(":" + HOST + " " + NOSUCHCHANNEL + " " + nick + " " + HOST + " :No such channel\r\n", id);
 }
 
-void    Server::replyNoSuchNick(const Client& client, const std::string& str)
-{
-    const int id(client.getId());
-    const std::string nick(client.getNickname());
-    addMessage(":" + HOST + " " + NOSUCHNICK + " " + nick + " " + str + " :No such nick/channel\r\n", id);
-}
-
 void    Server::replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName)
 {
     const int id(client.getId());
@@ -212,7 +205,7 @@ void    Server::replyBroadcastKick(const int id, const std::string& kickerNick, 
     Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, id);
 }
 
-void    Server::replyNoSuchNickError(const Client& client, const std::string& nickTarget)
+void    Server::replyNoSuchNick(const Client& client, const std::string& nickTarget)
 {
     addMessage(":" + HOST + " " + NICKNOTFOUND + " " + client.getNickname() + " " + nickTarget + " :No such nick/channel\r\n", client.getId());
 }

@@ -17,10 +17,10 @@ void Server::replyChannelModeIs(const Client& client, const Channel& channel)
 {
 	const int id(client.getId());
 	const std::string nick(client.getNickname());
-	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes(), id);
+	const int limit(channel.limit());
+	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes() + ((limit > 0) ? (" :" +  std::itoa(limit)) : ""), id);
+	// need to send limit is there is one
 }
-
-// :DOMAIN 329 nick #channel :timeStamp
 
 void Server::execMODE(Client& client, const std::string line)
 {
@@ -85,41 +85,77 @@ bool Server::isChannelValid(const std::string& name) const
     return false;    
 }
 
+void Server::replyModeUnknown(const Client& client, const std::string& param)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(":" + HOST + " " + UNKNOWNMODE + " " + nick + " " + param + " " + " :is an unknown mode character\r\n" ,id);
+}
+
+void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    // :ana!user@LibraIRC-rqb.ri9.75sut7.IP MODE #testingIRCforProjectPurposes :-i (same for +)
+    // ana sets mode -i on #testingIRCforProjectPurposes (same for +)
+    addMessage(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, id);
+    if (param1[0] == '+')
+    {
+        if (param1[1] == 'o')
+        {
+            addMessage(nick + " gives channel operator status to " + param2 + EOL, id);
+        }
+        else
+        {
+            addMessage(nick + " sets mode " + param1 + " on #" + channel + EOL, id);
+        }
+    }
+    else
+    {
+        if (param1[1] == 'o')
+        {
+            addMessage(nick + " removes channel operator status from " + param2 + EOL, id);
+        }
+        else
+        {
+            addMessage(nick + " sets mode " + param1 + " on #" + channel + EOL, id);
+        }
+    }
+}
+
 void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client)
 {
 	(void)client;
     // const int id(client.getId());
+    const std::string validTokens("+-kotli");
 
     // i, t, k, o, l
     while (!modes.empty())
     {
         const std::string token = modes.front();
         modes.pop();
-        bool status;
+        bool status(true);
 
-        if (token.at(0) == '+')
+        // if bad token
+        if (validTokens.find(token[0]) == std::string::npos)
         {
-            status = true;
-        }
-        else if (token.at(0) == '-')
-        {
-            status = false;
-        }
-        else
-        {
-            // reply
-            continue ; // or return??
+            replyModeUnknown(client, token);
+            return ;
         }
 
-        // TODO: replies based on result?????
+        // NOTE: token can also not include + or -, in which case a + will be assumed
+        status = token.at(0) != '-';
 
         if (token.at(1) == 'i')
         {
             channel.setInviteOnly(status);
+            replyMode(client, channel.getName(), token, "");
         }
         else if (token.at(1) == 't')
         {
             channel.setTopicRestriction(status);
+            replyMode(client, channel.getName(), token, "");
+
         }
         else if (token.at(1) == 'k')
         {
@@ -139,31 +175,49 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
 			modes.pop();
 			processLimit(limit, channel, status);
         }
-        else // bad arg
+        else // ignore
         {
-            // reply
-            // return ??
+            return ;
         }
     }
 }
 
-void Server::processOperator(Channel& channel, const std::string& user, const bool status)
+static std::string replyMissingParam(const std::string& client, const std::string& channel)
+{
+    const std::string REPLYCODE("696");
+    return ":" + HOST + " " + REPLYCODE + " " + client + " #" + channel + " o * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n";
+}
+
+void Server::processOperator(const Client& client, Channel& channel, const std::string& user, const bool status)
 {
 	ConnectionsList::const_iterator clientIt = getClient(user);
-	if (clientIt == _connections.end())
+    if (user.empty())
+    {
+        addMessage(replyMissingParam(client.getNickname(), channel.getName()), client.getId());
+        addMessage("#" + channel.getName() + " o * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
+    }
+	else if (clientIt == _connections.end())
 	{
-		// reply
-		// return ?
+        replyNoSuchNick(client, user);
 	}
 	else if (!channel.isInChannel(clientIt->getId()))
 	{
-		// reply
-		// return ?
+        replyNoSuchNick(client, user);
 	}
 	else
 	{
 		const int id(clientIt->getId());
-		status ? channel.addOperator(id) : channel.removeOperator(id);
+		if (status)
+        {
+            channel.addOperator(id);
+            replyMode(client, channel.getName(), "+o", user);
+        }
+        else
+        {
+            channel.removeOperator(id);
+            replyMode(client, channel.getName(), "-o", user);
+        }
+            
 	}
 }
 
@@ -171,7 +225,8 @@ void Server::processLimit(const std::string arg, Channel& channel, const bool st
 {
 	if (arg.empty())
 	{
-		// reply
+		// reply :irc01-white.librairc.net 696 ana #testingIRCforProjectPurposes l * :You must specify a parameter for the limit mode. Syntax: <limit>
+		// reply #testingIRCforProjectPurposes l * :You must specify a parameter for the limit mode. Syntax: <limit>.
 		return ;
 	}
 	if (status)
@@ -179,15 +234,19 @@ void Server::processLimit(const std::string arg, Channel& channel, const bool st
 		const int limit(std::atoi(arg.c_str())); // TODO: remove atoi [!!!!!!!!!!!]
 		if (limit < 1)
 		{
-			// reply
+			return ;
 		}
 		else
 		{
 			channel.setLimit(static_cast<size_t>(limit));
+            // :ana!user@LibraIRC-rqb.ri9.75sut7.IP MODE #testingIRCforProjectPurposes +l :1
+            //  ana sets channel limit to 1
 		}
 	}
 	else
 	{
 		channel.setLimit(0);
+        // :bea!user@LibraIRC-rqb.ri9.75sut7.IP MODE #testingIRCforProjectPurposes :-l
+        // bea removes user limit
 	}
 }

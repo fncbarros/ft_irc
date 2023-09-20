@@ -53,7 +53,6 @@ static const std::string INVITING("341");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
-static const std::string NOSUCHNICK("401");
 static const std::string CHANNELNOTFOUND("403");
 static const std::string CLIENTONCHANNEL("443");
 static const std::string BADJOIN("448");
@@ -62,6 +61,7 @@ static const std::string USERNOTINCHANNEL("441");
 static const std::string CLIENTNOTONCHANNEL("441");
 static const std::string KICK("312");
 static const std::string NOTONCHANNEL("442");
+static const std::string UNKNOWNMODE("472");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -123,9 +123,12 @@ public:
     void                            execMODE(Client& client, const std::string line);
     bool                            isChannelValid(const std::string& name) const;
     void                            parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client);
-    void                            processOperator(Channel& channel, const std::string& user, const bool status);
+    void                            processOperator(const Client& client, Channel& channel, const std::string& user, const bool status);
     void                            processLimit(const std::string arg, Channel& channel, const bool status);
     void                            replyChannelModeIs(const Client& client, const Channel& channel);
+    void                            replyModeUnknown(const Client& client, const std::string& token);
+    void                            replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2);
+
 
 private:
     // replyMessages.cpp
@@ -151,13 +154,12 @@ private:
     void                            replyBadJoin(const Client& client, const std::string& line);
     void                            replyList(const Client& client);
     void                            replyList(const Client& client, const Channel& channel);
-    void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget);
+    void                            replyNoSuchNick(const Client& client, const std::string& nickTarget);
     void                            replyNotOnChannelError(const Client& client, const std::string& channelName);
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName);
     void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName);
     void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName);
     void                            replyNoSuchChannel(const Client& client);
-    void                            replyNoSuchNick(const Client& client, const std::string& str);
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& channelName);
     void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
