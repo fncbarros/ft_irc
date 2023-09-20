@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/09/09 15:15:48 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/20 16:20:47 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,3 +275,14 @@ void    Server::replyBroadcastUserLeft(const int id, const Client& client, const
     addMessage(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", id);
 }
 
+void    Server::replyTopic(const Client& client, const std::string& channelTopic)
+{
+    const int id(client.getId());
+    addMessage(client.getNickname() + " has changed the topic to: " + channelTopic, id);
+}
+
+void    Server::replyNeedMoreParams(const Client& client)
+{
+    const int id(client.getId());
+    addMessage(NEEDMOREPARAMS, id);
+}

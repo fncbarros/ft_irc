@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/20 15:53:26 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,11 @@ Channel::~Channel()
 std::string Channel::getName() const
 {
     return _name;
+}
+
+std::string Channel::getTopic() const
+{
+    return _topic;
 }
 
 const ClientMap& Channel::getClients() const
@@ -162,14 +167,14 @@ bool    Channel::isInChannel(const int fd) const
     return (_clientsMap.find(fd) != _clientsMap.end());
 }
 
-std::string Channel::getTopic(void) const
-{
-    return _topic;
-}
-
 void Channel::setInviteOnly(const bool set)
 {
     _modes.invite_only = set;
+}
+
+void Channel::setTopic(const std::string& newTopic)
+{
+        _topic = newTopic;
 }
 
 void Channel::setTopicRestriction(const bool set)

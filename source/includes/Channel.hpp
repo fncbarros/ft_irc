@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:22:16 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/20 15:55:21 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ public:
 
     // Getters
     std::string         getName() const;
+    std::string         getTopic() const;
     const ClientMap&    getClients() const;
 
     bool                addClient(const Client& client, const bool chanop = false);
@@ -59,9 +60,8 @@ public:
     bool                isOperator(const int fd) const;
     bool                isInChannel(const int fd) const;
 
-    std::string         getTopic(void) const;
-
     void                setInviteOnly(const bool set);
+    void                setTopic(const std::string& newTopic);
     void                setTopicRestriction(const bool set);
     void                setKey(const std::string& key);
     void                setNoKey(void);

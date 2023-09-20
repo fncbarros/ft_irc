@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/09 15:07:55 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/20 16:25:29 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,6 +292,32 @@ void Server::execTOPIC(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***TOPIC: ";
     std::cout << line << std::endl;
+
+    const std::string channelTarget(line.substr(1, line.find(' ') - 1));
+    const std::string channelTopic(line.substr(line.find(' ') + 1, line.size()));
+    std::cout << channelTarget << std::endl;
+    std::cout << "\"" + channelTopic + "\"" << std::endl;
+    ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
+
+    if (channelTopic.empty() || channelTopic == "Network")
+    {
+        replyNeedMoreParams(client);
+    }
+    else if (channelTargetIt == _channels.end())
+    {
+        std::cout << "channel" << std::endl;
+        replyChannelNotFound(client, channelTarget);// ERR_NOSUCHCHANNEL (Código 403)
+    }
+    else if (!channelTargetIt->isClientInChannel(client.getId()))
+    {
+        replyNotOnChannel(client, channelTargetIt->getName());// RPL_NOTONCHANNEL (Código 442)
+    }
+    else
+    {
+        std::cout << "aqui2" << std::endl;
+        replyTopic(client, channelTopic); // RPL_TOPIC (Código 332)
+    }
+    //FAZER SOBRE 331 -> RPL_NOTOPIC
 }
 
 void Server::execMODE(Client& client, const std::string line)
