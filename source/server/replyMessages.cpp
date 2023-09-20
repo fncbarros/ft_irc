@@ -275,3 +275,7 @@ void    Server::replyBroadcastUserLeft(const int id, const Client& client, const
     addMessage(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", id);
 }
 
+void    Server::replyNoChannelJoined(const Client& client)
+{
+    addMessage(":" + HOST + " " + NOTONCHANNEL + " " + client.getNickname() + " :No channel joined. Try /join #<channel>\r\n", client.getId());
+}
