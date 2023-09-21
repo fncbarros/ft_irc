@@ -29,8 +29,8 @@ void Server::replyChannelModeIs(const Client& client, const Channel& channel)
 	std::string arg;
 	ss << limit;
     ss >> arg;
-	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes() + ((limit > 0) ? (" :" +  arg) : ""), id);
-	// need to send limit is there is one
+	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes() + ((limit > 0) ? (" :" +  arg) : "") + EOL, id);
+	// need to send limit if there is one
 }
 
 void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
@@ -90,7 +90,8 @@ void Server::execMODE(Client& client, const std::string line)
     while (!iss.eof())
     {
         iss >> args;
-        modes.push(args);
+        if (!args.empty())
+            modes.push(args);
     }
 
     if (!channel.isInChannel(client.getId()))
@@ -181,12 +182,16 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
             if (status)
             {
                 if (channel.setKey(newKey))
+                {
                     //reply
+                }
             }
             else
             {
                 if (channel.setNoKey())
+                {
                     // reply
+                }
             }
         }
         else if (token.at(1) == 'o')
