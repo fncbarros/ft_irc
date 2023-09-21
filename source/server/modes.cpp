@@ -165,20 +165,29 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
 
         if (token.at(1) == 'i')
         {
-            channel.setInviteOnly(status);
-            replyMode(client, channel.getName(), token, "");
+            if (channel.setInviteOnly(status))
+                replyMode(client, channel.getName(), token, "");
         }
         else if (token.at(1) == 't')
         {
-            channel.setTopicRestriction(status);
-            replyMode(client, channel.getName(), token, "");
+            if (channel.setTopicRestriction(status))
+                replyMode(client, channel.getName(), token, "");
 
         }
         else if (token.at(1) == 'k')
         {
             const std::string newKey(modes.front());
             modes.pop();
-            status ? channel.setKey(newKey) : channel.setNoKey();
+            if (status)
+            {
+                if (channel.setKey(newKey))
+                    //reply
+            }
+            else
+            {
+                if (channel.setNoKey())
+                    // reply
+            }
         }
         else if (token.at(1) == 'o')
         {
@@ -220,13 +229,13 @@ void Server::processOperator(const Client& client, Channel& channel, const std::
 		const int id(clientIt->getId());
 		if (status)
         {
-            channel.addOperator(id);
-            replyMode(client, channel.getName(), "+o", user);
+            if (channel.addOperator(id))
+                replyMode(client, channel.getName(), "+o", user);
         }
         else
         {
-            channel.removeOperator(id);
-            replyMode(client, channel.getName(), "-o", user);
+            if (channel.removeOperator(id))
+                replyMode(client, channel.getName(), "-o", user);
         }
             
 	}
@@ -252,20 +261,23 @@ void Server::processLimit(const Client& client, const std::string arg, Channel& 
 		else
 		{
 			
-            channel.setLimit(static_cast<size_t>(limit));
-            replyMode(client, channel.getName(), "+l", arg);
-            // :ana!user@LibraIRC-rqb.ri9.75sut7.IP MODE #channel +l :1
-
-            addMessage("#" + chanop + " sets channel limit to " + arg + EOL, client.getId());
-            //  ana sets channel limit to 1 <--- reply to all?
+            if (channel.setLimit(static_cast<size_t>(limit)))
+            {
+                replyMode(client, channel.getName(), "+l", arg);
+                // :ana!user@LibraIRC-rqb.ri9.75sut7.IP MODE #channel +l :1
+                addMessage("#" + chanop + " sets channel limit to " + arg + EOL, client.getId());
+                //  ana sets channel limit to 1 <--- reply to all?
+            }
 		}
 	}
 	else
 	{		
-        channel.setLimit(0);
-        // :bea!user@LibraIRC-rqb.ri9.75sut7.IP MODE #channel :-l
-        replyMode(client, channel.getName(), "-l", arg);
-        // bea removes user limit
-        addMessage(chanop + " removes user limit" + EOL, client.getId());
+        if (channel.setLimit(0))
+        {
+            // :bea!user@LibraIRC-rqb.ri9.75sut7.IP MODE #channel :-l
+            replyMode(client, channel.getName(), "-l", arg);
+            // bea removes user limit
+            addMessage(chanop + " removes user limit" + EOL, client.getId());
+        }
 	}
 }

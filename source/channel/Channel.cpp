@@ -157,51 +157,65 @@ std::string Channel::getTopic(void) const
     return _topic;
 }
 
-void Channel::setInviteOnly(const bool set)
+bool Channel::setInviteOnly(const bool set)
 {
+    const bool changeApplied(set != isInviteOnly());
     _modes.invite_only = set;
+    return changeApplied;
+
 }
 
-void Channel::setTopicRestriction(const bool set)
+bool Channel::setTopicRestriction(const bool set)
 {
+    bool changeApplied(set != isTopicRetricted());
     _modes.topic_restricted = set;
+    return changeApplied;
 }
 
-void Channel::setKey(const std::string& key)
+bool Channel::setKey(const std::string& key)
 {
+    const bool changeApplied(_modes.key != key);
     _modes.key = key;
+    return changeApplied;
 }
 
-void Channel::setNoKey(void)
+bool Channel::setNoKey(void)
 {
+    const bool changeApplied(!_modes.key.empty());
     _modes.key.clear();
+    return changeApplied;
 }
 
-void Channel::setPriviledges(const bool set)
+bool Channel::setLimit(const size_t limit)
 {
-    _modes.operator_privs = set;
-}
-
-void Channel::setLimit(const size_t limit)
-{
+    const bool changeApplied(_modes.limit != limit);
     _modes.limit = limit;
+    return changeApplied;
 }
 
-void Channel::deleteClient(const int fd)
+bool Channel::deleteClient(const int fd)
 {
     if (_clientsMap.erase(fd) > 0)
     {
         removeOperator(fd);
+        return true;
     }
+    return false;
+
 }
-void    Channel::addOperator(const int fd)
+bool    Channel::addOperator(const int fd)
 {
-    _operators.insert(fd);
+    if (_operators.find(fd) != _operators.end())
+    {
+        _operators.insert(fd);
+        return true;
+    }
+    return false;
 }
 
-void    Channel::removeOperator(const int fd)
+bool    Channel::removeOperator(const int fd)
 {
-    _operators.erase(fd);
+    return _operators.erase(fd) > 0;
 }
 
 /**
@@ -232,4 +246,9 @@ Channel::modes& Channel::modes::operator=(const modes &other)
         limit = other.limit;
     }
     return *this;
+}
+
+bool Channel::authenticate(const std::string& key)
+{
+    return key == _modes.key;
 }

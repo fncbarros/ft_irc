@@ -63,15 +63,15 @@ public:
 
     std::string         getTopic(void) const;
 
-    void                setInviteOnly(const bool set);
-    void                setTopicRestriction(const bool set);
-    void                setKey(const std::string& key);
-    void                setNoKey(void);
-    void                setPriviledges(const bool set);
-    void                setLimit(const size_t limit);
-    void                deleteClient(const int fd);
-    void                addOperator(const int fd);
-    void                removeOperator(const int fd);
+    bool                setInviteOnly(const bool set);
+    bool                setTopicRestriction(const bool set);
+    bool                setKey(const std::string& key);
+    bool                setNoKey(void);
+    bool                setLimit(const size_t limit);
+    bool                deleteClient(const int fd);
+    bool                addOperator(const int fd);
+    bool                removeOperator(const int fd);
+    bool                authenticate(const std::string& key);
 
     // Data
 private:
