@@ -124,7 +124,7 @@ public:
     bool                            isChannelValid(const std::string& name) const;
     void                            parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client);
     void                            processOperator(const Client& client, Channel& channel, const std::string& user, const bool status);
-    void                            processLimit(const std::string arg, Channel& channel, const bool status);
+    void                            processLimit(const Client& client, const std::string arg, Channel& channel, const bool status);
     void                            replyChannelModeIs(const Client& client, const Channel& channel);
     void                            replyModeUnknown(const Client& client, const std::string& token);
     void                            replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2);
@@ -145,7 +145,7 @@ private:
     void                            replyChannelNotFound(const Client& client, const std::string& channelName);
     void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
     void                            replyCAPLS(Client& client, std::string capabilities);
-    void                            replyJoin(const Client& client, const Channel& channel);
+    void                            replyJoin(const int id, const Client& client, const Channel& channel);
     void                            replyEndOfNames(const Client& client, const Channel& channel);
     void                            replyChannelMode(const Client& client, const Channel& channel);
     void                            replyCreationTime(const Client& client, const Channel& channel);

@@ -78,9 +78,9 @@ void    Server::replyCAPLS(Client& client, std::string capabilities)
     addMessage(":IRC42 " + capabilities + "\r\n", client.getId());
 }
 
-void    Server::replyJoin(const Client& client, const Channel& channel)
+void    Server::replyJoin(const int id, const Client& client, const Channel& channel)
 {
-    addMessage(":" + client.toString() + " JOIN #" + channel.getName() + " * \r\n", client.getId());
+    addMessage(":" + client.toString() + " JOIN #" + channel.getName() + " * :" + client.getNickname() + EOL,  id);
 }
 
 void    Server::replyName(const Client& client, const Channel& channel)
@@ -125,7 +125,7 @@ void    Server::replyChannelMode(const Client& client, const Channel& channel)
 
 void    Server::replyCreationTime(const Client& client, const Channel& channel)
 {
-    addMessage(":" + HOST + " " + CREATIONTIME + " " + client.getNickname() + " " +  channel.getName() + " " + Utils::timeToStr() + "\r\n", client.getId());
+    addMessage(":" + HOST + " " + CREATIONTIME + " " + client.getNickname() + " " +  channel.getName() + " " + Utils::timeToStr() + EOL, client.getId());
 }
 
 void    Server::replyWho(const Client& client, const Channel& channel)

@@ -163,7 +163,7 @@ void Server::execJOIN(Client& client, const std::string line)
         {
             _channels.push_back(channelName);
             _channels.back().addClient(client, true);
-            replyJoin(client, _channels.back());
+            replyJoin(client.getId(), client, _channels.back());
         }
         else
         {
@@ -178,14 +178,14 @@ void Server::execJOIN(Client& client, const std::string line)
                 replyBadJoin(client, line);
                 return ;
             }
-            replyJoin(client, channel);
 
             // Broadcast to all channel users
             for (ClientMap::const_iterator clientIt = list.begin(); clientIt != list.end(); clientIt++)
             {
                 const Client& user(*(clientIt->second));
-                Utils::writeTo(":" + client.toString() + " JOIN #" + channel.getName() + " *:realname\r\n", user.getId());
-                Utils::writeTo( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
+
+                replyJoin(user.getId(), client, channel);
+                addMessage( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
             }
         }
     }
