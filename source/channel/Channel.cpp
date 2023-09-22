@@ -205,7 +205,8 @@ bool Channel::deleteClient(const int fd)
 }
 bool    Channel::addOperator(const int fd)
 {
-    if (_operators.find(fd) != _operators.end())
+    // if not already operator
+    if (!isOperator(fd))
     {
         _operators.insert(fd);
         return true;
