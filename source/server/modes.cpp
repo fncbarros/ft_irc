@@ -100,7 +100,11 @@ void Server::execMODE(Client& client, const std::string line)
     }
     else if (modes.empty())
 	{
-		replyChannelModeIs(client, channel);
+    // >> @time=2023-09-22T17:05:47.613Z :apocalypse.IRC4Fun.net 324 ana #testingIRCBehaviour :+nt
+    // >> @time=2023-09-22T17:05:47.613Z :apocalypse.IRC4Fun.net 329 ana #testingIRCBehaviour :1695402334
+	// Channel #testingIRCBehaviour modes: +nt
+    // Channel #testingIRCBehaviour created on Fri Sep 22 18:05:34 2023
+    	replyChannelModeIs(client, channel);
 		replyCreationTime(client, channel);
 	}
     else if (!channel.isOperator(client.getId()))
@@ -143,11 +147,10 @@ void Server::replyModeUnknown(const Client& client, const std::string& param)
 
 void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client)
 {
-	(void)client;
-    // const int id(client.getId());
+    const int id(client.getId());
     const std::string validTokens("+-kotli");
+    char op(0);
 
-    // i, t, k, o, l
     while (!modes.empty())
     {
         const std::string token = modes.front();
@@ -161,21 +164,33 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
             return ;
         }
 
-        // NOTE: token can also not include + or -, in which case a + will be assumed
-        status = token.at(0) != '-';
+        try {
+            // NOTE: token can also not include + or -, in which case a + will be assumed
+            status = token.at(0) != '-';
+            op = token.at(1);
+        } catch (const std::exception& e) {
+            (void)e;
+            // reply or ignore
+            return ;
+        }
 
-        if (token.at(1) == 'i')
+        if (op == 'i')
         {
             if (channel.setInviteOnly(status))
                 replyMode(client, channel.getName(), token, "");
         }
-        else if (token.at(1) == 't')
+        else if (op == 't')
         {
             if (channel.setTopicRestriction(status))
                 replyMode(client, channel.getName(), token, "");
 
         }
-        else if (token.at(1) == 'k')
+        else if (status && (op != 'o') &&  modes.empty()) // if no argument to mode when required
+        {
+            addMessage(replyMissingParam(client.getNickname(), channel.getName(), token.substr(1)), id);
+            addMessage("#" + channel.getName() + " " + token.substr(1) + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", id);
+        }
+        else if (op == 'k')
         {
             const std::string newKey(modes.front());
             modes.pop();
@@ -184,6 +199,8 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
                 if (channel.setKey(newKey))
                 {
                     //reply
+                    // :ana!user@IRC4Fun-o1tbi9.8fkr.53si.0818.2001.IP MODE #testingIRCBehaviour +k :key
+                    // ana sets channel keyword to <key> --> broadcast
                 }
             }
             else
@@ -191,16 +208,18 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
                 if (channel.setNoKey())
                 {
                     // reply
+                    // :ana!user@IRC4Fun-o1tbi9.8fkr.53si.0818.2001.IP MODE #testingIRCBehaviour -k :key <-------- Need to pass key in order to remove it
+                    // ana removes channel keyword
                 }
             }
         }
-        else if (token.at(1) == 'o')
+        else if (op == 'o')
         {
             const std::string user(modes.front());
             modes.pop();
 			processOperator(client, channel, user, status);
         }
-        else if (token.at(1) == 'l') // see syntax further
+        else if (op == 'l') // see syntax further
         {
 			const std::string limit(modes.front());
 			modes.pop();
