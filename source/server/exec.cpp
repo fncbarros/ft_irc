@@ -279,7 +279,10 @@ void Server::execINVITE(Client& client, const std::string line)
     {
         replyClientTargetOnChannel(client, clientTargetIt->getNickname(), channelTargetIt->getName());
     }
-    //TODO: ERR_CHANOPRIVSNEEDED (482): Sent when the user does not have sufficient privileges (channel operator status) to invite users to the specified channel.
+    else if (!channelTargetIt->isOperator(client.getId()))
+    {
+        replyChanopNeeded(client, channelTarget, "You must be a channel operator to send an invite.");
+    }
     else
     {
         replyInviting(client, nickTarget, channelTargetIt->getName());
