@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/23 14:27:11 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 16:32:11 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,21 +71,22 @@ const ClientMap& Channel::getClients() const
 
 bool Channel::addClient(const Client& client, const bool chanop)
 {
-    if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
+    // TODO: See if was invited
+    if (_clientsMap.find(client.getId()) != _clientsMap.end())
     {
         return false;
     }
-    else if (_clientsMap.find(client.getId()) != _clientsMap.end())
+    else if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
     {
         return false;
     }
-    else
+    else if (!isInChannel(client.getId())) // if client is already in channel we ignore it
     {
         _clientsMap.insert(std::make_pair(client.getId(), &client));
         if (chanop)
             addOperator(client.getId());
-        return true;
     }
+    return true;
 
 }
 
@@ -105,11 +106,136 @@ void Channel::printList(int fd) const
     Utils::writeTo(nameList, fd);
 }
 
+bool Channel::isInviteOnly(void) const
+{
+    return _modes.invite_only;
+}
+
+bool Channel::isTopicRetricted(void) const
+{
+    return _modes.topic_restricted;
+}
+
+bool Channel::hasKey(void) const
+{
+    return !_modes.key.empty();
+}
+
+size_t Channel::limit(void) const
+{
+    return _modes.limit;
+}
+
+bool Channel::hasModes(void) const
+{
+    return (isInviteOnly() || isTopicRetricted() || hasKey() || limit());
+}
+
+bool    Channel::isOperator(const int fd) const
+{
+    return (_operators.find(fd) != _operators.end());
+}
+
+bool    Channel::isInChannel(const int fd) const
+{
+    return (_clientsMap.find(fd) != _clientsMap.end());
+}
+
+std::string Channel::returnModes(void) const
+{
+    std::string modes("+()");
+
+    if (hasModes())
+        modes = "+";
+    if (isInviteOnly())
+        modes += "i";
+    if (isTopicRetricted())
+        modes += "t";
+    if (hasKey())
+        modes += "k";
+    if (limit() > 0)
+        modes += "l";
+    return modes;
+}
+
+void Channel::setTopic(const std::string& newTopic)
+{
+    _topic = newTopic;
+}
+
+void Channel::setTopicNick(int newNick)
+{
+    _clientTopicNick = newNick;
+}
+
+bool Channel::setInviteOnly(const bool set)
+{
+    const bool changeApplied(set != isInviteOnly());
+    _modes.invite_only = set;
+    return changeApplied;
+}
+
+bool Channel::setTopicRestriction(const bool set)
+{
+    bool changeApplied(set != isTopicRetricted());
+    _modes.topic_restricted = set;
+    return changeApplied;
+}
+
+bool Channel::setKey(const std::string& key)
+{
+    const bool changeApplied(_modes.key != key);
+    _modes.key = key;
+    return changeApplied;
+}
+
+bool Channel::setNoKey(void)
+{
+    const bool changeApplied(!_modes.key.empty());
+    _modes.key.clear();
+    return changeApplied;
+}
+
+bool Channel::setLimit(const size_t limit)
+{
+    const bool changeApplied(_modes.limit != limit);
+    _modes.limit = limit;
+    return changeApplied;
+}
+
+bool Channel::deleteClient(const int fd)
+{
+    if (_clientsMap.erase(fd) > 0)
+    {
+        removeOperator(fd);
+        return true;
+    }
+    return false;
+
+}
+bool    Channel::addOperator(const int fd)
+{
+    // if not already operator
+    if (!isOperator(fd))
+    {
+        _operators.insert(fd);
+        return true;
+    }
+    return false;
+}
+
+bool    Channel::removeOperator(const int fd)
+{
+    return _operators.erase(fd) > 0;
+}
+
+/**
+ * modes functions
+*/
 Channel::modes::modes()
 : invite_only(false)
 , topic_restricted(false)
-, key(std::make_pair(false, ""))
-, operator_privs(false)
+, key("")
 , limit(0)
 {
 }
@@ -126,109 +252,12 @@ Channel::modes& Channel::modes::operator=(const modes &other)
         invite_only = other.invite_only;
         topic_restricted = other.topic_restricted;
         key = other.key;
-        operator_privs = other.operator_privs;
         limit = other.limit;
     }
     return *this;
 }
 
-bool Channel::isInviteOnly(void) const
+bool Channel::authenticate(const std::string& key)
 {
-    return _modes.invite_only;
+    return key == _modes.key;
 }
-
-bool Channel::isTopicRetricted(void) const
-{
-    return _modes.topic_restricted;
-}
-
-bool Channel::hasKey(void) const
-{
-    return _modes.key.first;
-}
-
-bool Channel::hasOperatorPriviledges(void) const
-{
-    return _modes.operator_privs;
-}
-
-size_t Channel::limit(void) const
-{
-    return _modes.limit;
-}
-
-bool Channel::hasModes(void) const
-{
-    return (isInviteOnly() || isTopicRetricted() || hasKey() || hasOperatorPriviledges() || limit());
-}
-
-bool    Channel::isOperator(const int fd) const
-{
-    return (_operators.find(fd) != _operators.end());
-}
-
-bool    Channel::isInChannel(const int fd) const
-{
-    return (_clientsMap.find(fd) != _clientsMap.end());
-}
-
-void Channel::setInviteOnly(const bool set)
-{
-    _modes.invite_only = set;
-}
-
-void Channel::setTopic(const std::string& newTopic)
-{
-    _topic = newTopic;
-}
-
-void Channel::setTopicNick(int newNick)
-{
-    _clientTopicNick = newNick;
-}
-
-void Channel::setTopicRestriction(const bool set)
-{
-    _modes.topic_restricted = set;
-}
-
-void Channel::setKey(const std::string& key)
-{
-    _modes.key.first = true;
-    _modes.key.second = key;
-}
-
-void Channel::setNoKey(void)
-{
-    _modes.key.first = false;
-    _modes.key.second.clear();
-}
-
-void Channel::setPriviledges(const bool set)
-{
-    _modes.operator_privs = set;
-}
-
-void Channel::setLimit(const size_t limit)
-{
-    _modes.limit = limit;
-}
-
-void Channel::deleteClient(const int fd)
-{
-    if (_clientsMap.erase(fd) > 0)
-    {
-        removeOperator(fd);
-    }
-}
-
-void    Channel::addOperator(const int fd)
-{
-    _operators.insert(fd);
-}
-
-void    Channel::removeOperator(const int fd)
-{
-    _operators.erase(fd);
-}
-

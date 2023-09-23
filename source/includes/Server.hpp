@@ -17,6 +17,7 @@
 
 #include <map>
 #include <vector>
+#include <queue>
 #include <netinet/in.h>
 #include <sstream>
 #include <arpa/inet.h>
@@ -36,10 +37,11 @@ static const std::string CREATED("003");
 static const std::string MYINFO("004");
 static const std::string NICKCOLLISION("433");
 static const std::string PASSMISMATCH("464");
-
+static const std::string CHANNELMODEIS("324");
+static const std::string UNKNOWNCOMMAND("421");
+static const std::string NEEDMOREPARAMS("461");
 static const std::string NAMREPLY("353");
 static const std::string ENDOFNAMES("366"); // <channel> :<info>
-static const std::string CHANNELMODEIS("324"); // <channel> <mode> <mode_params>
 static const std::string CREATIONTIME("329");
 static const std::string WHOSPCRPL("354");
 static const std::string ENDOFWHO("315");
@@ -50,7 +52,6 @@ static const std::string INVITING("341");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
-static const std::string NOSUCHNICK("401");
 static const std::string CHANNELNOTFOUND("403");
 static const std::string NOTOPIC("461");
 static const std::string TOPIC("332");
@@ -61,10 +62,10 @@ static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
 static const std::string USERNOTINCHANNEL("441");
 static const std::string CLIENTNOTONCHANNEL("441");
-static const std::string CHANOPRIVSNEEDED("482");
 static const std::string KICK("312");
 static const std::string NOTONCHANNEL("442");
-
+static const std::string UNKNOWNMODE("472");
+static const std::string CHANOPRIVSNEEDED("482");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -120,8 +121,19 @@ public:
     void                            execKICK(Client& client, const std::string line);
     void                            execINVITE(Client& client, const std::string line);
     void                            execTOPIC(Client& client, const std::string line);
-    void                            execMODE(Client& client, const std::string line);
     void                            execPART(Client& client, const std::string line);
+
+    // modes.cpp
+    void                            execMODE(Client& client, const std::string line);
+    bool                            isChannelValid(const std::string& name) const;
+    void                            parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client);
+    void                            processOperator(const Client& client, Channel& channel, const std::string& user, const bool status);
+    void                            processLimit(const Client& client, const std::string arg, Channel& channel, const bool status);
+    void                            replyChannelModeIs(const Client& client, const Channel& channel);
+    void                            replyModeUnknown(const Client& client, const std::string& token);
+    void                            replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2);
+    void                            replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg);
+    void                            replyMissingParam(const Client& client, const std::string& channel, const std::string& param);
 
 private:
     // replyMessages.cpp
@@ -138,7 +150,7 @@ private:
     void                            replyChannelNotFound(const Client& client, const std::string& channelName);
     void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
     void                            replyCAPLS(Client& client, std::string capabilities);
-    void                            replyJoin(const Client& client, const Channel& channel);
+    void                            replyJoin(const int id, const Client& client, const Channel& channel);
     void                            replyEndOfNames(const Client& client, const Channel& channel);
     void                            replyChannelMode(const Client& client, const Channel& channel);
     void                            replyCreationTime(const Client& client, const Channel& channel);
@@ -147,13 +159,12 @@ private:
     void                            replyBadJoin(const Client& client, const std::string& line);
     void                            replyList(const Client& client);
     void                            replyList(const Client& client, const Channel& channel);
-    void                            replyNoSuchNickError(const Client& client, const std::string& nickTarget);
+    void                            replyNoSuchNick(const Client& client, const std::string& nickTarget);
     void                            replyNotOnChannelError(const Client& client, const std::string& channelName);
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName);
     void                            replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName);
     void                            replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName);
     void                            replyNoSuchChannel(const Client& client);
-    void                            replyNoSuchNick(const Client& client, const std::string& str);
     void                            replyNotInChannel(const Client& client, const std::string& userNick, const std::string& channelName);
     void                            replyNoPriviledges(const Client& client, const std::string& channelName);
     void                            replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason);
@@ -180,15 +191,20 @@ private:
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
+
+    // Auxiliary functions
     ConnectionsList::const_iterator getClient(const std::string &nickname) const;
     void                            deleteClient(const int fd);
-    // Auxiliary functions
     static void                     printList(const ConnectionsList& list, const int fd);
+
+
     //Channel related
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
     bool                            channelExists(const std::string& name) const;
+    void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
+    void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);
 
 public:
     void                            connectionLoop(void);
