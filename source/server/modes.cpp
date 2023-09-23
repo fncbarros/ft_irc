@@ -19,14 +19,13 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
     const std::string nick(client.getNickname());
     // TODO: CLEANUP <---------------------------------- [!!!!!!!!!!!!]
     // ana sets mode -i on #testingIRCforProjectPurposes (same for +)
-    if (param2.empty())
-        addMessage(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, id);
+    addMessage(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, id);
 
     if (param1[0] == '+')
     {
         if (param1[1] == 'o')
         {
-            addMessage(nick + " gives channel operator status to " + param2 + EOL, id);
+            broadcast(nick + " gives channel operator status to " + param2 + EOL, channel);
         }
         else if (param1[1] == 'l')
         {
@@ -34,18 +33,18 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
         }
         else
         {
-            addMessage(nick + " sets mode " + param1 + " on #" + channel + EOL, id);
+            broadcast(nick + " sets mode " + param1 + " on #" + channel + EOL, channel);
         }
     }
     else
     {
         if (param1[1] == 'o')
         {
-            addMessage(nick + " removes channel operator status from " + param2 + EOL, id);
+            broadcast(nick + " removes channel operator status from " + param2 + EOL, channel);
         }
         else
         {
-            addMessage(nick + " sets mode " + param1 + " on #" + channel + EOL, id);
+            broadcast(nick + " sets mode " + param1 + " on #" + channel + EOL, channel);
         }
     }
 }
@@ -266,12 +265,16 @@ void Server::processOperator(const Client& client, Channel& channel, const std::
 		if (status)
         {
             if (channel.addOperator(id))
+            {
                 replyMode(client, channelName, "+o", user);
+            }
         }
         else
         {
             if (channel.removeOperator(id))
+            {
                 replyMode(client, channelName, "-o", user);
+            }
         }
             
 	}
