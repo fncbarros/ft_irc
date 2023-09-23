@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/09/23 16:46:35 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 17:28:31 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,8 +268,7 @@ void    Server::replyBroadcastUserLeft(const int id, const Client& client, const
 
 void    Server::replyTopic(const Client& client, const Channel& channelTarget)
 {
-    const int id(client.getId());
-    addMessage(":" + client.toString() + " TOPIC #" + channelTarget.getName() + " :" + channelTarget.getTopic() + "\r\n", id);
+    broadcast(":" + client.toString() + " TOPIC #" + channelTarget.getName() + " :" + channelTarget.getTopic() + "\r\n", channelTarget);
 }
 
 void    Server::replyNotChannelOperatorTopic(const Client& client, const std::string& channelTargetName)

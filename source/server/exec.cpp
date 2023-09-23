@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/23 17:23:48 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 17:42:05 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,6 @@ void Server::execTOPIC(Client& client, const std::string line)
 
     if (channelTargetIt == _channels.end())
     {
-        std::cout << "channel not found" << std::endl;
         if (line.at(0) != '#')
             replyNoSuchChannel(client);
         else
@@ -313,22 +312,15 @@ void Server::execTOPIC(Client& client, const std::string line)
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
     {
-        std::cout << "not on channel" << std::endl;
         replyNotOnChannel(client, channelTargetIt->getName());
-    }
-    else if (channelTargetIt->isTopicRetricted())
-    {
-        std::cout << "aqui" << std::endl;
-        if (!channelTargetIt->isOperator(client.getId()))
-        {
-            std::cout << "aqui2" << std::endl;
-            replyNotChannelOperatorTopic(client, channelTarget);
-            return ;
-        }
     }
     else if (line.find(':') != std::string::npos)
     {
-        std::cout << "right" << std::endl;
+        if (channelTargetIt->isTopicRetricted())
+        {
+            if (!channelTargetIt->isOperator(client.getId()))
+                replyNotChannelOperatorTopic(client, channelTarget);
+        }
         channelTargetIt->setTopic(channelTopic);
         channelTargetIt->setTopicNick(client.getId());
         replyTopic(client, *channelTargetIt);
@@ -338,12 +330,10 @@ void Server::execTOPIC(Client& client, const std::string line)
         if (channelTargetIt->getTopic() != "")
         {
             std::string clientNickTopic = getClient(channelTargetIt->getTopicNick())->getNickname();
-            std::cout << "NO TOPIC" << std::endl;
             replyNoTopic(client, *channelTargetIt, clientNickTopic);
         }
         else
         {
-            std::cout << "NO TOPIC SET" << std::endl;
             replyNoTopicSet(client, *channelTargetIt);
         }
     }
