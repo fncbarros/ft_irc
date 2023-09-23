@@ -35,7 +35,6 @@ public:
         bool        invite_only;
         bool        topic_restricted;
         std::string key;
-        bool        operator_privs;
         size_t      limit;
 
         modes();
@@ -54,7 +53,6 @@ public:
     bool                isInviteOnly(void) const;
     bool                isTopicRetricted(void) const;
     bool                hasKey(void) const;
-    bool                hasOperatorPriviledges(void) const;
     size_t              limit(void) const;
     bool                hasModes(void) const;
     bool                isOperator(const int fd) const;

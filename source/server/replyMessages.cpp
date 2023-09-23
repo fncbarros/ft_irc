@@ -116,8 +116,6 @@ void    Server::replyChannelMode(const Client& client, const Channel& channel)
         modes += 't';
     if (channel.hasKey())
         modes += 'k';
-    if (channel.hasOperatorPriviledges())
-        modes += 'o';
     if (channel.limit())
         modes += 'l';
     addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " " +  channel.getName() + modes + "\r\n", client.getId());

@@ -111,11 +111,6 @@ bool Channel::hasKey(void) const
     return !_modes.key.empty();
 }
 
-bool Channel::hasOperatorPriviledges(void) const
-{
-    return _modes.operator_privs;
-}
-
 size_t Channel::limit(void) const
 {
     return _modes.limit;
@@ -123,7 +118,7 @@ size_t Channel::limit(void) const
 
 bool Channel::hasModes(void) const
 {
-    return (isInviteOnly() || isTopicRetricted() || hasKey() || hasOperatorPriviledges() || limit());
+    return (isInviteOnly() || isTopicRetricted() || hasKey() || limit());
 }
 
 bool    Channel::isOperator(const int fd) const
@@ -228,7 +223,6 @@ Channel::modes::modes()
 : invite_only(false)
 , topic_restricted(false)
 , key("")
-, operator_privs(false)
 , limit(0)
 {
 }
@@ -245,7 +239,6 @@ Channel::modes& Channel::modes::operator=(const modes &other)
         invite_only = other.invite_only;
         topic_restricted = other.topic_restricted;
         key = other.key;
-        operator_privs = other.operator_privs;
         limit = other.limit;
     }
     return *this;
