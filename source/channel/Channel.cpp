@@ -138,8 +138,10 @@ bool    Channel::isInChannel(const int fd) const
 
 std::string Channel::returnModes(void) const
 {
-    std::string modes("+");
+    std::string modes("+()");
 
+    if (hasModes())
+        modes = "+";
     if (isInviteOnly())
         modes += "i";
     if (isTopicRetricted())

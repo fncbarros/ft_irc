@@ -272,7 +272,6 @@ void   Server::replyChanopNeeded(const Client& client, const std::string& channe
 {
     const std::string firstHalf(":" + HOST + " " + CHANOPRIVSNEEDED + " " + client.getNickname() + " #" + channel + " :");
     addMessage(firstHalf + msg + EOL, client.getId());
-    addMessage("#" + channel + " :" + msg + EOL, client.getId());
 }
 
 void Server::replyMissingParam(const Client& client, const std::string& channel, const std::string& param)
@@ -280,4 +279,17 @@ void Server::replyMissingParam(const Client& client, const std::string& channel,
     const std::string REPLYCODE("696");
     addMessage(":" + HOST + " " + REPLYCODE + " " + client.getNickname() + " #" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
     addMessage("#" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
+}
+
+void Server::replyChannelModeIs(const Client& client, const Channel& channel)
+{
+	const int id(client.getId());
+	const int limit(channel.limit());
+    std::string limitNum = (limit > 0) ? (" :" + Utils::numToStr(limit)) : "";
+    std::string modes;
+
+    if (limitNum.empty())
+        modes = ":";
+    modes += channel.returnModes();
+	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " #" + channel.getName() +  " :" + channel.returnModes() + limitNum + EOL, id);
 }

@@ -128,7 +128,8 @@ public:
     void                            replyChannelModeIs(const Client& client, const Channel& channel);
     void                            replyModeUnknown(const Client& client, const std::string& token);
     void                            replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2);
-
+    void                            replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg);
+    void                            replyMissingParam(const Client& client, const std::string& channel, const std::string& param);
 
 private:
     // replyMessages.cpp
@@ -171,8 +172,6 @@ private:
     void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
-    void                            replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg);
-    void                            replyMissingParam(const Client& client, const std::string& channel, const std::string& param);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

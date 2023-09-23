@@ -13,21 +13,11 @@
 #include <Server.hpp>
 #include <cstdlib>
 
-void Server::replyChannelModeIs(const Client& client, const Channel& channel)
-{
-	const int id(client.getId());
-	const std::string nick(client.getNickname());
-	const int limit(channel.limit());
-    const std::string arg = (limit > 0) ? (" :" + Utils::numToStr(limit)) : "";
-
-	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes() + arg + EOL, id);
-}
-
 void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    // :ana!user@LibraIRC-rqb.ri9.75sut7.IP MODE #testingIRCforProjectPurposes :-i (same for +)
+    // TODO: CLEANUP <---------------------------------- [!!!!!!!!!!!!]
     // ana sets mode -i on #testingIRCforProjectPurposes (same for +)
     if (param2.empty())
         addMessage(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, id);
@@ -108,19 +98,24 @@ std::string getNotChanopMsg(const std::string& token)
 void Server::execMODE(Client& client, const std::string line)
 {
     // TODO: might need to check for other symbols ('&','+','!')
-
+    const int id(client.getId());
     std::istringstream iss(line);
     std::string channelName;
     std::queue<std::string> modes;
     std::string args;
 
     iss >> channelName;
-    if (!isChannelValid(channelName))
+    if (channelName.empty())
+    {
+        addMessage("MODE :<target> [[(+|-)]<modes> [<mode-parameters>]]\r\n", id);
         return ;
-    channelName.erase(0, 1);
+    }
+    if (!isChannelValid(channelName))
+    {
+        addMessage(channelName + " :No such channel\r\n", id);
+        return ;
+    }
 
-    Channel& channel = *(getChannel(channelName));
-    
     // insert all arguments in string
     while (!iss.eof())
     {
@@ -129,20 +124,14 @@ void Server::execMODE(Client& client, const std::string line)
             modes.push(args);
     }
 
-    if (!channel.isInChannel(client.getId()))
-    {
-        // reply
-    }
-    else if (modes.empty())
+    channelName.erase(0, 1);
+    Channel& channel = *(getChannel(channelName));
+    if (modes.empty())
 	{
-    // >> @time=2023-09-22T17:05:47.613Z :apocalypse.IRC4Fun.net 324 ana #testingIRCBehaviour :+nt
-    // >> @time=2023-09-22T17:05:47.613Z :apocalypse.IRC4Fun.net 329 ana #testingIRCBehaviour :1695402334
-	// Channel #testingIRCBehaviour modes: +nt
-    // Channel #testingIRCBehaviour created on Fri Sep 22 18:05:34 2023
     	replyChannelModeIs(client, channel);
 		replyCreationTime(client, channel);
 	}
-    else if (!channel.isOperator(client.getId()))
+    else if (!channel.isOperator(id))
     {
         const std::string token(modes.front());
         replyChanopNeeded(client, channelName, getNotChanopMsg(token));
@@ -155,23 +144,13 @@ void Server::execMODE(Client& client, const std::string line)
 
 bool Server::isChannelValid(const std::string& name) const
 {
-    if (name.size() < 2)
-    {
-        // reply
-    }
-    else if (name[0] != '#')
-    {
-        // reply
-    }
-    else if (!channelExists(name.substr(1)))
-    {
-        // reply
-    }
-    else
-    {
-        return true;
-    }
-    return false;    
+    if (name.empty())
+        return false;
+    bool invalid(name.size() < 2);
+    invalid |= (name.at(0) != '#');
+    invalid |= (!channelExists(name.substr(1)));
+
+    return !invalid;
 }
 
 void Server::replyModeUnknown(const Client& client, const std::string& param)
@@ -219,7 +198,6 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
         {
             if (channel.setTopicRestriction(status))
                 replyMode(client, channelName, token, "");
-
         }
         else if ((token != "+l") &&  modes.empty()) // if no argument to mode when required
         {
