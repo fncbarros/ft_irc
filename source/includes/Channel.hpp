@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/20 16:36:00 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:26:59 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ public:
     // Getters
     std::string         getName() const;
     std::string         getTopic() const;
+    int                 getTopicNick() const;
     const ClientMap&    getClients() const;
 
     bool                addClient(const Client& client, const bool chanop = false);
@@ -62,6 +63,7 @@ public:
 
     void                setInviteOnly(const bool set);
     void                setTopic(const std::string& newTopic);
+    void                setTopicNick(int newNick);
     void                setTopicRestriction(const bool set);
     void                setKey(const std::string& key);
     void                setNoKey(void);
@@ -78,5 +80,5 @@ private:
     struct modes    _modes;
     ClientMap       _clientsMap;
     std::set<int>   _operators;
-
+    int             _clientTopicNick;
 };

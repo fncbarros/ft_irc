@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/20 16:34:53 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 16:16:34 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,32 +289,62 @@ void Server::execINVITE(Client& client, const std::string line)
 
 void Server::execTOPIC(Client& client, const std::string line)
 {
-    std::cout << client.getUsername() << ": ";
-    std::cout << "***TOPIC: ";
-    std::cout << line << std::endl;
+    if (line.empty())
+    {
+        std::cout << "line empty" << std::endl;
+        return ;
+    }
 
-    const std::string channelTarget(line.substr(1, line.find(' ') - 1));
-    const std::string channelTopic(line.substr(line.find(' ') + 1, line.size()));
-    std::cout << channelTarget << std::endl;
-    std::cout << "\"" + channelTopic + "\"" << std::endl;
+    const std::string channelTarget(line.substr(line.find('#') + 1, line.find(' ') - 1));
+    const std::string channelTopic(line.substr(line.find(':') + 1));
+    
     ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
 
-    if (channelTopic.empty() || channelTopic == "Network")
+    int verifyLine = line.find(':');
+    if (channelTargetIt == _channels.end())
     {
-        replyNeedMoreParams(client);
-    }
-    else if (channelTargetIt == _channels.end())
-    {
-        replyChannelNotFound(client, channelTarget);// ERR_NOSUCHCHANNEL (Código 403)
+        std::cout << "channel not found" << std::endl;
+        if (line.at(0) != '#')
+            replyNeedMoreParams(client);
+        else
+            replyTopicChannelNotFound(client, channelTarget);
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
     {
-        replyNotOnChannel(client, channelTargetIt->getName());// RPL_NOTONCHANNEL (Código 442)
+        std::cout << "not on channel" << std::endl;
+        replyNotOnChannel(client, channelTargetIt->getName());
+    }
+    else if (channelTargetIt->isTopicRetricted())
+    {
+        std::cout << "aqui" << std::endl;
+        if (!channelTargetIt->isOperator(client.getId()))
+        {
+            std::cout << "aqui2" << std::endl;
+            replyNotChannelOperatorTopic(client, channelTarget);
+            return ;
+        }
+    }
+    else if (verifyLine != -1)
+    {
+        std::cout << "right" << std::endl;
+        channelTargetIt->setTopic(channelTopic);
+        replyTopic(client, *channelTargetIt);
     }
     else
     {
-        std::cout << "aqui2" << std::endl;
-        replyTopic(client, channelTopic); // RPL_TOPIC (Código 332)
+        channelTargetIt->setTopicNick(client.getId());
+        std::string clientNickTopic = getClient(channelTargetIt->getTopicNick())->getNickname();
+        std::cout << "clientNick" << clientNickTopic << std::endl;
+        if (channelTargetIt->getTopic() != "")
+        {
+            std::cout << "NO TOPIC" << std::endl;
+            replyNoTopic(client, *channelTargetIt, clientNickTopic);
+        }
+        else
+        {
+            std::cout << "NO TOPIC SET" << std::endl;
+            replyNoTopicSet(client, *channelTargetIt);
+        }
     }
 }
 

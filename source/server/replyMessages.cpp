@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/09/20 16:35:40 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 15:41:11 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,14 +275,39 @@ void    Server::replyBroadcastUserLeft(const int id, const Client& client, const
     addMessage(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", id);
 }
 
-void    Server::replyTopic(const Client& client, const std::string& channelTopic)
+void    Server::replyTopic(const Client& client, const Channel& channelTarget)
 {
     const int id(client.getId());
-    addMessage(client.getNickname() + " has changed the topic to: " + channelTopic, id);
+    addMessage(":" + client.toString() + " TOPIC #" + channelTarget.getName() + " :" + channelTarget.getTopic() + "\r\n", id);
+}
+
+void    Server::replyNotChannelOperatorTopic(const Client& client, const std::string& channelTargetName)
+{
+    const int id(client.getId());
+    addMessage(HOST + " " + CHANOPRIVSNEEDED + " " + client.getNickname() + " " + channelTargetName + " :You're not a channel operator", id);
+}
+
+void    Server::replyNoTopic(const Client& client, const Channel& channelTarget, const std::string nickTopic)
+{
+    const int id(client.getId());
+    // addMessage(":" + client.toString() + " " + TOPIC + " " + client.getNickname() + " #" + channelTarget.getName() + " :" + channelTarget.getTopic() + "\r\n", id);
+    addMessage(":" + client.toString() + " " + TOPICWHOTIME + " " + client.getNickname() + " #" + channelTarget.getName() + " " + nickTopic + "\r\n", id);
+}
+
+void    Server::replyNoTopicSet(const Client& client, const Channel& channelTarget)
+{
+    const int id(client.getId());
+    addMessage(":" + client.toString() + " " + NOTOPIC + " " + client.getNickname() + " #" + channelTarget.getName() + " :No topic is set." + "\r\n", id);
 }
 
 void    Server::replyNeedMoreParams(const Client& client)
 {
     const int id(client.getId());
-    addMessage(NEEDMOREPARAMS, id);
+    addMessage(HOST + " :No such channel\r\n", id);
+}
+
+void    Server::replyTopicChannelNotFound(const Client& client, const std::string& channelTargetName)
+{
+    const int id(client.getId());
+    addMessage("#" + channelTargetName + " :No such channel" + "\r\n", id);
 }

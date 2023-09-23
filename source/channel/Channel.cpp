@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/20 15:53:26 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:27:11 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,11 @@ std::string Channel::getName() const
 std::string Channel::getTopic() const
 {
     return _topic;
+}
+
+int Channel::getTopicNick() const
+{
+    return _clientTopicNick;
 }
 
 const ClientMap& Channel::getClients() const
@@ -174,7 +179,12 @@ void Channel::setInviteOnly(const bool set)
 
 void Channel::setTopic(const std::string& newTopic)
 {
-        _topic = newTopic;
+    _topic = newTopic;
+}
+
+void Channel::setTopicNick(int newNick)
+{
+    _clientTopicNick = newNick;
 }
 
 void Channel::setTopicRestriction(const bool set)
