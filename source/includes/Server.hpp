@@ -172,6 +172,7 @@ private:
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
     void                            replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg);
+    void                            replyMissingParam(const Client& client, const std::string& channel, const std::string& param);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

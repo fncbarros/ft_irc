@@ -13,24 +13,14 @@
 #include <Server.hpp>
 #include <cstdlib>
 
-
-static std::string replyMissingParam(const std::string& client, const std::string& channel, const std::string& param)
-{
-    const std::string REPLYCODE("696");
-    return ":" + HOST + " " + REPLYCODE + " " + client + " #" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n";
-}
-
 void Server::replyChannelModeIs(const Client& client, const Channel& channel)
 {
 	const int id(client.getId());
 	const std::string nick(client.getNickname());
-    std::stringstream ss;
 	const int limit(channel.limit());
-	std::string arg;
-	ss << limit;
-    ss >> arg;
-	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes() + ((limit > 0) ? (" :" +  arg) : "") + EOL, id);
-	// need to send limit if there is one
+    const std::string arg = (limit > 0) ? (" :" + Utils::numToStr(limit)) : "";
+
+	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + nick + "#" + channel.getName() +  " :" + channel.returnModes() + arg + EOL, id);
 }
 
 void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
@@ -193,7 +183,6 @@ void Server::replyModeUnknown(const Client& client, const std::string& param)
 
 void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client)
 {
-    const int id(client.getId());
     const std::string channelName(channel.getName());
     const std::string validTokens("+-kotli");
     char op(0);
@@ -234,8 +223,7 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
         }
         else if ((token != "+l") &&  modes.empty()) // if no argument to mode when required
         {
-            addMessage(replyMissingParam(client.getNickname(), channelName, token.substr(1)), id);
-            addMessage("#" + channelName + " " + token.substr(1) + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", id);
+            replyMissingParam(client, channelName, token.substr(1));
         }
         else if (op == 'k')
         {
@@ -284,8 +272,7 @@ void Server::processOperator(const Client& client, Channel& channel, const std::
     const std::string channelName(channel.getName());
     if (user.empty())
     {
-        addMessage(replyMissingParam(client.getNickname(), channelName, "o"), client.getId());
-        addMessage("#" + channelName + " o * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
+        replyMissingParam(client, channelName, "o"), client.getId();
     }
 	else if (clientIt == _connections.end())
 	{
@@ -318,8 +305,7 @@ void Server::processLimit(const Client& client, const std::string arg, Channel& 
 	
     if (arg.empty())
 	{
-        addMessage(replyMissingParam(chanop, channel.getName(), "l"), client.getId());
-        addMessage("#" + channel.getName() + " l * :You must specify a parameter for the limit mode. Syntax: <nick>.\r\n", client.getId());
+        replyMissingParam(client, channel.getName(), "l"), client.getId();
 		return ;
 	}
 	if (status)

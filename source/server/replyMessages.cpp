@@ -274,3 +274,10 @@ void   Server::replyChanopNeeded(const Client& client, const std::string& channe
     addMessage(firstHalf + msg + EOL, client.getId());
     addMessage("#" + channel + " :" + msg + EOL, client.getId());
 }
+
+void Server::replyMissingParam(const Client& client, const std::string& channel, const std::string& param)
+{
+    const std::string REPLYCODE("696");
+    addMessage(":" + HOST + " " + REPLYCODE + " " + client.getNickname() + " #" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
+    addMessage("#" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
+}
