@@ -70,6 +70,51 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
     }
 }
 
+std::string getNotChanopMsg(const std::string& token)
+{
+    if (token == "+i")
+    {
+        return "You must be channel operator to set channel mode i (invite only)";
+    }
+    else if (token == "-i")
+    {
+        return "You must be channel operator to unset channel mode i (invite only)";
+    }
+    else if (token == "+t")
+    {
+        return "You must be channel operator to set channel mode t (topic restriction)";
+    }
+    else if (token == "-t")
+    {
+        return "You must be channel operator to unset channel mode t (topic restriction)";
+    }
+    else if (token == "+k")
+    {
+        return "You must be channel operator to set channel mode k (key)";
+    }
+    else if (token == "-k")
+    {
+        return "You must be channel operator to unset channel mode k (key)";
+    }
+    else if (token == "+o")
+    {
+        return "You must be channel operator to set channel mode o (channel operator)";
+    }
+    else if (token == "-o")
+    {
+        return "You must be channel operator to unset channel mode o (channel operator)";
+    }
+    else if (token == "+l")
+    {
+        return "You must be channel operator to set channel mode l (limit)";
+    }
+    else if (token == "-l")
+    {
+        return "You must be channel operator to unset channel mode l (limit)";
+    }
+    return "";
+}
+
 void Server::execMODE(Client& client, const std::string line)
 {
     // TODO: might need to check for other symbols ('&','+','!')
@@ -109,7 +154,8 @@ void Server::execMODE(Client& client, const std::string line)
 	}
     else if (!channel.isOperator(client.getId()))
     {
-        // reply
+        const std::string token(modes.front());
+        replyChanopNeeded(client, channelName, getNotChanopMsg(token));
     }
 	else
     {
@@ -148,6 +194,7 @@ void Server::replyModeUnknown(const Client& client, const std::string& param)
 void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client)
 {
     const int id(client.getId());
+    const std::string channelName(channel.getName());
     const std::string validTokens("+-kotli");
     char op(0);
 
@@ -177,18 +224,18 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
         if (op == 'i')
         {
             if (channel.setInviteOnly(status))
-                replyMode(client, channel.getName(), token, "");
+                replyMode(client, channelName, token, "");
         }
         else if (op == 't')
         {
             if (channel.setTopicRestriction(status))
-                replyMode(client, channel.getName(), token, "");
+                replyMode(client, channelName, token, "");
 
         }
-        else if (status && (op != 'o') &&  modes.empty()) // if no argument to mode when required
+        else if ((token != "+l") &&  modes.empty()) // if no argument to mode when required
         {
-            addMessage(replyMissingParam(client.getNickname(), channel.getName(), token.substr(1)), id);
-            addMessage("#" + channel.getName() + " " + token.substr(1) + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", id);
+            addMessage(replyMissingParam(client.getNickname(), channelName, token.substr(1)), id);
+            addMessage("#" + channelName + " " + token.substr(1) + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", id);
         }
         else if (op == 'k')
         {
@@ -198,18 +245,17 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
             {
                 if (channel.setKey(newKey))
                 {
-                    //reply
-                    // :ana!user@IRC4Fun-o1tbi9.8fkr.53si.0818.2001.IP MODE #testingIRCBehaviour +k :key
-                    // ana sets channel keyword to <key> --> broadcast
+                    replyMode(client, channelName, token, newKey);
+                    const std::string msg(client.getNickname() + " sets channel keyword to " + newKey + EOL);
+                    broadcast(msg, channel);
                 }
             }
             else
             {
                 if (channel.setNoKey())
                 {
-                    // reply
-                    // :ana!user@IRC4Fun-o1tbi9.8fkr.53si.0818.2001.IP MODE #testingIRCBehaviour -k :key <-------- Need to pass key in order to remove it
-                    // ana removes channel keyword
+                    replyMode(client, channelName, token, newKey);
+                    const std::string msg(client.getNickname() + " removes channel keyword" + EOL);
                 }
             }
         }
@@ -235,10 +281,11 @@ void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const 
 void Server::processOperator(const Client& client, Channel& channel, const std::string& user, const bool status)
 {
 	ConnectionsList::const_iterator clientIt = getClient(user);
+    const std::string channelName(channel.getName());
     if (user.empty())
     {
-        addMessage(replyMissingParam(client.getNickname(), channel.getName(), "o"), client.getId());
-        addMessage("#" + channel.getName() + " o * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
+        addMessage(replyMissingParam(client.getNickname(), channelName, "o"), client.getId());
+        addMessage("#" + channelName + " o * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
     }
 	else if (clientIt == _connections.end())
 	{
@@ -254,12 +301,12 @@ void Server::processOperator(const Client& client, Channel& channel, const std::
 		if (status)
         {
             if (channel.addOperator(id))
-                replyMode(client, channel.getName(), "+o", user);
+                replyMode(client, channelName, "+o", user);
         }
         else
         {
             if (channel.removeOperator(id))
-                replyMode(client, channel.getName(), "-o", user);
+                replyMode(client, channelName, "-o", user);
         }
             
 	}
@@ -277,7 +324,7 @@ void Server::processLimit(const Client& client, const std::string arg, Channel& 
 	}
 	if (status)
 	{
-		const int limit(std::atoi(arg.c_str())); // TODO: remove atoi [!!!!!!!!!!!]
+        const int limit = Utils::riskyConversion<std::string, int>(arg);
 		if (limit < 1)
 		{
 			return ;
@@ -288,20 +335,16 @@ void Server::processLimit(const Client& client, const std::string arg, Channel& 
             if (channel.setLimit(static_cast<size_t>(limit)))
             {
                 replyMode(client, channel.getName(), "+l", arg);
-                // :ana!user@LibraIRC-rqb.ri9.75sut7.IP MODE #channel +l :1
-                addMessage("#" + chanop + " sets channel limit to " + arg + EOL, client.getId());
-                //  ana sets channel limit to 1 <--- reply to all?
+                broadcast("#" + chanop + " sets channel limit to " + arg + EOL, channel, client.getId());
             }
 		}
 	}
 	else
-	{		
+	{
         if (channel.setLimit(0))
         {
-            // :bea!user@LibraIRC-rqb.ri9.75sut7.IP MODE #channel :-l
             replyMode(client, channel.getName(), "-l", arg);
-            // bea removes user limit
-            addMessage(chanop + " removes user limit" + EOL, client.getId());
+            broadcast(chanop + " removes user limit" + EOL, channel, client.getId());
         }
 	}
 }
