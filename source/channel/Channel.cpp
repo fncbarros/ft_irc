@@ -70,7 +70,7 @@ bool Channel::addClient(const Client& client, const bool chanop)
     {
         return false;
     }
-    else if (!isInChannel(client.getId()))
+    else if (!isInChannel(client.getId())) // if client is already in channel we ignore it
     {
         _clientsMap.insert(std::make_pair(client.getId(), &client));
         if (chanop)

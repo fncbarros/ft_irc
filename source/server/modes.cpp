@@ -15,39 +15,13 @@
 
 void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
 {
-    const int id(client.getId());
     const std::string nick(client.getNickname());
 
     // "Official" reply
-    addMessage(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, id);
-
-    // Custom reply
-    if (param1[0] == '+')
-    {
-        if (param1[1] == 'o')
-        {
-            broadcast(nick + " gives channel operator status to " + param2 + EOL, channel);
-        }
-        else if (param1[1] == 'l')
-        {
-            addMessage(":" + client.toString() + " MODE #" + channel + " " + param1 + " :" + param2 + EOL, id);
-        }
-        else
-        {
-            broadcast(nick + " sets mode " + param1 + " on #" + channel + EOL, channel);
-        }
-    }
+    if (param1 == "+l")
+        broadcast(":" + client.toString() + " MODE #" + channel + " " + param1 + " :" + param2 + EOL, channel);
     else
-    {
-        if (param1[1] == 'o')
-        {
-            broadcast(nick + " removes channel operator status from " + param2 + EOL, channel);
-        }
-        else
-        {
-            broadcast(nick + " sets mode " + param1 + " on #" + channel + EOL, channel);
-        }
-    }
+        broadcast(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, channel);
 }
 
 std::string getNotChanopMsg(const std::string& token)
@@ -303,7 +277,6 @@ void Server::processLimit(const Client& client, const std::string arg, Channel& 
             if (channel.setLimit(static_cast<size_t>(limit)))
             {
                 replyMode(client, channel.getName(), "+l", arg);
-                broadcast("#" + chanop + " sets channel limit to " + arg + EOL, channel, client.getId());
             }
 		}
 	}
