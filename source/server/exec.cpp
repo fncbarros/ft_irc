@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/23 16:16:34 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 17:23:48 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,14 +303,13 @@ void Server::execTOPIC(Client& client, const std::string line)
     
     ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
 
-    int verifyLine = line.find(':');
     if (channelTargetIt == _channels.end())
     {
         std::cout << "channel not found" << std::endl;
         if (line.at(0) != '#')
-            replyNeedMoreParams(client);
+            replyNoSuchChannel(client);
         else
-            replyTopicChannelNotFound(client, channelTarget);
+            replyChannelNotFound(client, channelTarget);
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
     {
@@ -327,19 +326,18 @@ void Server::execTOPIC(Client& client, const std::string line)
             return ;
         }
     }
-    else if (verifyLine != -1)
+    else if (line.find(':') != std::string::npos)
     {
         std::cout << "right" << std::endl;
         channelTargetIt->setTopic(channelTopic);
+        channelTargetIt->setTopicNick(client.getId());
         replyTopic(client, *channelTargetIt);
     }
     else
     {
-        channelTargetIt->setTopicNick(client.getId());
-        std::string clientNickTopic = getClient(channelTargetIt->getTopicNick())->getNickname();
-        std::cout << "clientNick" << clientNickTopic << std::endl;
         if (channelTargetIt->getTopic() != "")
         {
+            std::string clientNickTopic = getClient(channelTargetIt->getTopicNick())->getNickname();
             std::cout << "NO TOPIC" << std::endl;
             replyNoTopic(client, *channelTargetIt, clientNickTopic);
         }

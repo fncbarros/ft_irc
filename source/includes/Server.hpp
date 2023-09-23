@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/23 15:41:50 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 16:45:29 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,9 @@ static const std::string INVITING("341");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
-static const std::string CHANNELNOTFOUND("403");
-static const std::string NOTOPIC("461");
 static const std::string TOPIC("332");
 static const std::string TOPICWHOTIME("333");
-static const std::string NEEDMOREPARAMS("331");
+static const std::string NOTOPIC("331");
 static const std::string CLIENTONCHANNEL("443");
 static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
@@ -180,7 +178,6 @@ private:
     void                            replyNotChannelOperatorTopic(const Client& client, const std::string& channelTargetName);
     void                            replyNoTopic(const Client& client, const Channel& channelTarget, const std::string nickTopic);
     void                            replyNoTopicSet(const Client& client, const Channel& channelTarget);
-    void                            replyNeedMoreParams(const Client& client);
     void                            replyTopicChannelNotFound(const Client& client, const std::string& channelTargetName);
 
 

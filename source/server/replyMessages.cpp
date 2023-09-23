@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/09/23 16:33:33 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/23 16:46:35 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void    Server::replyPrivateMessage(const Client& client, const Client& targetCl
 
 void    Server::replyChannelNotFound(const Client& client, const std::string &channelName)
 {
-    addMessage(":" + client.toString() + " " + CHANNELNOTFOUND + " " + client.getNickname() + " #" + channelName + " :No such channel\r\n", client.getId());
+    addMessage(":" + client.toString() + " " + NOSUCHCHANNEL + " " + client.getNickname() + " #" + channelName + " :No such channel\r\n", client.getId());
 }
 
 void    Server::replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message)
@@ -289,18 +289,6 @@ void    Server::replyNoTopicSet(const Client& client, const Channel& channelTarg
 {
     const int id(client.getId());
     addMessage(":" + client.toString() + " " + NOTOPIC + " " + client.getNickname() + " #" + channelTarget.getName() + " :No topic is set." + "\r\n", id);
-}
-
-void    Server::replyNeedMoreParams(const Client& client)
-{
-    const int id(client.getId());
-    addMessage(HOST + " :No such channel\r\n", id);
-}
-
-void    Server::replyTopicChannelNotFound(const Client& client, const std::string& channelTargetName)
-{
-    const int id(client.getId());
-    addMessage("#" + channelTargetName + " :No such channel" + "\r\n", id);
 }
 
 void   Server::replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg)
