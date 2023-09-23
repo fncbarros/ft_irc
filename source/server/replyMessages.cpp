@@ -268,3 +268,9 @@ void    Server::replyBroadcastUserLeft(const int id, const Client& client, const
     addMessage(client.getNickname() + " (" + client.getUsername() + "@" + HOST + ") has left (" + reason + ")\r\n", id);
 }
 
+void   Server::replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg)
+{
+    const std::string firstHalf(":" + HOST + " " + CHANOPRIVSNEEDED + " " + client.getNickname() + " #" + channel + " :");
+    addMessage(firstHalf + msg + EOL, client.getId());
+    addMessage("#" + channel + " :" + msg + EOL, client.getId());
+}

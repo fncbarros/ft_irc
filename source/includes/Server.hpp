@@ -40,7 +40,6 @@ static const std::string PASSMISMATCH("464");
 static const std::string CHANNELMODEIS("324");
 static const std::string UNKNOWNCOMMAND("421");
 static const std::string NEEDMOREPARAMS("461");
-static const std::string CHANOPRIVSNEEDED("482");
 static const std::string NAMREPLY("353");
 static const std::string ENDOFNAMES("366"); // <channel> :<info>
 static const std::string CREATIONTIME("329");
@@ -62,6 +61,7 @@ static const std::string CLIENTNOTONCHANNEL("441");
 static const std::string KICK("312");
 static const std::string NOTONCHANNEL("442");
 static const std::string UNKNOWNMODE("472");
+static const std::string CHANOPRIVSNEEDED("482");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -171,6 +171,7 @@ private:
     void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
+    void                            replyChanopNeeded(const Client& client, const std::string& channel, const std::string& msg);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
@@ -191,6 +192,8 @@ private:
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
     static const std::string        returnChannelName(const std::string& line);
     bool                            channelExists(const std::string& name) const;
+    void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
+    void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);
 
 public:
     void                            connectionLoop(void);
