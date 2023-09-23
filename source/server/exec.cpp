@@ -167,18 +167,18 @@ void Server::execJOIN(Client& client, const std::string line)
         }
         else
         {
-            // TODO: need to check if client is not channel user already
             Channel& channel(*channelIt);
             const ClientMap& list(channel.getClients());
 
-            // add user to channel
-            if (!channel.addClient(client))
+            if (!channel.addClient(client)) // add user to channel
             {
-                std::cerr << "Could not add " << client.getNickname() << " to #" << channelName << std::endl;
-                replyBadJoin(client, line);
+                // TODO: need to check if client is not channel user already
+                // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
+                // TODO: reply if limit passed
+                // TODO: reply if invite only and not invited
+                replyBadJoin(client, line); // <-- pass reason enum maybe??
                 return ;
             }
-
             // Broadcast to all channel users
             for (ClientMap::const_iterator clientIt = list.begin(); clientIt != list.end(); clientIt++)
             {

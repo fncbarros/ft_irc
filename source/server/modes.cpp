@@ -17,10 +17,11 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    // TODO: CLEANUP <---------------------------------- [!!!!!!!!!!!!]
-    // ana sets mode -i on #testingIRCforProjectPurposes (same for +)
+
+    // "Official" reply
     addMessage(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, id);
 
+    // Custom reply
     if (param1[0] == '+')
     {
         if (param1[1] == 'o')

@@ -207,7 +207,6 @@ void    Server::replyBroadcastKick(const int id, const std::string& kickerNick, 
 
 void    Server::replyNoSuchNick(const Client& client, const std::string& nickTarget)
 {
-    // TODO: if there is a channel, name has to be given
     addMessage(":" + HOST + " " + NICKNOTFOUND + " " + client.getNickname() + " " + nickTarget + " :No such nick/channel\r\n", client.getId());
 }
 

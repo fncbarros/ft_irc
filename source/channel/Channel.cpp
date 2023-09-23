@@ -61,22 +61,22 @@ const ClientMap& Channel::getClients() const
 
 bool Channel::addClient(const Client& client, const bool chanop)
 {
-    if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
-    {
-        // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
-        return false;
-    }
-    else if (_clientsMap.find(client.getId()) != _clientsMap.end())
+    // TODO: See if was invited
+    if (_clientsMap.find(client.getId()) != _clientsMap.end())
     {
         return false;
     }
-    else
+    else if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
+    {
+        return false;
+    }
+    else if (!isInChannel(client.getId()))
     {
         _clientsMap.insert(std::make_pair(client.getId(), &client));
         if (chanop)
             addOperator(client.getId());
-        return true;
     }
+    return true;
 
 }
 
