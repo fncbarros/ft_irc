@@ -190,6 +190,7 @@ void Server::execJOIN(Client& client, const std::string line)
             if (channel.isInviteOnly() && !client.wasInvited(channelName))
             {
                 replyInviteOnly(client, channelName);
+                return ;
             }
             if (!channel.addClient(client)) // add user to channel
             {
