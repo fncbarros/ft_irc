@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/24 17:18:12 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:26:25 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ static const std::string YOURHOST("002");
 static const std::string CREATED("003");
 static const std::string MYINFO("004");
 static const std::string NICKCOLLISION("433");
+static const std::string PASSNEEDPARAMS("462");
 static const std::string PASSMISMATCH("464");
 static const std::string CHANNELMODEIS("324");
 static const std::string UNKNOWNCOMMAND("421");
@@ -89,7 +90,7 @@ private:
      *  Check in the connections vector the
      * client that have the same socket_id as fd parameter and read the fd message
     */
-    bool                            inspectEvent(int fd);
+    void                            inspectEvent(int fd);
 
     // parser.cpp
     tokenList                       parse(std::string buffer);
@@ -99,7 +100,7 @@ private:
 
     // authentication.cpp
     bool                            auth(Client& client, const tokenPair& processedMsg);
-    bool                            checkPassword(Client& client, const tokenPair& processedMsg);
+    void                            checkPassword(Client& client, const tokenPair& processedMsg);
     void                            checkUser(Client& client, tokenPair processedMsg);
     void                            activateClient(Client& client);
 
@@ -138,6 +139,7 @@ private:
     // replyMessages.cpp
     void                            addMessage(const std::string& message, int fd);
     void                            replyPassMissMatch(const Client& client);
+    void                            replyPassNeedMorParams(const Client& client);
     void                            replyWelcome(const Client& client);
     void                            replyYourHost(const Client& client);
     void                            replyCreated(const Client& client);
@@ -181,6 +183,8 @@ private:
     void                            replyNoTopicSet(const Client& client, const Channel& channelTarget);
     void                            replyTopicChannelNotFound(const Client& client, const std::string& channelTargetName);
 
+    void                            replyNoChannelJoined(const Client& client);
+    void                            replyModeMissingParams(const int id);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

@@ -13,17 +13,6 @@
 #include <Server.hpp>
 #include <cstdlib>
 
-void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
-{
-    const std::string nick(client.getNickname());
-
-    // "Official" reply
-    if (param1 == "+l")
-        broadcast(":" + client.toString() + " MODE #" + channel + " " + param1 + " :" + param2 + EOL, channel);
-    else
-        broadcast(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, channel);
-}
-
 std::string getNotChanopMsg(const std::string& token)
 {
     if (token == "+i")
@@ -81,12 +70,12 @@ void Server::execMODE(Client& client, const std::string line)
     iss >> channelName;
     if (channelName.empty())
     {
-        addMessage("MODE :<target> [[(+|-)]<modes> [<mode-parameters>]]\r\n", id);
+        replyModeMissingParams(id);
         return ;
     }
     if (!isChannelValid(channelName))
     {
-        addMessage(channelName + " :No such channel\r\n", id);
+        replyNoSuchChannelSimple(id, channelName);
         return ;
     }
 
@@ -101,16 +90,16 @@ void Server::execMODE(Client& client, const std::string line)
     channelName.erase(0, 1);
     Channel& channel = *(getChannel(channelName));
     if (modes.empty())
-	{
-    	replyChannelModeIs(client, channel);
-		replyCreationTime(client, channel);
-	}
+    {
+        replyChannelModeIs(client, channel);
+        replyCreationTime(client, channel);
+    }
     else if (!channel.isOperator(id))
     {
         const std::string token(modes.front());
         replyChanopNeeded(client, channelName, getNotChanopMsg(token));
     }
-	else
+    else
     {
         parseModes(modes, channel, client);
     }
@@ -127,117 +116,112 @@ bool Server::isChannelValid(const std::string& name) const
     return !invalid;
 }
 
-void Server::replyModeUnknown(const Client& client, const std::string& param)
-{
-    const int id(client.getId());
-    const std::string nick(client.getNickname());
-    addMessage(":" + HOST + " " + UNKNOWNMODE + " " + nick + " " + param + " " + " :is an unknown mode character\r\n" ,id);
-}
-
 void Server::parseModes(std::queue<std::string>& modes, Channel& channel, const Client& client)
 {
     const std::string channelName(channel.getName());
     const std::string validTokens("+-kotli");
-    char op(0);
+    char operation;
 
     while (!modes.empty())
     {
         const std::string token = modes.front();
         modes.pop();
-        bool status(true);
+
+        if (token.size() != 1 && token.size() != 2) // argument has to have only 1 or 2 char max
+        {
+            return ;
+        }
+
+        // get operation
+        if (token.size() > 1)
+            operation = token[1];
+        else if ((token[0] != '+') || (token[0] != '-')) // if arg is a single '+' or '-', ignore
+            operation = token[0];
+        else
+            return ;
 
         // if bad token
-        if (validTokens.find(token[0]) == std::string::npos)
+        if (validTokens.find(token[0]) == std::string::npos) // if no valid
         {
             replyModeUnknown(client, token);
             return ;
         }
 
-        try {
-            // NOTE: token can also not include + or -, in which case a + will be assumed
-            status = token.at(0) != '-';
-            op = token.at(1);
-        } catch (const std::exception& e) {
-            (void)e;
-            // reply or ignore
-            return ;
-        }
+        const bool status = token[0] != '-';
 
-        if (op == 'i')
+        if (operation == 'i')
         {
             if (channel.setInviteOnly(status))
                 replyMode(client, channelName, token, "");
         }
-        else if (op == 't')
+        else if (operation == 't')
         {
             if (channel.setTopicRestriction(status))
                 replyMode(client, channelName, token, "");
         }
-        else if ((token != "+l") &&  modes.empty()) // if no argument to mode when required
+        else if ((token != "-l") &&  modes.empty()) // if no argument to mode when required
         {
             replyMissingParam(client, channelName, token.substr(1));
         }
-        else if (op == 'k')
+        else if (operation == 'k')
         {
             const std::string newKey(modes.front());
             modes.pop();
+            std::string msg;
             if (status)
             {
                 if (channel.setKey(newKey))
                 {
                     replyMode(client, channelName, token, newKey);
-                    const std::string msg(client.getNickname() + " sets channel keyword to " + newKey + EOL);
-                    broadcast(msg, channel);
+                    msg = client.getNickname() + " sets channel keyword to " + newKey + EOL;
                 }
             }
-            else
+            else if (channel.setNoKey())
             {
-                if (channel.setNoKey())
-                {
-                    replyMode(client, channelName, token, newKey);
-                    const std::string msg(client.getNickname() + " removes channel keyword" + EOL);
-                }
+                replyMode(client, channelName, token, newKey);
+                msg = client.getNickname() + " removes channel keyword" + EOL;
             }
+            broadcast(msg, channel);
         }
-        else if (op == 'o')
+        else if (operation == 'o')
         {
             const std::string user(modes.front());
             modes.pop();
-			processOperator(client, channel, user, status);
+            processOperator(client, channel, user, status);
         }
-        else if (op == 'l') // see syntax further
+        else if (operation == 'l') // see syntax further
         {
-			const std::string limit(modes.front());
-			modes.pop();
-			processLimit(client, limit, channel, status);
-        }
-        else // ignore
-        {
-            return ;
+            std::string limit;
+            if (token != "-l")
+            {
+                limit = modes.front();
+                modes.pop();
+            }
+            processLimit(client, limit, channel, status);
         }
     }
 }
 
 void Server::processOperator(const Client& client, Channel& channel, const std::string& user, const bool status)
 {
-	ConnectionsList::const_iterator clientIt = getClient(user);
+    ConnectionsList::const_iterator clientIt = getClient(user);
     const std::string channelName(channel.getName());
     if (user.empty())
     {
         replyMissingParam(client, channelName, "o"), client.getId();
     }
-	else if (clientIt == _connections.end())
-	{
+    else if (clientIt == _connections.end())
+    {
         replyNoSuchNick(client, user);
-	}
-	else if (!channel.isInChannel(clientIt->getId()))
-	{
+    }
+    else if (!channel.isInChannel(clientIt->getId()))
+    {
         replyNoSuchNick(client, user);
-	}
-	else
-	{
-		const int id(clientIt->getId());
-		if (status)
+    }
+    else
+    {
+        const int id(clientIt->getId());
+        if (status)
         {
             if (channel.addOperator(id))
             {
@@ -252,40 +236,26 @@ void Server::processOperator(const Client& client, Channel& channel, const std::
             }
         }
             
-	}
+    }
 }
 
 void Server::processLimit(const Client& client, const std::string arg, Channel& channel, const bool status)
 {
     const std::string chanop(client.getNickname());
-	
+        
     if (arg.empty())
-	{
+    {
         replyMissingParam(client, channel.getName(), "l"), client.getId();
-		return ;
-	}
-	if (status)
-	{
+    }
+    else if (status)
+    {
         const int limit = Utils::riskyConversion<std::string, int>(arg);
-		if (limit < 1)
-		{
-			return ;
-		}
-		else
-		{
-			
-            if (channel.setLimit(static_cast<size_t>(limit)))
-            {
-                replyMode(client, channel.getName(), "+l", arg);
-            }
-		}
-	}
-	else
-	{
-        if (channel.setLimit(0))
-        {
-            replyMode(client, channel.getName(), "-l", arg);
-            broadcast(chanop + " removes user limit" + EOL, channel, client.getId());
-        }
-	}
+        if (channel.setLimit(static_cast<size_t>(limit)))
+            replyMode(client, channel.getName(), "+l", arg);
+    }
+    else if (channel.setLimit(0))
+    {
+        replyMode(client, channel.getName(), "-l", arg);
+        broadcast(chanop + " removes user limit" + EOL, channel, client.getId());
+    }
 }
