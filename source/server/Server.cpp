@@ -46,8 +46,6 @@ Server::~Server()
         close(_server_socket);
 }
 
-// Public functions
-
 void    Server::interrupt()
 {
     _interrupt = true;
@@ -98,7 +96,7 @@ int Server::setConnection(const int port, const std::string password)
     setPassword(password);
     _socket_addr.sin_family = AF_INET;
 	_socket_addr.sin_port = htons(port);
-	_socket_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+	_socket_addr.sin_addr.s_addr = INADDR_ANY;
     setCurrentDate();
 
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -106,7 +104,6 @@ int Server::setConnection(const int port, const std::string password)
 		std::cout << "Failed to create the socket" << std::endl;
         std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
-
 	}
     fcntl(_server_socket, F_SETFL, O_NONBLOCK);
 

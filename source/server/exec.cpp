@@ -97,11 +97,23 @@ void Server::execLIST(Client& client, const std::string line)
 void Server::execWHO(Client& client, const std::string line)
 {
     // look for channel
-    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
-    if (channelIt == _channels.end())
+    std::string channelName;
+    std::istringstream iss(line);
+    iss >> channelName;
+    
+    if (channelName.empty())
     {
-        replyWho(client, *channelIt);
-        replyEndOfWho(client, *channelIt);
+        addMessage("WHO :<server>|<nick>|<channel>|<realname>|<host>|0 [[Aafhilmnoprstux][%acdfhilnorstu] <server>|<nick>|<channel>|<realname>|<host>|0]\r\n", client.getId());
+    }
+    else if (channelName[0] != '#')
+    {
+        replyBadJoin(client, channelName);
+    }
+    else if (channelExists(channelName))
+    {
+        Channel channel(*getChannel(channelName));
+        replyWho(client, channel);
+        replyEndOfWho(client, channel);
     }
 }
 
@@ -119,7 +131,7 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 
     if (token.at(0) == '#')
     {
-        token.erase(0, 1); // remove '#'
+        token.erase(0u, 1u); // remove '#'
         ChannelsList::const_iterator channelIt(getChannel(token));
         if (channelIt == _channels.end())
         {
@@ -145,17 +157,21 @@ void Server::execPRIVMSG(Client& client, const std::string line)
  * */
 void Server::execJOIN(Client& client, const std::string line)
 {
-    std::string channelName(returnChannelName(line));
+    std::string channelName;
+    std::istringstream iss(line);
+    iss >> channelName;
+    
     if (channelName.empty())
     {
-        Utils::writeTo("Usage: JOIN <channel>, joins the channel", client.getId());
+        addMessage("Usage: JOIN <channel>, joins the channel\r\n", client.getId());
     }
-    else if (channelName.find(BADJOIN) == 0u)
+    else if (channelName[0] != '#')
     {
-        replyBadJoin(client, channelName.substr(3u));
+        replyBadJoin(client, channelName);
     }
     else
     {
+        channelName.erase(0u, 1u);
         // look for channel
         ChannelsList::iterator channelIt = getChannel(channelName);
 
@@ -166,18 +182,18 @@ void Server::execJOIN(Client& client, const std::string line)
             _channels.back().addClient(client, true);
             replyJoin(client.getId(), client, _channels.back());
         }
-        else
+        else if (!channelIt->isClientInChannel(client.getId())) // if client is not yet in channel
         {
             Channel& channel(*channelIt);
             const ClientMap& list(channel.getClients());
 
+            if (channel.isInviteOnly() && !client.wasInvited(channelName))
+            {
+                replyInviteOnly(client, channelName);
+            }
             if (!channel.addClient(client)) // add user to channel
             {
-                // TODO: need to check if client is not channel user already
-                // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
-                // TODO: reply if limit passed
-                // TODO: reply if invite only and not invited
-                replyBadJoin(client, line); // <-- pass reason enum maybe??
+                replyChannelIsFull(client, channelName);
                 return ;
             }
             // Broadcast to all channel users
@@ -209,7 +225,7 @@ void Server::execKICK(Client& client, const std::string line)
         return ;
     }
 
-    channelName.erase(0, 1);
+    channelName.erase(0u, 1u);
     ChannelsList::iterator channelIter(getChannel(channelName));
 
     if(channelIter == _channels.end())
@@ -222,7 +238,7 @@ void Server::execKICK(Client& client, const std::string line)
     const ConnectionsList::const_iterator channelUserIter(getClient(userNick));
     std::getline(iss >> std::ws, reason);
     if (reason[0] == ':')
-        reason.erase(0, 1);
+        reason.erase(0u, 1u);
     if (reason.empty())
         reason = kickerNick;
 
@@ -255,6 +271,7 @@ void Server::execKICK(Client& client, const std::string line)
             }
         }
         channelIter->deleteClient(userId);
+        deleteIfEmpty(channelIter);
     }
     replyYouWereKicked(userId, channelName, kickerNick, reason);
 }
@@ -264,11 +281,18 @@ void Server::execINVITE(Client& client, const std::string line)
     const std::string nickTarget(line.substr(0, line.find('#') - 1));
     const std::string channelTarget(line.substr(line.find('#') + 1));
 
-    ConnectionsList::const_iterator clientTargetIt = getClient(nickTarget);
-    ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
+    ConnectionsList::iterator clientTargetIt = getClient(nickTarget);
+    ChannelsList::iterator channelTargetIt = getChannel(channelTarget.substr(1));
 
-    //TODO: ERR_NEEDMOREPARAMS (461)
-    if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
+    if (nickTarget.empty() && channelTarget.empty())
+    {
+        addMessage("Usage: INVITE <nick> [<channel>], invites someone to a channel, by default the current channel (needs chanop)\r\n", client.getId());
+    }
+    else if (channelTarget[0] != '#')
+    {
+        replyChannelNotFound(client, channelTarget.substr(1));
+    }
+    else if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
     {
         replyNoSuchNick(client, nickTarget);
     }
@@ -286,6 +310,7 @@ void Server::execINVITE(Client& client, const std::string line)
     }
     else
     {
+        clientTargetIt->setInvited(channelTarget);
         replyInviting(client, nickTarget, channelTargetIt->getName());
         replyInvitingReceived(client, *clientTargetIt, channelTargetIt->getName());
     }
@@ -355,7 +380,7 @@ void Server::execPART(Client& client, const std::string line)
         return ;
     }
 
-    channelName.erase(0, 1);
+    channelName.erase(0u, 1u);
 
     if (!channelExists(channelName))
     {
@@ -367,7 +392,7 @@ void Server::execPART(Client& client, const std::string line)
         ChannelsList::iterator channelIter(getChannel(channelName));
         std::getline(iss >> std::ws, reason);
         if (reason[0] == ':')
-            reason.erase(0, 1);
+            reason.erase(0u, 1u);
 
         if (!channelIter->isClientInChannel(id))
         {
@@ -377,7 +402,7 @@ void Server::execPART(Client& client, const std::string line)
         {
             replyYouLeftChannel(id, channelName, reason);
 
-            // reply all channel memebers
+            // reply all channel members
             ClientMap map = channelIter->getClients();
             for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
             {
@@ -388,6 +413,7 @@ void Server::execPART(Client& client, const std::string line)
                 replyPart(client, channelName);
             }
             channelIter->deleteClient(id);
+            deleteIfEmpty(channelName);
         }
     }
     

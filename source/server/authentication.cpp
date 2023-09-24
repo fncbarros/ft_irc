@@ -51,18 +51,16 @@ void    Server::checkUser(Client& client, tokenPair processedMsg)
 {
     if (!processedMsg.first.compare("NICK"))
     {
-        std::cout << "executing nick" << std::endl;
         execNICK(client, processedMsg.second);
     }
     else if (!processedMsg.first.compare("USER"))
     {
-        std::cout << "executing user" << std::endl;
         execUSER(client, processedMsg.second);
     }
     else
     {
-        std::cout << "Invalid Command" << std::endl;
-        // TODO: reply RPL_TRYAGAIN (263) or ERR_NOTREGISTERED (451)
+        std::cout << "Authentication needed\n" << std::endl;
+        replyNotRegistered(client);
     }
 }
 

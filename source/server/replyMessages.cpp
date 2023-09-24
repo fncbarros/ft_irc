@@ -24,7 +24,7 @@ void    Server::addMessage(const std::string& message, int fd)
 
 void    Server::replyWelcome(const Client& client)
 {
-    addMessage(":IRC42 " + WELCOME + " " + client.getNickname() + " :Welcome to the Internet Relay Network " + client.toString() + "\r\n", client.getId());
+    addMessage(":IRC42 " + WELCOME + " " + client.getNickname() + " :Welcome to the Internet Relay Network " + client.toString() + EOL, client.getId());
 }
 
 void Server::replyPassMissMatch(const Client& client)
@@ -45,7 +45,7 @@ void    Server::replyYourHost(const Client& client)
 
 void    Server::replyCreated(const Client& client)
 {
-    addMessage(":IRC42 " + CREATED + " " + client.getNickname() + " :This server was created " + _server_date_created + "\r\n", client.getId());
+    addMessage(":IRC42 " + CREATED + " " + client.getNickname() + " :This server was created " + _server_date_created + EOL, client.getId());
 }
 
 void    Server::replyMyInfo(const Client& client)
@@ -65,7 +65,7 @@ void    Server::replyPrivMessageNickNotFound(const Client& client, const std::st
 
 void    Server::replyPrivateMessage(const Client& client, const Client& targetClient, const std::string& message)
 {
-    addMessage(":" + client.toString() + " PRIVMSG " + targetClient.getNickname() + " " + message + "\r\n", targetClient.getId());
+    addMessage(":" + client.toString() + " PRIVMSG " + targetClient.getNickname() + " " + message + EOL, targetClient.getId());
 }
 
 void    Server::replyChannelNotFound(const Client& client, const std::string &channelName)
@@ -75,12 +75,12 @@ void    Server::replyChannelNotFound(const Client& client, const std::string &ch
 
 void    Server::replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message)
 {
-    addMessage(":" + clientSender.toString() + " PRIVMSG #" + channelName + " " + message + "\r\n", client.getId());
+    addMessage(":" + clientSender.toString() + " PRIVMSG #" + channelName + " " + message + EOL, client.getId());
 }
 
 void    Server::replyCAPLS(Client& client, std::string capabilities)
 {
-    addMessage(":IRC42 " + capabilities + "\r\n", client.getId());
+    addMessage(":IRC42 " + capabilities + EOL, client.getId());
 }
 
 void    Server::replyJoin(const int id, const Client& client, const Channel& channel)
@@ -101,7 +101,7 @@ void    Server::replyName(const Client& client, const Channel& channel)
     {
         addMessage(it->second->toString() + " ", client.getId());
     }
-    addMessage("\r\n", client.getId());
+    addMessage(EOL, client.getId());
   
 }
 
@@ -123,7 +123,7 @@ void    Server::replyChannelMode(const Client& client, const Channel& channel)
         modes += 'k';
     if (channel.limit())
         modes += 'l';
-    addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " " +  channel.getName() + modes + "\r\n", client.getId());
+    addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " " +  channel.getName() + modes + EOL, client.getId());
 }
 
 void    Server::replyCreationTime(const Client& client, const Channel& channel)
@@ -136,8 +136,8 @@ void    Server::replyWho(const Client& client, const Channel& channel)
     // :<server_name> 354 <nick> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>
     // TODO: figure out second half of reply
     addMessage( ":" + HOST + " " + WHOSPCRPL + " " + client.getNickname() + " " + channel.getName() + " "
-            +  client.getUsername() + " " +  HOST + " " + /* <server>  <nick> <flags> :<hopcount> <realname> */
-            + "\r\n", client.getId());
+            +  client.getUsername() + " " +  HOST + " " /* + <server>  <nick> <flags> :<hopcount> <realname> */ 
+            + EOL, client.getId());
 }
 
 void    Server::replyEndOfWho(const Client& client, const Channel& channel)
@@ -146,9 +146,9 @@ void    Server::replyEndOfWho(const Client& client, const Channel& channel)
                    ":End of /WHO list\r\n", client.getId());
 }
 
-void    Server::replyBadJoin(const Client& client, const std::string& line)
+void    Server::replyBadJoin(const Client& client, const std::string& channel)
 {
-    addMessage(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + line + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
+    addMessage(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + channel + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
 }
 
 void    Server::replyList(const Client& client)
@@ -160,7 +160,7 @@ void    Server::replyList(const Client& client)
     {
         std::string numberOfUsers = Utils::numToStr(it->getClients().size());
 
-        addMessage(":" + HOST + " " + LIST + " " + client.getNickname() + " #" + it->getName() + " " + numberOfUsers + " :" + it->getTopic() + "\r\n", client.getId());
+        addMessage(":" + HOST + " " + LIST + " " + client.getNickname() + " #" + it->getName() + " " + numberOfUsers + " :" + it->getTopic() + EOL, client.getId());
     }
     addMessage(":" + HOST + " " + LISTEND + " " + client.getNickname() + " :End of /LIST\r\n", client.getId());
 }
@@ -225,12 +225,12 @@ void    Server::replyClientTargetOnChannel(const Client& client, const std::stri
 
 void    Server::replyInviting(const Client& client, const std::string& nickTarget, const std::string& channelName)
 {
-    addMessage(":" + HOST + " " + INVITING + " " + client.getNickname() + " " + nickTarget + " :#" + channelName + "\r\n", client.getId());
+    addMessage(":" + HOST + " " + INVITING + " " + client.getNickname() + " " + nickTarget + " :#" + channelName + EOL, client.getId());
 }
 
 void    Server::replyInvitingReceived(const Client& client, const Client& clientTarget, const std::string& channelName)
 {
-    addMessage(":" + client.toString() + " INVITE " + clientTarget.getNickname() + " :#" + channelName + "\r\n", clientTarget.getId());
+    addMessage(":" + client.toString() + " INVITE " + clientTarget.getNickname() + " :#" + channelName + EOL, clientTarget.getId());
 }
 
 void    Server::replyNotOnChannel(const Client& client, const std::string& channelName)
@@ -243,7 +243,7 @@ void    Server::replyNotOnChannel(const Client& client, const std::string& chann
 void    Server::replyPart(const Client& client, const std::string& channelName)
 {
     const int id(client.getId());
-    addMessage(":" + client.toString() + " PART #" + channelName + "\r\n", id);
+    addMessage(":" + client.toString() + " PART #" + channelName + EOL, id);
 }
 
 void    Server::replyYouWereKicked(const int id, const std::string& channelName, const std::string& kickerNick, const std::string& reason)
@@ -320,7 +320,12 @@ void Server::replyChannelModeIs(const Client& client, const Channel& channel)
     modes += channel.returnModes();
 	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " #" + channel.getName() +  " :" + channel.returnModes() + limitNum + EOL, id);
 }
-  
+
+void    Server::replyInviteOnly(const Client& client, const std::string& channel)
+{
+    addMessage(":" + HOST + " " + INVITEONLYCHAN + " " + client.getNickname() + " #" + channel + " :Cannot join channel (+i)\r\n", client.getId());
+}
+
 void    Server::replyNoChannelJoined(const Client& client)
 {
     addMessage(":" + HOST + " " + NOTONCHANNEL + " " + client.getNickname() + " :No channel joined. Try /join #<channel>\r\n", client.getId());
@@ -347,4 +352,14 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
         broadcast(":" + client.toString() + " MODE #" + channel + " " + param1 + " :" + param2 + EOL, channel);
     else
         broadcast(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, channel);
+}
+
+void Server::replyChannelIsFull(const Client& client, const std::string& channel)
+{
+    addMessage(":" + HOST + " " + CHANNELISFULL + " " + client.getNickname() + " #" + channel + " :Cannot join channel (+l)\r\n", client.getId());
+}
+
+void Server::replyNotRegistered(const Client& client)
+{
+    addMessage(":"+ HOST + " " + NOTREGISTERED + " " +  client.getNickname() + " :You have not registered.\r\n", client.getId());
 }

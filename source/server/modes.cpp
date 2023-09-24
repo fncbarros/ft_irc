@@ -87,7 +87,7 @@ void Server::execMODE(Client& client, const std::string line)
             modes.push(args);
     }
 
-    channelName.erase(0, 1);
+    channelName.erase(0u, 1u);
     Channel& channel = *(getChannel(channelName));
     if (modes.empty())
     {
@@ -243,12 +243,12 @@ void Server::processLimit(const Client& client, const std::string arg, Channel& 
 {
     const std::string chanop(client.getNickname());
         
-    if (arg.empty())
+    if (status)
     {
-        replyMissingParam(client, channel.getName(), "l"), client.getId();
-    }
-    else if (status)
-    {
+        if (arg.empty())
+        {
+            replyMissingParam(client, channel.getName(), "l"), client.getId();
+        }
         const int limit = Utils::riskyConversion<std::string, int>(arg);
         if (channel.setLimit(static_cast<size_t>(limit)))
             replyMode(client, channel.getName(), "+l", arg);
