@@ -152,7 +152,7 @@ private:
     void                            replyCreationTime(const Client& client, const Channel& channel);
     void                            replyWho(const Client& client, const Channel& channel);
     void                            replyEndOfWho(const Client& client, const Channel& channel);
-    void                            replyBadJoin(const Client& client, const std::string& line);
+    void                            replyBadJoin(const Client& client, const std::string& channel);
     void                            replyList(const Client& client);
     void                            replyList(const Client& client, const Channel& channel);
     void                            replyNoSuchNick(const Client& client, const std::string& nickTarget);
@@ -190,7 +190,6 @@ private:
     //Channel related
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
-    static const std::string        returnChannelName(const std::string& line);
     bool                            channelExists(const std::string& name) const;
     void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
     void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);

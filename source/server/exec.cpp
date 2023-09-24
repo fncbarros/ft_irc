@@ -96,11 +96,23 @@ void Server::execLIST(Client& client, const std::string line)
 void Server::execWHO(Client& client, const std::string line)
 {
     // look for channel
-    ChannelsList::const_iterator channelIt = getChannel(returnChannelName(line));
-    if (channelIt == _channels.end())
+    std::string channelName;
+    std::istringstream iss(line);
+    iss >> channelName;
+    
+    if (channelName.empty())
     {
-        replyWho(client, *channelIt);
-        replyEndOfWho(client, *channelIt);
+        addMessage("WHO :<server>|<nick>|<channel>|<realname>|<host>|0 [[Aafhilmnoprstux][%acdfhilnorstu] <server>|<nick>|<channel>|<realname>|<host>|0]\r\n", client.getId());
+    }
+    else if (channelName[0] != '#')
+    {
+        replyBadJoin(client, channelName);
+    }
+    else if (channelExists(channelName))
+    {
+        Channel channel(*getChannel(channelName));
+        replyWho(client, channel);
+        replyEndOfWho(client, channel);
     }
 }
 
@@ -144,14 +156,17 @@ void Server::execPRIVMSG(Client& client, const std::string line)
  * */
 void Server::execJOIN(Client& client, const std::string line)
 {
-    std::string channelName(returnChannelName(line));
+    std::string channelName;
+    std::istringstream iss(line);
+    iss >> channelName;
+    
     if (channelName.empty())
     {
-        Utils::writeTo("Usage: JOIN <channel>, joins the channel", client.getId());
+        addMessage("Usage: JOIN <channel>, joins the channel\r\n", client.getId());
     }
-    else if (channelName.find(BADJOIN) == 0u)
+    else if (channelName[0] != '#')
     {
-        replyBadJoin(client, channelName.substr(3u));
+        replyBadJoin(client, channelName);
     }
     else
     {

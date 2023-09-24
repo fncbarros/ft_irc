@@ -141,9 +141,9 @@ void    Server::replyEndOfWho(const Client& client, const Channel& channel)
                    ":End of /WHO list\r\n", client.getId());
 }
 
-void    Server::replyBadJoin(const Client& client, const std::string& line)
+void    Server::replyBadJoin(const Client& client, const std::string& channel)
 {
-    addMessage(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + line + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
+    addMessage(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + channel + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
 }
 
 void    Server::replyList(const Client& client)
