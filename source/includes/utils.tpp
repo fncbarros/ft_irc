@@ -24,4 +24,26 @@ namespace Utils
 		oss << value;
 		return oss.str();
 	}
+
+	template<typename T>
+	T strToNum(const std::string& str)
+	{
+		std::istringstream iss(str);
+		T converted;
+		iss >> converted;
+		return converted;
+	}
+
+	template<typename From, typename To>
+	To riskyConversion(const From& value)
+	{
+		std::istringstream iss(value);
+		To converted;
+		try {
+			iss >> converted;
+		} catch (const std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+		return converted;
+	}
 } // namespace Utils

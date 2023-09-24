@@ -1,0 +1,90 @@
+KICK:
+When someone gets kicked, the others (including the kicker) get a who reply (sometimes??), but only if there's more than 1 user on the channel:
+>> @time=2023-09-17T11:28:45.863Z :darkArmy.IRC4Fun.net 354 catz 152 #test user IRC4Fun-jjcum1.rev.vodafone.pt odyssey.IRC4Fun.net ana H@s 0 :realname
+>> @time=2023-09-17T11:28:45.863Z :darkArmy.IRC4Fun.net 354 catz 152 #test user IRC4Fun-jjcum1.rev.vodafone.pt darkArmy.IRC4Fun.net catz Hs 0 :realname
+>> @time=2023-09-17T11:28:45.863Z :darkArmy.IRC4Fun.net 315 catz #test :End of /WHO list.
+
+--------------------------------------------------------------------------------------------------------------
+MODES:
+/MODE #channel [+|-]modes [parameters]
+
+Invite-only:
+/MODE #channel -i
+
+New topic:
+/MODE #channel +t :New channel topic goes here
+
+Make user an operator:
+/MODE #channel +o UserName
+
+RPL_CHANNELMODEIS (324):
+Indicates the current modes set on the channel.
+:<server_name> 324 <nick> <channel> <+|->modes [parameters]
+:irc.example.com 324 YourNick #channel +i
+
+RPL_CREATIONTIME (329):
+Indicates the creation time of the channel.
+:<server_name> 329 <nick> <channel> <timestamp>
+:irc.example.com 329 YourNick #channel 1568347890
+
+ERR_NEEDMOREPARAMS (461):
+Sent if you attempt to change channel modes without providing the required parameters.
+:<server_name> 461 <nick> MODE :Not enough parameters
+:irc.example.com 461 YourNick MODE :Not enough parameters
+
+ERR_CHANOPRIVSNEEDED (482):
+Sent if you attempt to change certain channel modes without the necessary privileges (channel operator status).
+:<server_name> 482 <nick> <channel> :You're not channel operator
+:irc.example.com 482 YourNick #channel :You're not channel operator
+
+Some possible messages:
+#channelname :Cannot join channel (+i)
+(when a channel is set to "invite-only," users who are not invited or not on the invite)
+
+#channelname :You're not channel operator
+(When a channel is set with the "+t" mode (topic lock), users who attempt to change the channel topic without the necessary privileges)
+
+#channelname :Cannot join channel (+k)
+(When a channel is set with the "+k" mode (channel key), users who attempt to join the channel without providing the correct key )
+
+MODE #channelname +o YourNickname
+(When a user is granted operator status in the channel using the "+o" mode)
+
+#channelname :Cannot join channel (+l)
+(When a channel is set with the "+l" mode (user limit), users who attempt to join the channel when it has reached its user limit)
+
+--------------------------------------------------------------------------------------------------------------
+Channel:
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------
+In IRC (Internet Relay Chat), symbols like '&', '#', '+', and '!' have specific meanings and are used to denote different types of channels. Here's an explanation of each symbol:
+
+1. **# (Pound or Hash)**:
+   - The '#' symbol is commonly used to denote public channels in IRC. 
+   Public channels are open to all users, and anyone can join and participate in the conversation.
+   - Example: #chatroom
+
+2. **& (Ampersand)**:
+   - The '&' symbol is used to denote local channels in IRC. 
+   Local channels are typically specific to a particular IRC server and are not part of the global IRC network. 
+   Users on one server can create and join local channels that are not visible or accessible to users on other servers.
+   - Example: &localchannel
+
+3. **+ (Plus)**:
+   - The '+' symbol is used to indicate that a channel is "secret" or "private" in IRC. 
+   Secret channels are not listed in the channel list (usually obtained with the LIST command), and users need an invitation or specific access to join them.
+   - Example: +privatechannel
+
+4. **! (Exclamation)**:
+   - The '!' symbol is used to denote "network service" channels in some IRC networks. 
+   These channels are often used for network-related services or functions and are typically not for regular chat or discussion among users.
+   - Example: !services
+
+These symbols are often part of the channel name and help users understand the type and accessibility of a channel. 
+It's important to note that the use of symbols in channel names can vary between IRC networks and may be subject to network-specific conventions and rules. 
+Always check the guidelines of the IRC network you are using for specific details on channel naming conventions and their meanings.
+

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <Server.hpp>
+#include <cstdlib>
 
 void Server::exec(Client& client, const tokenPair& message)
 {
@@ -163,33 +164,32 @@ void Server::execJOIN(Client& client, const std::string line)
         {
             _channels.push_back(channelName);
             _channels.back().addClient(client, true);
-            replyJoin(client, _channels.back());
+            replyJoin(client.getId(), client, _channels.back());
         }
         else
         {
-            // TODO: need to check if client is not channel user already
             Channel& channel(*channelIt);
             const ClientMap& list(channel.getClients());
 
-            // add user to channel
-            if (!channel.addClient(client))
+            if (!channel.addClient(client)) // add user to channel
             {
-                std::cerr << "Could not add " << client.getNickname() << " to #" << channelName << std::endl;
-                replyBadJoin(client, line);
+                // TODO: need to check if client is not channel user already
+                // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
+                // TODO: reply if limit passed
+                // TODO: reply if invite only and not invited
+                replyBadJoin(client, line); // <-- pass reason enum maybe??
                 return ;
             }
-            replyJoin(client, channel);
-
             // Broadcast to all channel users
             for (ClientMap::const_iterator clientIt = list.begin(); clientIt != list.end(); clientIt++)
             {
                 const Client& user(*(clientIt->second));
-                Utils::writeTo(":" + client.toString() + " JOIN #" + channel.getName() + " *:realname\r\n", user.getId());
-                Utils::writeTo( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
+
+                replyJoin(user.getId(), client, channel);
+                addMessage( client.getNickname() + "(" + client.toString() + ") has joined\r\n", user.getId());
             }
         }
     }
-
 }
 
 void Server::execKICK(Client& client, const std::string line)
@@ -270,7 +270,7 @@ void Server::execINVITE(Client& client, const std::string line)
     //TODO: ERR_NEEDMOREPARAMS (461)
     if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
     {
-        replyNoSuchNickError(client, nickTarget);
+        replyNoSuchNick(client, nickTarget);
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
     {
@@ -280,7 +280,10 @@ void Server::execINVITE(Client& client, const std::string line)
     {
         replyClientTargetOnChannel(client, clientTargetIt->getNickname(), channelTargetIt->getName());
     }
-    //TODO: ERR_CHANOPRIVSNEEDED (482): Sent when the user does not have sufficient privileges (channel operator status) to invite users to the specified channel.
+    else if (!channelTargetIt->isOperator(client.getId()))
+    {
+        replyChanopNeeded(client, channelTarget, "You must be a channel operator to send an invite.");
+    }
     else
     {
         replyInviting(client, nickTarget, channelTargetIt->getName());
@@ -293,11 +296,6 @@ void Server::execTOPIC(Client& client, const std::string line)
     std::cout << client.getUsername() << ": ";
     std::cout << "***TOPIC: ";
     std::cout << line << std::endl;
-}
-
-void Server::execMODE(Client& client, const std::string line)
-{
-    std::cout << client.getId() << " " + line << std::endl;
 }
 
 void Server::execPART(Client& client, const std::string line)
@@ -316,7 +314,7 @@ void Server::execPART(Client& client, const std::string line)
     }
 
     channelName.erase(0, 1);
-    
+
     if (!channelExists(channelName))
     {
         replyNoSuchChannel(client);

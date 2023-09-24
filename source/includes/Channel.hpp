@@ -30,6 +30,18 @@ public:
     Channel& operator=(const Channel& other);
     ~Channel();
 
+    // modes type
+    struct modes {
+        bool        invite_only;
+        bool        topic_restricted;
+        std::string key;
+        size_t      limit;
+
+        modes();
+        modes(const modes& other);
+        modes& operator=(const modes& other);
+    };
+
     // Getters
     std::string         getName() const;
     const ClientMap&    getClients() const;
@@ -38,38 +50,26 @@ public:
     bool                isClientInChannel(int fd) const;
     void                printList(int fd) const; // DEBUG
 
-    struct modes {
-        bool invite_only;
-        bool topic_restricted;
-        std::pair<bool, std::string> key;
-        bool operator_privs;
-        size_t limit;
-
-        modes();
-        modes(const modes& other);
-        modes& operator=(const modes& other);
-    };
-
     bool                isInviteOnly(void) const;
     bool                isTopicRetricted(void) const;
     bool                hasKey(void) const;
-    bool                hasOperatorPriviledges(void) const;
     size_t              limit(void) const;
     bool                hasModes(void) const;
     bool                isOperator(const int fd) const;
     bool                isInChannel(const int fd) const;
+    std::string         returnModes(void) const;
 
     std::string         getTopic(void) const;
 
-    void                setInviteOnly(const bool set);
-    void                setTopicRestriction(const bool set);
-    void                setKey(const std::string& key);
-    void                setNoKey(void);
-    void                setPriviledges(const bool set);
-    void                setLimit(const size_t limit);
-    void                deleteClient(const int fd);
-    void                addOperator(const int fd);
-    void                removeOperator(const int fd);
+    bool                setInviteOnly(const bool set);
+    bool                setTopicRestriction(const bool set);
+    bool                setKey(const std::string& key);
+    bool                setNoKey(void);
+    bool                setLimit(const size_t limit);
+    bool                deleteClient(const int fd);
+    bool                addOperator(const int fd);
+    bool                removeOperator(const int fd);
+    bool                authenticate(const std::string& key);
 
     // Data
 private:

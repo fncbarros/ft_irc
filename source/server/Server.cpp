@@ -227,15 +227,11 @@ std::string    Server::readMessage(int fd) const
     int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
 
     // Log
-    if (bytesReceived < 0)
+    if (bytesReceived < 0 && errno != EBADF)
     {
-        std::cout << strerror(errno) << std::endl;
+        std::cerr << strerror(errno) << std::endl;
         std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
     }
-    else
-    {
-        std::cout << "Client message received: \"" << buffer << "\"" << std::endl;
-    }
+
     return buffer;
 }
-
