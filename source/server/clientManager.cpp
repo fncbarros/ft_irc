@@ -59,8 +59,8 @@ void Server::deleteClient(const int fd)
         itChannel->deleteClient(fd);
         deleteIfEmpty(itChannel);
     }
+
     ConnectionsList::iterator client = getClient(fd);
-    // TODO: check if client belongs to any Channel and remove them
     if (client != _connections.end())
         _connections.erase(client);
     close(fd);

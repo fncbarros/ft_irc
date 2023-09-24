@@ -47,6 +47,7 @@ static const std::string LISTSTART("321");
 static const std::string LIST("322");
 static const std::string LISTEND("323");
 static const std::string INVITING("341");
+static const std::string AWAY("301");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
@@ -179,6 +180,7 @@ private:
     void                            replyModeMissingParams(const int id);
     void                            replyChannelIsFull(const Client& client, const std::string& channel);
     void                            replyNotRegistered(const Client& client);
+    void                            replyAway(const std::string& nick, const std::string& message);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
@@ -202,6 +204,7 @@ private:
     bool                            channelExists(const std::string& name) const;
     void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
     void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);
+    void                            broadcast(const std::string& msg);
     void                            deleteIfEmpty(const std::string& channel);
     void                            deleteIfEmpty(const ChannelsList::iterator it);
 

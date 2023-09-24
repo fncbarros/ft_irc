@@ -34,39 +34,29 @@ void Server::exec(Client& client, const tokenPair& message)
 void Server::execUSER(Client& client, const std::string line)
 {
     // parse line
-    // ...
-    const std::string name = line.substr(0, line.find(' ')); // TODO: check if find returned npos
+    const std::string name = line.substr(0, line.find(' '));
     if (name.empty())
     {
         // send error
-        Utils::writeTo("Missing argument.\n", client.getId());
+        addMessage("Missing argument.\n", client.getId());
         return ;
     }
-
     if (client.getUsername().empty())
     {
-        std::cout << "User " << name << " has been added.\n";
+        addMessage("Username " + name + " set.\n", client.getId());
     }
-    else
-    {
-        Utils::writeTo("Username " + name + " set.\n", client.getId());
-        std::cout << "Username " << name << " set.\n";
-    }
-
     client.setUserActive();
     client.setUsername(name);
-    //parse rest??
 }
 
 void Server::execNICK(Client& client, const std::string line)
 {
     // parse line
-    // ...
-    const std::string name = line.substr(0, line.find(' ')); // TODO: check if find returned npos
+    const std::string name = line.substr(0, line.find(' '));
     if (name.empty())
     {
         // send error
-        Utils::writeTo("Missing argument.\n", client.getId());
+        addMessage("Missing argument.\n", client.getId());
         return ;
     }
 
@@ -84,14 +74,13 @@ void Server::execNICK(Client& client, const std::string line)
     client.setNickActive();
     if (client.isValid())
         replyWelcome(client);
-    std::cout << "Nickname " << name << " set.\n";
-    //parse rest??
 }
 
 void Server::execQUIT(Client& client, const std::string line)
 {
-    (void)line;
+    const std::string nick(client.getNickname()); 
     deleteClient(client.getId());
+    replyAway(nick, line);
 }
 
 void Server::execPRIVMSG(Client& client, const std::string line)

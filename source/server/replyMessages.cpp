@@ -319,3 +319,8 @@ void Server::replyNotRegistered(const Client& client)
 {
     addMessage(":"+ HOST + " " + NOTREGISTERED + " " +  client.getNickname() + " :You have not registered.\r\n", client.getId());
 }
+
+void Server::replyAway(const std::string& nick, const std::string& message)
+{
+    broadcast(":" + HOST + " " + AWAY + " " + nick + " " + message);
+}
