@@ -33,6 +33,11 @@ void Server::replyPassMissMatch(const Client& client)
     addMessage(":IRC42 " + PASSMISMATCH + " * :Password incorrect\r\n", client.getId());
 }
 
+void Server::replyPassNeedMorParams(const Client& client)
+{
+    addMessage(":IRC42 " + PASSNEEDPARAMS + " * :Not enough parameters\r\n", client.getId());
+}
+
 void    Server::replyYourHost(const Client& client)
 {
     addMessage(":IRC42 " + YOURHOST + " " + client.getNickname() + " :Your host is IRC42, running version 1.0\r\n", client.getId());
