@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/09/23 17:28:31 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:24:39 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,11 @@ void Server::replyPassMissMatch(const Client& client)
 {
     std::cout << "Incorrect pass" << std::endl;
     addMessage(":IRC42 " + PASSMISMATCH + " * :Password incorrect\r\n", client.getId());
+}
+
+void Server::replyPassNeedMorParams(const Client& client)
+{
+    addMessage(":IRC42 " + PASSNEEDPARAMS + " * :Not enough parameters\r\n", client.getId());
 }
 
 void    Server::replyYourHost(const Client& client)
@@ -314,4 +319,32 @@ void Server::replyChannelModeIs(const Client& client, const Channel& channel)
         modes = ":";
     modes += channel.returnModes();
 	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " #" + channel.getName() +  " :" + channel.returnModes() + limitNum + EOL, id);
+}
+  
+void    Server::replyNoChannelJoined(const Client& client)
+{
+    addMessage(":" + HOST + " " + NOTONCHANNEL + " " + client.getNickname() + " :No channel joined. Try /join #<channel>\r\n", client.getId());
+}
+
+void    Server::replyModeMissingParams(const int id)
+{
+    addMessage("MODE :<target> [[(+|-)]<modes> [<mode-parameters>]]\r\n", id);
+}
+
+void Server::replyModeUnknown(const Client& client, const std::string& param)
+{
+    const int id(client.getId());
+    const std::string nick(client.getNickname());
+    addMessage(":" + HOST + " " + UNKNOWNMODE + " " + nick + " " + param + " " + " :is an unknown mode character\r\n" ,id);
+}
+
+void Server::replyMode(const Client& client, const std::string& channel, const std::string& param1, const std::string& param2)
+{
+    const std::string nick(client.getNickname());
+
+    // "Official" reply
+    if (param1 == "+l")
+        broadcast(":" + client.toString() + " MODE #" + channel + " " + param1 + " :" + param2 + EOL, channel);
+    else
+        broadcast(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, channel);
 }

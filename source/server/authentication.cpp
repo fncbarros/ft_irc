@@ -16,7 +16,9 @@ bool Server::auth(Client& client, const tokenPair &processedMsg)
 {
     std::cout << "isuseractive " <<  client.isUserActive() << " isnickactive " << client.isNickActive() << std::endl;
     if (!client.isPassActive())
-        return checkPassword(client, processedMsg);
+    {
+        checkPassword(client, processedMsg);
+    }
     else if (!client.isUserActive() || !client.isNickActive())
     {
         checkUser(client, processedMsg);
@@ -29,22 +31,20 @@ bool Server::auth(Client& client, const tokenPair &processedMsg)
     return true;
 }
 
-bool    Server::checkPassword(Client& client, const tokenPair &processedMsg)
+void    Server::checkPassword(Client& client, const tokenPair &processedMsg)
 {
-    if (processedMsg.first.compare("PASS"))
+    if (processedMsg.first.compare("PASS") || processedMsg.second.empty())
     {
-        std::cout << "command received is not PASS" << std::endl;
-        return false;
+        replyPassNeedMorParams(client);
     }
-    if (processedMsg.second != _password)
+    else if (processedMsg.second != _password)
     {
         replyPassMissMatch(client);
-        return false;
     }
-    
-    std::cout << "pass correct" << std::endl;
-    client.setPassActive();
-    return true;
+    else
+    {
+        client.setPassActive();
+    }
 }
 
 void    Server::checkUser(Client& client, tokenPair processedMsg)
