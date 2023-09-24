@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:13:22 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/23 16:32:11 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,22 @@ Channel::~Channel()
     // TODO: broadcast to server?
 }
 
-std::string Channel::getName() const
+std::string Channel::getName(void) const
 {
     return _name;
 }
 
-const ClientMap& Channel::getClients() const
+std::string Channel::getTopic(void) const
+{
+    return _topic;
+}
+
+int Channel::getTopicNick(void) const
+{
+    return _clientTopicNick;
+}
+
+const ClientMap& Channel::getClients(void) const
 {
     return _clientsMap;
 }
@@ -143,10 +153,14 @@ std::string Channel::returnModes(void) const
     return modes;
 }
 
-
-std::string Channel::getTopic(void) const
+void Channel::setTopic(const std::string& newTopic)
 {
-    return _topic;
+    _topic = newTopic;
+}
+
+void Channel::setTopicNick(int newNick)
+{
+    _clientTopicNick = newNick;
 }
 
 size_t Channel::size(void)const
@@ -159,7 +173,6 @@ bool Channel::setInviteOnly(const bool set)
     const bool changeApplied(set != isInviteOnly());
     _modes.invite_only = set;
     return changeApplied;
-
 }
 
 bool Channel::setTopicRestriction(const bool set)

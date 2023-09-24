@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbarros <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/08/09 19:22:16 by fbarros          ###   ########.fr       */
+/*   Updated: 2023/09/23 16:34:15 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,9 @@ public:
     };
 
     // Getters
-    std::string         getName() const;
-    const ClientMap&    getClients() const;
+    std::string         getName(void) const;
+    int                 getTopicNick(void) const;
+    const ClientMap&    getClients(void) const;
 
     bool                addClient(Client& client, const bool chanop = false);
     bool                isClientInChannel(int fd) const;
@@ -62,6 +63,8 @@ public:
     std::string         getTopic(void) const;
     size_t              size(void) const;
 
+    void                setTopic(const std::string& newTopic);
+    void                setTopicNick(int newNick);
     bool                setInviteOnly(const bool set);
     bool                setTopicRestriction(const bool set);
     bool                setKey(const std::string& key);
@@ -79,5 +82,5 @@ private:
     struct modes    _modes;
     ClientMap       _clientsMap;
     std::set<int>   _operators;
-
+    int             _clientTopicNick;
 };
