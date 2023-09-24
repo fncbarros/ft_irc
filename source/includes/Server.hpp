@@ -173,6 +173,7 @@ private:
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
     void                            replyNoChannelJoined(const Client& client);
+    void                            replyModeMissingParams(const int id);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
