@@ -18,6 +18,7 @@ tokenList Server::parse(std::string buffer)
     std::string line;
     std::vector<std::string> strList;
     tokenList list;
+    std::string eof("\r\n");
 
     while (std::getline(iss, line)) {
         strList.push_back(line + "\n"); // add back \n 
@@ -26,6 +27,12 @@ tokenList Server::parse(std::string buffer)
     for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
     {
         line = *it;
+        if (line.at(0) == '/')
+        {
+            std::cout << "in [" << *line.begin() << "]" << std::endl;
+            line.erase(line.begin());
+            eof.erase(eof.begin());
+        }
         size_t spacePosition = line.find(' ');
 
         if (spacePosition == std::string::npos)
@@ -34,8 +41,8 @@ tokenList Server::parse(std::string buffer)
            continue ;
         }
 
-        std::string s1(line.substr(0, spacePosition));
-        std::string s2(line.substr(spacePosition + 1, (line.find('\r') - (spacePosition + 1))));
+        std::string s1(line.substr(0u, spacePosition));
+        std::string s2(line.substr(spacePosition + 1, (line.find(eof) - (spacePosition + 1))));
         list.push_back(tokenPair(s1, s2));
     }
     return list;

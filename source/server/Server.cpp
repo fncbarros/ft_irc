@@ -126,18 +126,17 @@ int Server::setConnection(const int port, const std::string password)
     return 0;
 }
 
-bool Server::inspectEvent(int fd)
+void Server::inspectEvent(int fd)
 {
-    bool ret = true;
     if (_interrupt)
-        return true;
+        return;
 
     // if new connection
     if (fd == _server_socket)
     {
         // if connection failed, return
         if ((fd = acceptNewConnection()) < 0)
-            return true;
+            return;
     }
 
     std::string rawMsg = readMessage(fd);
@@ -145,15 +144,11 @@ bool Server::inspectEvent(int fd)
     ConnectionsList::iterator client = getClient(fd);
 
     if (client == _connections.end())
-        return false;
+        return;
 
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
         std::cout << "message: " << message->first << " " << message->second << std::endl;
-        if (message->first.empty())
-        {
-            deleteClient(client->getId());
-        }
         if (!message->first.compare("CAP"))
         {
             execCAP(*client, rawMsg);
@@ -161,19 +156,13 @@ bool Server::inspectEvent(int fd)
         else if (!client->isValid())
         {
             std::cout << "client need to be authenticated" << std::endl;
-            if (auth(*client, *message) == false)
-            {
-                ret = false;
-                deleteClient(client->getId());
-                break;
-            }
+            auth(*client, *message);
         }
         else
+        {
             exec(*client, *message);
+        }
     }
-
-        
-    return ret;
 }
 
 void Server::connectionLoop()
