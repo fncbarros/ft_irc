@@ -46,7 +46,6 @@ Channel& Channel::operator=(const Channel& other)
 
 Channel::~Channel()
 {
-    // TODO: broadcast to server?
 }
 
 std::string Channel::getName(void) const

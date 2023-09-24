@@ -73,3 +73,11 @@ void    Server::broadcast(const std::string& msg, const Channel& channel, const 
         }
     }
 }
+
+void    Server::broadcast(const std::string& msg)
+{
+    for (ConnectionsList::iterator it = _connections.begin(); it != _connections.end(); it++)
+    {
+        addMessage(msg, it->getId());
+    }
+}

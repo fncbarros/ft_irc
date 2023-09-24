@@ -25,8 +25,6 @@ Server::Server()
     _commands.insert(std::make_pair<std::string, exec_ptr>("MODE",&Server::execMODE));
     _commands.insert(std::make_pair<std::string, exec_ptr>("USER",&Server::execUSER));
     _commands.insert(std::make_pair<std::string, exec_ptr>("NICK",&Server::execNICK));
-    _commands.insert(std::make_pair<std::string, exec_ptr>("LIST",&Server::execLIST));
-    _commands.insert(std::make_pair<std::string, exec_ptr>("WHO",&Server::execWHO));
     _commands.insert(std::make_pair<std::string, exec_ptr>("QUIT",&Server::execQUIT));
     _commands.insert(std::make_pair<std::string, exec_ptr>("PRIVMSG",&Server::execPRIVMSG));
     _commands.insert(std::make_pair<std::string, exec_ptr>("PART",&Server::execPART));
@@ -77,7 +75,6 @@ int Server::acceptNewConnection()
     if (new_socket_connection < 0)
     {
         std::cout << "Failed to create the connection" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return -1;
     }
     else
@@ -103,7 +100,6 @@ int Server::setConnection(const int port, const std::string password)
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
 	}
     fcntl(_server_socket, F_SETFL, O_NONBLOCK);
@@ -111,20 +107,19 @@ int Server::setConnection(const int port, const std::string password)
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
 	}
 
     if (listen(_server_socket, 20) < 0)
     {
         std::cout << "Failed to listen the socket" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
     }
     
     std::cout << "connection bind" << std::endl;
     return 0;
 }
+
 
 void Server::inspectEvent(int fd)
 {
@@ -139,23 +134,27 @@ void Server::inspectEvent(int fd)
             return;
     }
 
-    std::string rawMsg = readMessage(fd);
-    tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
-
     if (client == _connections.end())
         return;
+    const std::string rawMsg = readMessage(fd);
+    
+    client->addToBuffer(rawMsg);
+
+    const std::string line(client->getLine());
+    if (line.empty())
+        return ;
+
+    tokenList processedMsg = parse(line);
 
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
-        std::cout << "message: " << message->first << " " << message->second << std::endl;
         if (!message->first.compare("CAP"))
         {
-            execCAP(*client, rawMsg);
+            continue ;
         }
-        else if (!client->isValid())
+        else if (!client->isValid() && message->first.compare("QUIT"))
         {
-            std::cout << "client need to be authenticated" << std::endl;
             auth(*client, *message);
         }
         else
@@ -177,8 +176,6 @@ void Server::connectionLoop()
     FD_SET(_server_socket, &_connections_set_read);
     FD_SET(_server_socket, &_connections_set_write);
 
-    
-
     while (!_interrupt)
     {
         // the fd_set is always destroyed by the select() method
@@ -187,7 +184,6 @@ void Server::connectionLoop()
         int ret = select(FD_SETSIZE, &ready_connections_read, &ready_connections_write, NULL, &time);
         if (ret < 0)
         {
-            std::cout << "Select error: " << strerror(errno) << std::endl;
             continue;
         }
         else if (ret == 0)
@@ -227,8 +223,8 @@ std::string    Server::readMessage(int fd) const
     // Log
     if (bytesReceived < 0 && errno != EBADF)
     {
-        std::cerr << strerror(errno) << std::endl;
-        std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
+        std::cerr << "Error: failed to read message\n";
+        std::cerr << buffer << std::endl;
     }
 
     return buffer;

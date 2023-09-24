@@ -43,12 +43,11 @@ static const std::string NEEDMOREPARAMS("461");
 static const std::string NAMREPLY("353");
 static const std::string ENDOFNAMES("366"); // <channel> :<info>
 static const std::string CREATIONTIME("329");
-static const std::string WHOSPCRPL("354");
-static const std::string ENDOFWHO("315");
 static const std::string LISTSTART("321");
 static const std::string LIST("322");
 static const std::string LISTEND("323");
 static const std::string INVITING("341");
+static const std::string AWAY("301");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
@@ -114,12 +113,10 @@ public:
     void                            execUSER(Client& client, const std::string line);
     void                            execNICK(Client& client, const std::string line);
     void                            execLIST(Client& client, const std::string line);
-    void                            execWHO(Client& client, const std::string line);
     void                            execQUIT(Client& client, const std::string line);
     void                            execPRIVMSG(Client& client, const std::string line);
     void                            execNOTICE(Client& client, const std::string line);
     // Channel-specific commands
-    void                            execCAP(Client& client, std::string command);
     void                            execJOIN(Client& client, const std::string line);
     void                            execKICK(Client& client, const std::string line);
     void                            execINVITE(Client& client, const std::string line);
@@ -154,16 +151,11 @@ private:
     void                            replyChannelNotFound(const Client& client, const std::string& channelName);
     void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
     void                            replyNoExternalChannelMessage(const Client& client, const std::string& channelName);
-    void                            replyCAPLS(Client& client, std::string capabilities);
     void                            replyJoin(const int id, const Client& client, const Channel& channel);
     void                            replyEndOfNames(const Client& client, const Channel& channel);
     void                            replyChannelMode(const Client& client, const Channel& channel);
     void                            replyCreationTime(const Client& client, const Channel& channel);
-    void                            replyWho(const Client& client, const Channel& channel);
-    void                            replyEndOfWho(const Client& client, const Channel& channel);
     void                            replyBadJoin(const Client& client, const std::string& channel);
-    void                            replyList(const Client& client);
-    void                            replyList(const Client& client, const Channel& channel);
     void                            replyNoSuchNick(const Client& client, const std::string& nickTarget);
     void                            replyNotOnChannelError(const Client& client, const std::string& channelName);
     void                            replyClientTargetOnChannel(const Client& client, const std::string& nickTarget, const std::string& channelName);
@@ -191,6 +183,7 @@ private:
     void                            replyModeMissingParams(const int id);
     void                            replyChannelIsFull(const Client& client, const std::string& channel);
     void                            replyNotRegistered(const Client& client);
+    void                            replyAway(const std::string& nick, const std::string& message);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
@@ -215,6 +208,7 @@ private:
     bool                            channelExists(const std::string& name) const;
     void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
     void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);
+    void                            broadcast(const std::string& msg);
     void                            deleteIfEmpty(const std::string& channel);
     void                            deleteIfEmpty(const ChannelsList::iterator it);
 

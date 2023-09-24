@@ -61,6 +61,8 @@ public:
     void            setMessage(const std::string& msg);
     void            replyMessage(void);
     std::string     returnLine(void);
+    void            addToBuffer(const std::string msg);
+    std::string     getLine(void);
 
 private:
     int                         _socket_id;
@@ -70,4 +72,5 @@ private:
     std::string                 _msgBuffer;
     std::vector<std::string>    _replyMessages;
     std::set<std::string>       _invitedTo;
+    std::string                 _buffer;
 };

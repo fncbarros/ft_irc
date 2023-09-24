@@ -60,7 +60,6 @@ std::string getNotChanopMsg(const std::string& token)
 
 void Server::execMODE(Client& client, const std::string line)
 {
-    // TODO: might need to check for other symbols ('&','+','!')
     const int id(client.getId());
     std::istringstream iss(line);
     std::string channelName;

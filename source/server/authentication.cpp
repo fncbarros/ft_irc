@@ -14,7 +14,6 @@
 
 bool Server::auth(Client& client, const tokenPair &processedMsg)
 {
-    std::cout << "isuseractive " <<  client.isUserActive() << " isnickactive " << client.isNickActive() << std::endl;
     if (!client.isPassActive())
     {
         checkPassword(client, processedMsg);

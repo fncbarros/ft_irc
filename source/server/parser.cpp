@@ -18,7 +18,7 @@ tokenList Server::parse(std::string buffer)
     std::string line;
     std::vector<std::string> strList;
     tokenList list;
-    std::string eof("\r\n");
+    std::string eof(EOL);
 
     while (std::getline(iss, line)) {
         strList.push_back(line + "\n"); // add back \n 
@@ -27,9 +27,11 @@ tokenList Server::parse(std::string buffer)
     for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
     {
         line = *it;
+
+        if (line.empty())
+            continue ;
         if (line.at(0) == '/')
         {
-            std::cout << "in [" << *line.begin() << "]" << std::endl;
             line.erase(line.begin());
             eof.erase(eof.begin());
         }
