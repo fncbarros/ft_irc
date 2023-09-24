@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/24 17:18:06 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 20:41:43 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,11 +123,11 @@ void Server::execPRIVMSG(Client& client, const std::string line)
         ChannelsList::const_iterator channelIt(getChannel(token));
         if (channelIt == _channels.end())
         {
-            /// some reply
+            replyNoSuchNick(client, token);
         }
-        else if (channelIt->isInChannel(client.getId()) == false)
+        else if (!channelIt->isInChannel(client.getId()))
         {
-            // some other reply
+            replyNoExternalChannelMessage(client, token);
         }
         else
         {
@@ -137,6 +137,43 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     else
     {
         clientPrivateMessage(client, token, message);
+    }
+}
+
+void Server::execNOTICE(Client& client, const std::string line)
+{
+    std::string token(line.substr(0, line.find(' ')));
+    const std::string message(line.substr(line.find(' ') + 1));
+
+    if (token.at(0) == '#')
+    {
+        token.erase(0, 1); // remove '#'
+        ChannelsList::const_iterator channelIt(getChannel(token));
+        if (channelIt == _channels.end())
+        {
+            replyNoSuchNick(client, token);
+        }
+        else if (!channelIt->isInChannel(client.getId()))
+        {
+            replyNotOnChannel(client, channelIt->getName());
+        }
+        else
+        {
+            channelNotice(client, token, message);
+        }
+    }
+    else
+    {
+        ConnectionsList::const_iterator newClient = getClient(token);
+
+        if (newClient == _connections.end())
+        {
+            replyNoSuchNick(client, token);
+        }
+        else
+        {
+            replyNoticePriv(client, message, token, *newClient);
+        }
     }
 }
 
@@ -320,7 +357,10 @@ void Server::execTOPIC(Client& client, const std::string line)
         if (channelTargetIt->isTopicRetricted())
         {
             if (!channelTargetIt->isOperator(client.getId()))
-                replyNotChannelOperatorTopic(client, channelTarget);
+            {
+                replyNoPriviledges(client, channelTarget);
+                return ;
+            }
         }
         channelTargetIt->setTopic(channelTopic);
         channelTargetIt->setTopicNick(client.getId());
@@ -403,8 +443,3 @@ void Server::execCAP(Client& client, std::string command)
         capabilities = "CAP * ACK :CAP END";
     replyCAPLS(client, capabilities);
 }
-
-// void Server::execNOTICE(Client& client, const std::string line)
-// {
-    
-// }

@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:47:11 by falmeida          #+#    #+#             */
-/*   Updated: 2023/09/24 17:26:31 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 20:45:43 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,11 @@ void    Server::replyChannelNotFound(const Client& client, const std::string &ch
 void    Server::replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message)
 {
     addMessage(":" + clientSender.toString() + " PRIVMSG #" + channelName + " " + message + "\r\n", client.getId());
+}
+
+void    Server::replyNoExternalChannelMessage(const Client& client, const std::string& channelName)
+{
+    addMessage(":IRC42 " + CANNOTSENDTOCHAN + " " + client.getNickname() + " #" + channelName + " :No external channel messages " + "(#" + channelName + ")" + "\r\n", client.getId());
 }
 
 void    Server::replyCAPLS(Client& client, std::string capabilities)
@@ -276,12 +281,6 @@ void    Server::replyTopic(const Client& client, const Channel& channelTarget)
     broadcast(":" + client.toString() + " TOPIC #" + channelTarget.getName() + " :" + channelTarget.getTopic() + "\r\n", channelTarget);
 }
 
-void    Server::replyNotChannelOperatorTopic(const Client& client, const std::string& channelTargetName)
-{
-    const int id(client.getId());
-    addMessage(HOST + " " + CHANOPRIVSNEEDED + " " + client.getNickname() + " " + channelTargetName + " :You're not a channel operator", id);
-}
-
 void    Server::replyNoTopic(const Client& client, const Channel& channelTarget, const std::string nickTopic)
 {
     const int id(client.getId());
@@ -347,4 +346,14 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
         broadcast(":" + client.toString() + " MODE #" + channel + " " + param1 + " :" + param2 + EOL, channel);
     else
         broadcast(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, channel);
+}
+
+void    Server::replyNoticePriv(const Client& client, const std::string& message, const std::string& channel, const Client& newClient)
+{
+    addMessage(":" + client.toString() + " NOTICE " + channel + " " + message + "\r\n", newClient.getId());
+}
+
+void    Server::replyChannelMessageNotice(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message)
+{
+    addMessage(":" + clientSender.toString() + " NOTICE #" + channelName + " " + message + "\r\n", client.getId());
 }

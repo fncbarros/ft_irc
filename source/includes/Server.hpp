@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/24 17:26:25 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 20:45:52 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ static const std::string KICK("312");
 static const std::string NOTONCHANNEL("442");
 static const std::string UNKNOWNMODE("472");
 static const std::string CHANOPRIVSNEEDED("482");
+static const std::string CANNOTSENDTOCHAN("404");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -114,7 +115,7 @@ public:
     void                            execWHO(Client& client, const std::string line);
     void                            execQUIT(Client& client, const std::string line);
     void                            execPRIVMSG(Client& client, const std::string line);
-    // void                            execNOTICE(Client& client, const std::string line);
+    void                            execNOTICE(Client& client, const std::string line);
     // Channel-specific commands
     void                            execCAP(Client& client, std::string command);
     void                            execJOIN(Client& client, const std::string line);
@@ -150,6 +151,7 @@ private:
     void                            replyName(const Client& client, const Channel& channel);
     void                            replyChannelNotFound(const Client& client, const std::string& channelName);
     void                            replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
+    void                            replyNoExternalChannelMessage(const Client& client, const std::string& channelName);
     void                            replyCAPLS(Client& client, std::string capabilities);
     void                            replyJoin(const int id, const Client& client, const Channel& channel);
     void                            replyEndOfNames(const Client& client, const Channel& channel);
@@ -178,17 +180,17 @@ private:
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
     void                            replyTopic(const Client& client, const Channel& channelTarget);
-    void                            replyNotChannelOperatorTopic(const Client& client, const std::string& channelTargetName);
     void                            replyNoTopic(const Client& client, const Channel& channelTarget, const std::string nickTopic);
     void                            replyNoTopicSet(const Client& client, const Channel& channelTarget);
-    void                            replyTopicChannelNotFound(const Client& client, const std::string& channelTargetName);
-
     void                            replyNoChannelJoined(const Client& client);
     void                            replyModeMissingParams(const int id);
+    void                            replyNoticePriv(const Client& client, const std::string& message, const std::string& channel, const Client& newClient);
+    void                            replyChannelMessageNotice(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
     void                            clientPrivateMessage(const Client& client, const std::string& nickname, const std::string& message);
+    void                            channelNotice(const Client& client, const std::string& channelname, const std::string& message);
 
     // clientManager.cpp
     ConnectionsList::iterator       getClient(const int fd);
