@@ -46,7 +46,7 @@ public:
     std::string         getName() const;
     const ClientMap&    getClients() const;
 
-    bool                addClient(const Client& client, const bool chanop = false);
+    bool                addClient(Client& client, const bool chanop = false);
     bool                isClientInChannel(int fd) const;
     void                printList(int fd) const; // DEBUG
 

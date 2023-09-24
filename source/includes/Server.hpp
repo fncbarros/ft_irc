@@ -51,7 +51,6 @@ static const std::string INVITING("341");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
-static const std::string CHANNELNOTFOUND("403");
 static const std::string CLIENTONCHANNEL("443");
 static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
@@ -61,6 +60,7 @@ static const std::string KICK("312");
 static const std::string NOTONCHANNEL("442");
 static const std::string UNKNOWNMODE("472");
 static const std::string CHANOPRIVSNEEDED("482");
+static const std::string INVITEONLYCHAN("473");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -171,6 +171,7 @@ private:
     void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
+    void                            replyInviteOnly(const Client& client, const std::string& channel);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
@@ -180,8 +181,10 @@ private:
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
 
+
     // Auxiliary functions
     ConnectionsList::const_iterator getClient(const std::string &nickname) const;
+    ConnectionsList::iterator       getClient(const std::string &nickname);
     void                            deleteClient(const int fd);
     static void                     printList(const ConnectionsList& list, const int fd);
 

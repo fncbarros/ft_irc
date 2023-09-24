@@ -65,7 +65,7 @@ void    Server::replyPrivateMessage(const Client& client, const Client& targetCl
 
 void    Server::replyChannelNotFound(const Client& client, const std::string &channelName)
 {
-    addMessage(":" + client.toString() + " " + CHANNELNOTFOUND + " " + client.getNickname() + " #" + channelName + " :No such channel\r\n", client.getId());
+    addMessage(":" + client.toString() + " " + NOSUCHCHANNEL + " " + client.getNickname() + " #" + channelName + " :No such channel\r\n", client.getId());
 }
 
 void    Server::replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message)
@@ -290,4 +290,9 @@ void Server::replyChannelModeIs(const Client& client, const Channel& channel)
         modes = ":";
     modes += channel.returnModes();
 	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " #" + channel.getName() +  " :" + channel.returnModes() + limitNum + EOL, id);
+}
+
+void    Server::replyInviteOnly(const Client& client, const std::string& channel)
+{
+    addMessage(":" + HOST + " " + INVITEONLYCHAN + " " + client.getNickname() + " #" + channel + " :Cannot join channel (+i)\r\n", client.getId());
 }

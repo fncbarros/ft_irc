@@ -278,11 +278,18 @@ void Server::execINVITE(Client& client, const std::string line)
     const std::string nickTarget(line.substr(0, line.find('#') - 1));
     const std::string channelTarget(line.substr(line.find('#') + 1));
 
-    ConnectionsList::const_iterator clientTargetIt = getClient(nickTarget);
-    ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
+    ConnectionsList::iterator clientTargetIt = getClient(nickTarget);
+    ChannelsList::iterator channelTargetIt = getChannel(channelTarget.substr(1));
 
-    //TODO: ERR_NEEDMOREPARAMS (461)
-    if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
+    if (nickTarget.empty() && channelTarget.empty())
+    {
+        addMessage("Usage: INVITE <nick> [<channel>], invites someone to a channel, by default the current channel (needs chanop)\r\n", client.getId());
+    }
+    else if (channelTarget[0] != '#')
+    {
+        replyChannelNotFound(client, channelTarget.substr(1));
+    }
+    else if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
     {
         replyNoSuchNick(client, nickTarget);
     }
@@ -300,6 +307,7 @@ void Server::execINVITE(Client& client, const std::string line)
     }
     else
     {
+        clientTargetIt->setInvited(channelTarget);
         replyInviting(client, nickTarget, channelTargetIt->getName());
         replyInvitingReceived(client, *clientTargetIt, channelTargetIt->getName());
     }

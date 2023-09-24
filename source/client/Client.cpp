@@ -63,6 +63,8 @@ bool  Client::isUserActive(void) const { return _auth.isValidUser; }
 
 bool  Client::isNickActive(void) const { return _auth.isValidNickName; }
 
+bool Client::wasInvited(const std::string& channel) const{ return _invitedTo.find(channel) != _invitedTo.end(); }
+
 bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
 
 bool Client::isMessageWaiting(void) const { return (_msgBuffer.find(EOL) != std::string::npos); }
@@ -76,6 +78,10 @@ void Client::setPassActive(void) { _auth.isValidPassword = true; }
 void Client::setUserActive(void) { _auth.isValidUser = true; }
 
 void Client::setNickActive(void) { _auth.isValidNickName = true; }
+
+void Client::setInvited(const std::string& channel) { _invitedTo.insert(channel); }
+
+void Client::removeInvited(const std::string& channel) { _invitedTo.erase(channel); }
 
 void Client::setMessage(const std::string& msg) { _replyMessages.push_back(msg); }
 
@@ -107,11 +113,6 @@ void    Client::replyMessage(void)
         _replyMessages.erase(_replyMessages.begin());
     }
 }
-
-//const Channel&  join(const std::string& channel)
-//{
-//    for (std::vector<Channel>::const_iterator it = )
-//}
 
 t_auth::auth()
 : isValidPassword(false)

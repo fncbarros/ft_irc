@@ -45,6 +45,7 @@ public:
     bool            isPassActive(void) const;
     bool            isUserActive(void) const;
     bool            isNickActive(void) const;
+    bool            wasInvited(const std::string& channel) const;
     int             getId(void) const;
     bool            isOperator(void) const;
     bool            isMessageWaiting(void) const;
@@ -53,9 +54,11 @@ public:
     void            setPassActive(void);
     void            setUserActive(void);
     void            setNickActive(void);
+    void            setInvited(const std::string& channel);
+    void            removeInvited(const std::string& channel);
     void            registerBuffer(const std::string msg);
     void            setMessage(const std::string& msg);
-    void            replyMessage();
+    void            replyMessage(void);
     std::string     returnLine(void);
 
 private:
@@ -65,4 +68,5 @@ private:
     t_auth                      _auth;
     std::string                 _msgBuffer;
     std::vector<std::string>    _replyMessages;
+    std::set<std::string>       _invitedTo;
 };

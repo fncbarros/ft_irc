@@ -59,14 +59,16 @@ const ClientMap& Channel::getClients() const
     return _clientsMap;
 }
 
-bool Channel::addClient(const Client& client, const bool chanop)
+bool Channel::addClient(Client& client, const bool chanop)
 {
     // TODO: See if was invited
-    if (_clientsMap.find(client.getId()) != _clientsMap.end())
+
+    if (isInviteOnly() && !client.wasInvited(_name))
     {
-        return false;
+        // reply
+        replyInviteOnly(client, _name);
     }
-    else if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
+    else if ((limit() != 0) && (_clientsMap.size() == _modes.limit))
     {
         return false;
     }
@@ -75,6 +77,7 @@ bool Channel::addClient(const Client& client, const bool chanop)
         _clientsMap.insert(std::make_pair(client.getId(), &client));
         if (chanop)
             addOperator(client.getId());
+        client.removeInvited(_name);
     }
     return true;
 
@@ -192,7 +195,7 @@ bool Channel::setLimit(const size_t limit)
 
 bool Channel::deleteClient(const int fd)
 {
-    if (_clientsMap.fd) > 0)
+    if (_clientsMap.erase(fd) > 0)
     {
         removeOperator(fd);
         return true;
