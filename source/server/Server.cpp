@@ -46,8 +46,6 @@ Server::~Server()
         close(_server_socket);
 }
 
-// Public functions
-
 void    Server::interrupt()
 {
     _interrupt = true;

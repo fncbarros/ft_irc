@@ -94,7 +94,7 @@ std::string Client::returnLine(void)
         return "";
 
     const std::string s(_msgBuffer.substr(0u, pos));
-    _msgBuffer.erase(0u, pos + 1);
+    _msgBuffer.erase(0u, pos + 1u);
 
     return s;
 }

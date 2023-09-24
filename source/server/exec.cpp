@@ -130,7 +130,7 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 
     if (token.at(0) == '#')
     {
-        token.erase(0, 1); // remove '#'
+        token.erase(0u, 1u); // remove '#'
         ChannelsList::const_iterator channelIt(getChannel(token));
         if (channelIt == _channels.end())
         {
@@ -170,6 +170,7 @@ void Server::execJOIN(Client& client, const std::string line)
     }
     else
     {
+        channelName.erase(0u, 1u);
         // look for channel
         ChannelsList::iterator channelIt = getChannel(channelName);
 
@@ -187,7 +188,6 @@ void Server::execJOIN(Client& client, const std::string line)
 
             if (!channel.addClient(client)) // add user to channel
             {
-                // TODO: need to check if client is not channel user already
                 // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
                 // TODO: reply if limit passed
                 // TODO: reply if invite only and not invited
@@ -223,7 +223,7 @@ void Server::execKICK(Client& client, const std::string line)
         return ;
     }
 
-    channelName.erase(0, 1);
+    channelName.erase(0u, 1u);
     ChannelsList::iterator channelIter(getChannel(channelName));
 
     if(channelIter == _channels.end())
@@ -236,7 +236,7 @@ void Server::execKICK(Client& client, const std::string line)
     const ConnectionsList::const_iterator channelUserIter(getClient(userNick));
     std::getline(iss >> std::ws, reason);
     if (reason[0] == ':')
-        reason.erase(0, 1);
+        reason.erase(0u, 1u);
     if (reason.empty())
         reason = kickerNick;
 
@@ -327,7 +327,7 @@ void Server::execPART(Client& client, const std::string line)
         return ;
     }
 
-    channelName.erase(0, 1);
+    channelName.erase(0u, 1u);
 
     if (!channelExists(channelName))
     {
@@ -339,7 +339,7 @@ void Server::execPART(Client& client, const std::string line)
         ChannelsList::iterator channelIter(getChannel(channelName));
         std::getline(iss >> std::ws, reason);
         if (reason[0] == ':')
-            reason.erase(0, 1);
+            reason.erase(0u, 1u);
 
         if (!channelIter->isClientInChannel(id))
         {

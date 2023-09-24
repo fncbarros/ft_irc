@@ -98,7 +98,7 @@ void Server::execMODE(Client& client, const std::string line)
             modes.push(args);
     }
 
-    channelName.erase(0, 1);
+    channelName.erase(0u, 1u);
     Channel& channel = *(getChannel(channelName));
     if (modes.empty())
 	{
