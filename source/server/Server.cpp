@@ -76,7 +76,6 @@ int Server::acceptNewConnection()
     if (new_socket_connection < 0)
     {
         std::cout << "Failed to create the connection" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return -1;
     }
     else
@@ -102,7 +101,6 @@ int Server::setConnection(const int port, const std::string password)
     if ((_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cout << "Failed to create the socket" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
 	}
     fcntl(_server_socket, F_SETFL, O_NONBLOCK);
@@ -110,20 +108,19 @@ int Server::setConnection(const int port, const std::string password)
     if (bind(_server_socket, (sockaddr *)&_socket_addr, sizeof(_socket_addr)) < 0)
 	{
 		std::cout << "Failed to bind the socket" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
 	}
 
     if (listen(_server_socket, 20) < 0)
     {
         std::cout << "Failed to listen the socket" << std::endl;
-        std::cout << "Err: " << strerror(errno) << std::endl;
         return 1;
     }
     
     std::cout << "connection bind" << std::endl;
     return 0;
 }
+
 
 void Server::inspectEvent(int fd)
 {
@@ -138,23 +135,28 @@ void Server::inspectEvent(int fd)
             return;
     }
 
-    std::string rawMsg = readMessage(fd);
-    tokenList processedMsg = parse(rawMsg);
     ConnectionsList::iterator client = getClient(fd);
+    const std::string rawMsg = readMessage(fd);
+    
+    client->addToBuffer(rawMsg);
+    if (!Utils::isLineComplete(rawMsg))
+        return ;
+
+    const std::string line(client->getLine());
+
+    tokenList processedMsg = parse(line);
 
     if (client == _connections.end())
         return;
 
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
-        std::cout << "message: " << message->first << " " << message->second << std::endl;
         if (!message->first.compare("CAP"))
         {
             execCAP(*client, rawMsg);
         }
         else if (!client->isValid())
         {
-            std::cout << "client need to be authenticated" << std::endl;
             auth(*client, *message);
         }
         else
@@ -175,8 +177,6 @@ void Server::connectionLoop()
     FD_ZERO(&_connections_set_write);
     FD_SET(_server_socket, &_connections_set_read);
     FD_SET(_server_socket, &_connections_set_write);
-
-    
 
     while (!_interrupt)
     {
@@ -227,7 +227,7 @@ std::string    Server::readMessage(int fd) const
     if (bytesReceived < 0 && errno != EBADF)
     {
         std::cerr << strerror(errno) << std::endl;
-        std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
+        // std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
     }
 
     return buffer;

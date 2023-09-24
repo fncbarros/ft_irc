@@ -18,18 +18,20 @@ tokenList Server::parse(std::string buffer)
     std::string line;
     std::vector<std::string> strList;
     tokenList list;
-    std::string eof("\r\n");
+    std::string eof(EOL);
 
     while (std::getline(iss, line)) {
-        strList.push_back(line + "\n"); // add back \n 
+        strList.push_back(line); // add back \n 
     }
+
+    if (line.empty())
+        return list;
 
     for (std::vector<std::string>::iterator it = strList.begin(); it != strList.end(); it++)
     {
         line = *it;
         if (line.at(0) == '/')
         {
-            std::cout << "in [" << *line.begin() << "]" << std::endl;
             line.erase(line.begin());
             eof.erase(eof.begin());
         }
@@ -37,7 +39,7 @@ tokenList Server::parse(std::string buffer)
 
         if (spacePosition == std::string::npos)
         {
-           list.push_back(tokenPair(line.substr(0u, line.find(EOL)), ""));
+           list.push_back(tokenPair(line.substr(0u, line.find(eof)), ""));
            continue ;
         }
 

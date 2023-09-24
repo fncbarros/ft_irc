@@ -55,4 +55,9 @@ namespace Utils
         std::time(&currentTime);
         return numToStr(currentTime);
     }
+
+    bool isLineComplete(const std::string& line)
+    {
+        return line.find("\n") != std::string::npos;
+    }
 }

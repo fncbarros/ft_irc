@@ -62,4 +62,5 @@ namespace Utils
     bool        isDigit(const std::string& s);
     bool        writeTo(const std::string& s, const int fd);
     std::string timeToStr(void);
+    bool isLineComplete(const std::string& line);
 } // namespace Utils
