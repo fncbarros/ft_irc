@@ -57,6 +57,7 @@ void Server::deleteClient(const int fd)
     for (ChannelsList::iterator itChannel = _channels.begin(); itChannel != _channels.end(); itChannel++)
     {
         itChannel->deleteClient(fd);
+        deleteIfEmpty(itChannel);
     }
     ConnectionsList::iterator client = getClient(fd);
     // TODO: check if client belongs to any Channel and remove them
@@ -77,4 +78,17 @@ void Server::printList(const ConnectionsList& list, const int fd)
         nameList += it->getNickname() + "\n";
     }
     Utils::writeTo(nameList, fd);
+}
+
+void Server::deleteIfEmpty(const std::string& channel)
+{
+    ChannelsList::iterator it(getChannel(channel));
+    if (it->size() == 0)
+        _channels.erase(it);
+}
+
+void Server::deleteIfEmpty(const ChannelsList::iterator it)
+{
+    if (it->size() == 0)
+        _channels.erase(it);
 }

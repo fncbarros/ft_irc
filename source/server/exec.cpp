@@ -271,6 +271,7 @@ void Server::execKICK(Client& client, const std::string line)
             }
         }
         channelIter->deleteClient(userId);
+        deleteIfEmpty(channelIter);
     }
     replyYouWereKicked(userId, channelName, kickerNick, reason);
 }
@@ -370,6 +371,7 @@ void Server::execPART(Client& client, const std::string line)
                 replyPart(client, channelName);
             }
             channelIter->deleteClient(id);
+            deleteIfEmpty(channelName);
         }
     }
     

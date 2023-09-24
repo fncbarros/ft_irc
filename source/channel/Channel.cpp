@@ -149,6 +149,11 @@ std::string Channel::getTopic(void) const
     return _topic;
 }
 
+size_t Channel::size(void)const
+{
+    return _clientsMap.size();
+}
+
 bool Channel::setInviteOnly(const bool set)
 {
     const bool changeApplied(set != isInviteOnly());

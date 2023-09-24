@@ -60,6 +60,7 @@ public:
     std::string         returnModes(void) const;
 
     std::string         getTopic(void) const;
+    size_t              size(void) const;
 
     bool                setInviteOnly(const bool set);
     bool                setTopicRestriction(const bool set);
