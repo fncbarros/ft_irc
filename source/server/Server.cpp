@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/09 15:16:35 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:35:49 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Server::Server()
     _commands.insert(std::make_pair<std::string, exec_ptr>("QUIT",&Server::execQUIT));
     _commands.insert(std::make_pair<std::string, exec_ptr>("PRIVMSG",&Server::execPRIVMSG));
     _commands.insert(std::make_pair<std::string, exec_ptr>("PART",&Server::execPART));
+    _commands.insert(std::make_pair<std::string, exec_ptr>("NOTICE",&Server::execNOTICE));
     
 }
 
