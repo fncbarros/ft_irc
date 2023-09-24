@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/09 15:14:05 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:24:17 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,9 @@ static const std::string INVITING("341");
 
 // Error codes
 static const std::string NICKNOTFOUND("401");
-static const std::string CHANNELNOTFOUND("403");
+static const std::string TOPIC("332");
+static const std::string TOPICWHOTIME("333");
+static const std::string NOTOPIC("331");
 static const std::string CLIENTONCHANNEL("443");
 static const std::string BADJOIN("448");
 static const std::string NOSUCHCHANNEL("403");
@@ -174,6 +176,12 @@ private:
     void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
+    void                            replyTopic(const Client& client, const Channel& channelTarget);
+    void                            replyNotChannelOperatorTopic(const Client& client, const std::string& channelTargetName);
+    void                            replyNoTopic(const Client& client, const Channel& channelTarget, const std::string nickTopic);
+    void                            replyNoTopicSet(const Client& client, const Channel& channelTarget);
+    void                            replyTopicChannelNotFound(const Client& client, const std::string& channelTargetName);
+
     void                            replyNoChannelJoined(const Client& client);
     void                            replyModeMissingParams(const int id);
 
