@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:22:13 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/23 17:42:05 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:18:06 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -389,7 +389,6 @@ void Server::execPART(Client& client, const std::string line)
             channelIter->deleteClient(id);
         }
     }
-    
 }
 
 void Server::execCAP(Client& client, std::string command)
@@ -403,3 +402,8 @@ void Server::execCAP(Client& client, std::string command)
         capabilities = "CAP * ACK :CAP END";
     replyCAPLS(client, capabilities);
 }
+
+// void Server::execNOTICE(Client& client, const std::string line)
+// {
+    
+// }

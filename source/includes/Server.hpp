@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/23 16:45:29 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:18:12 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ public:
     void                            execWHO(Client& client, const std::string line);
     void                            execQUIT(Client& client, const std::string line);
     void                            execPRIVMSG(Client& client, const std::string line);
+    // void                            execNOTICE(Client& client, const std::string line);
     // Channel-specific commands
     void                            execCAP(Client& client, std::string command);
     void                            execJOIN(Client& client, const std::string line);
