@@ -128,7 +128,7 @@ void Server::execPRIVMSG(Client& client, const std::string line)
 {
     std::string token(line.substr(0, line.find(' ')));
     const std::string message(line.substr(line.find(' ') + 1));
-
+    
     if (token.at(0) == '#')
     {
         token.erase(0u, 1u); // remove '#'
@@ -157,7 +157,11 @@ void Server::execNOTICE(Client& client, const std::string line)
     std::string token(line.substr(0, line.find(' ')));
     const std::string message(line.substr(line.find(' ') + 1));
 
-    if (token.at(0) == '#')
+    if (token.empty())
+    {
+        addMessage("Usage: NOTICE <nick/channel> <message>, sends a notice\r\n", client.getId());
+    }
+    else if (token.at(0) == '#')
     {
         token.erase(0, 1); // remove '#'
         ChannelsList::const_iterator channelIt(getChannel(token));
