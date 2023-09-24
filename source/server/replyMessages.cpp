@@ -50,7 +50,7 @@ void    Server::replyCreated(const Client& client)
 
 void    Server::replyMyInfo(const Client& client)
 {
-    addMessage(":IRC42 " + MYINFO + " " + client.getNickname() + " IRC42 1.0 0=o\r\n", client.getId());
+    addMessage(":IRC42 " + MYINFO + " " + client.getNickname() + " IRC42 1.0\r\n", client.getId());
 }
 
 void    Server::replyNickCollision(const Client& client)
@@ -76,11 +76,6 @@ void    Server::replyChannelNotFound(const Client& client, const std::string &ch
 void    Server::replyChannelMessage(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message)
 {
     addMessage(":" + clientSender.toString() + " PRIVMSG #" + channelName + " " + message + EOL, client.getId());
-}
-
-void    Server::replyCAPLS(Client& client, std::string capabilities)
-{
-    addMessage(":IRC42 " + capabilities + EOL, client.getId());
 }
 
 void    Server::replyJoin(const int id, const Client& client, const Channel& channel)
@@ -131,45 +126,9 @@ void    Server::replyCreationTime(const Client& client, const Channel& channel)
     addMessage(":" + HOST + " " + CREATIONTIME + " " + client.getNickname() + " " +  channel.getName() + " " + Utils::timeToStr() + EOL, client.getId());
 }
 
-void    Server::replyWho(const Client& client, const Channel& channel)
-{
-    // :<server_name> 354 <nick> <channel> <username> <host> <server> <nick> <flags> :<hopcount> <realname>
-    // TODO: figure out second half of reply
-    addMessage( ":" + HOST + " " + WHOSPCRPL + " " + client.getNickname() + " " + channel.getName() + " "
-            +  client.getUsername() + " " +  HOST + " " /* + <server>  <nick> <flags> :<hopcount> <realname> */ 
-            + EOL, client.getId());
-}
-
-void    Server::replyEndOfWho(const Client& client, const Channel& channel)
-{
-    addMessage(":" + HOST + " " + ENDOFWHO + " " + client.getNickname() + " " + channel.getName() + " " +
-                   ":End of /WHO list\r\n", client.getId());
-}
-
 void    Server::replyBadJoin(const Client& client, const std::string& channel)
 {
     addMessage(":" + HOST + " " + BADJOIN + " " + client.getNickname() + " " + channel + " :Cannot join channel: Channel name must start with a hash mark (#)\r\n", client.getId());
-}
-
-void    Server::replyList(const Client& client)
-{
-    std::string numberOfChannels = Utils::numToStr(_channels.size());
-
-    addMessage(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel :Users Name\r\n" , client.getId());
-    for (ChannelsList::const_iterator it = _channels.begin(); it != _channels.end(); it++)
-    {
-        std::string numberOfUsers = Utils::numToStr(it->getClients().size());
-
-        addMessage(":" + HOST + " " + LIST + " " + client.getNickname() + " #" + it->getName() + " " + numberOfUsers + " :" + it->getTopic() + EOL, client.getId());
-    }
-    addMessage(":" + HOST + " " + LISTEND + " " + client.getNickname() + " :End of /LIST\r\n", client.getId());
-}
-
-void    Server::replyList(const Client& client, const Channel& channel)
-{
-    (void)channel;
-    (void)client;
-    // addMessage(':' + HOST + " " + LISTSTART + " " + client.getNickname() + " :Channel list - " + numberOfChannels + " channels\r\n" , client.getId());
 }
 
 void    Server::replyNoSuchChannel(const Client& client)
@@ -190,9 +149,7 @@ void    Server::replyNoPriviledges(const Client& client, const std::string& chan
 {
     const int id(client.getId());
     const std::string nick(client.getNickname());
-    const std::string reply("#" + channelName + " :You're not channel operator\r\n");
-    Utils::writeTo(reply, id);
-    Utils::writeTo(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " " + reply, id);
+    addMessage(":" + HOST + " " + CHANOPRIVSNEEDED + " " + nick + " #" + channelName + " :You're not channel operator\r\n", id);
 }
 
 void    Server::replyKick(const Client& client, const Client& kicker, const Channel& channel, const std::string& userNick, const std::string& reason)
@@ -200,12 +157,12 @@ void    Server::replyKick(const Client& client, const Client& kicker, const Chan
     const int id(client.getId());
     const std::string nick(kicker.getNickname());
     const std::string channelName(channel.getName());
-    Utils::writeTo(":" + kicker.toString() + " " + "KICK" + " #" + channelName + " " + userNick + " :" + reason + EOL, id);
+    addMessage(":" + kicker.toString() + " " + "KICK" + " #" + channelName + " " + userNick + " :" + reason + EOL, id);
 }
 
 void    Server::replyBroadcastKick(const int id, const std::string& kickerNick, const std::string& userNick, const std::string& channelName, const std::string& reason)
 {
-    Utils::writeTo(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, id);
+    addMessage(kickerNick + " has kicked " + userNick + " from #" + channelName + " :" + reason + EOL, id);
 }
 
 void    Server::replyNoSuchNick(const Client& client, const std::string& nickTarget)
@@ -305,7 +262,6 @@ void Server::replyMissingParam(const Client& client, const std::string& channel,
 {
     const std::string REPLYCODE("696");
     addMessage(":" + HOST + " " + REPLYCODE + " " + client.getNickname() + " #" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
-    addMessage("#" + channel + " " + param + " * :You must specify a parameter for the op mode. Syntax: <nick>.\r\n", client.getId());
 }
 
 void Server::replyChannelModeIs(const Client& client, const Channel& channel)

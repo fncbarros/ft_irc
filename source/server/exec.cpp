@@ -88,39 +88,9 @@ void Server::execNICK(Client& client, const std::string line)
     //parse rest??
 }
 
-void Server::execLIST(Client& client, const std::string line)
-{
-    (void)line;
-    replyList(client);
-}
-
-void Server::execWHO(Client& client, const std::string line)
-{
-    // look for channel
-    std::string channelName;
-    std::istringstream iss(line);
-    iss >> channelName;
-    
-    if (channelName.empty())
-    {
-        addMessage("WHO :<server>|<nick>|<channel>|<realname>|<host>|0 [[Aafhilmnoprstux][%acdfhilnorstu] <server>|<nick>|<channel>|<realname>|<host>|0]\r\n", client.getId());
-    }
-    else if (channelName[0] != '#')
-    {
-        replyBadJoin(client, channelName);
-    }
-    else if (channelExists(channelName))
-    {
-        Channel channel(*getChannel(channelName));
-        replyWho(client, channel);
-        replyEndOfWho(client, channel);
-    }
-}
-
 void Server::execQUIT(Client& client, const std::string line)
 {
     (void)line;
-    std::cout << client.getId() << " closed connection.\n";
     deleteClient(client.getId());
 }
 
@@ -274,7 +244,7 @@ void Server::execKICK(Client& client, const std::string line)
         channelIter->deleteClient(userId);
         deleteIfEmpty(channelIter);
     }
-    replyYouWereKicked(userId, channelName, kickerNick, reason);
+    // replyYouWereKicked(userId, channelName, kickerNick, reason);
 }
 
 void Server::execINVITE(Client& client, const std::string line)
@@ -420,14 +390,3 @@ void Server::execPART(Client& client, const std::string line)
     
 }
 
-void Server::execCAP(Client& client, std::string command)
-{
-    std::string capabilities;
-    if (command.find("LS") != std::string::npos)
-        capabilities = "* LS :cap1, cap2, cap3";
-    else if (command.find("REQ") != std::string::npos)
-        capabilities = "* ACK :cap1, cap2, -cap3";
-    else if (command.find("END") != std::string::npos)
-        capabilities = "* ACK :CAP END";
-    replyCAPLS(client, capabilities);
-}

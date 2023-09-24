@@ -25,8 +25,6 @@ Server::Server()
     _commands.insert(std::make_pair<std::string, exec_ptr>("MODE",&Server::execMODE));
     _commands.insert(std::make_pair<std::string, exec_ptr>("USER",&Server::execUSER));
     _commands.insert(std::make_pair<std::string, exec_ptr>("NICK",&Server::execNICK));
-    _commands.insert(std::make_pair<std::string, exec_ptr>("LIST",&Server::execLIST));
-    _commands.insert(std::make_pair<std::string, exec_ptr>("WHO",&Server::execWHO));
     _commands.insert(std::make_pair<std::string, exec_ptr>("QUIT",&Server::execQUIT));
     _commands.insert(std::make_pair<std::string, exec_ptr>("PRIVMSG",&Server::execPRIVMSG));
     _commands.insert(std::make_pair<std::string, exec_ptr>("PART",&Server::execPART));
@@ -152,7 +150,7 @@ void Server::inspectEvent(int fd)
     {
         if (!message->first.compare("CAP"))
         {
-            execCAP(*client, message->second);
+            continue ;
         }
         else if (!client->isValid() && message->first.compare("QUIT"))
         {
