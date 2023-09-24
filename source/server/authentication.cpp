@@ -33,11 +33,9 @@ bool Server::auth(Client& client, const tokenPair &processedMsg)
 
 void    Server::checkPassword(Client& client, const tokenPair &processedMsg)
 {
-    std::cout << "[" << processedMsg.second << "]" << std::endl;
     if (processedMsg.first.compare("PASS") || processedMsg.second.empty())
     {
         replyPassNeedMorParams(client);
-        std::cout << "command received is not PASS" << std::endl;
     }
     else if (processedMsg.second != _password)
     {
@@ -45,7 +43,6 @@ void    Server::checkPassword(Client& client, const tokenPair &processedMsg)
     }
     else
     {
-        std::cout << "pass correct" << std::endl;
         client.setPassActive();
     }
 }
