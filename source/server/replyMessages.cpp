@@ -291,3 +291,8 @@ void Server::replyChannelModeIs(const Client& client, const Channel& channel)
     modes += channel.returnModes();
 	addMessage(":" + HOST + " " + CHANNELMODEIS + " " + client.getNickname() + " #" + channel.getName() +  " :" + channel.returnModes() + limitNum + EOL, id);
 }
+  
+void    Server::replyNoChannelJoined(const Client& client)
+{
+    addMessage(":" + HOST + " " + NOTONCHANNEL + " " + client.getNickname() + " :No channel joined. Try /join #<channel>\r\n", client.getId());
+}
