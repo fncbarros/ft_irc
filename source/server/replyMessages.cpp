@@ -329,3 +329,9 @@ void Server::replyMode(const Client& client, const std::string& channel, const s
     else
         broadcast(":" + client.toString() + " MODE #" + channel + " :" + param1 + EOL, channel);
 }
+
+void Server::replyChannelIsFull(const Client& client, const std::string& channel)
+{
+    addMessage(":" + HOST + " " + CHANNELISFULL + " " + client.getNickname() + " #" + channel + " :Cannot join channel (+l)\r\n", client.getId());
+    addMessage("Cannot join #" + channel + " (User limit reached)\r\n", client.getId());
+}

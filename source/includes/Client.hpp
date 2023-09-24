@@ -13,6 +13,7 @@
 #pragma once
 
 #include <common.hpp>
+#include <set>
 
 // Forward declarations
 class Channel;

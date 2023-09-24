@@ -61,14 +61,7 @@ const ClientMap& Channel::getClients() const
 
 bool Channel::addClient(Client& client, const bool chanop)
 {
-    // TODO: See if was invited
-
-    if (isInviteOnly() && !client.wasInvited(_name))
-    {
-        // reply
-        replyInviteOnly(client, _name);
-    }
-    else if ((limit() != 0) && (_clientsMap.size() == _modes.limit))
+    if ((limit() != 0) && (_clientsMap.size() == _modes.limit))
     {
         return false;
     }
@@ -80,7 +73,6 @@ bool Channel::addClient(Client& client, const bool chanop)
         client.removeInvited(_name);
     }
     return true;
-
 }
 
 bool    Channel::isClientInChannel(int fd) const
