@@ -360,7 +360,7 @@ void Server::execPART(Client& client, const std::string line)
         {
             replyYouLeftChannel(id, channelName, reason);
 
-            // reply all channel memebers
+            // reply all channel members
             ClientMap map = channelIter->getClients();
             for (ClientMap::const_iterator it = map.begin(); it != map.end(); it++)
             {

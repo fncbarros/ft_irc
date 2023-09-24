@@ -63,6 +63,7 @@ static const std::string UNKNOWNMODE("472");
 static const std::string CHANOPRIVSNEEDED("482");
 static const std::string INVITEONLYCHAN("473");
 static const std::string CHANNELISFULL("471");
+static const std::string NOTREGISTERED("451");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -178,6 +179,7 @@ private:
     void                            replyNoChannelJoined(const Client& client);
     void                            replyModeMissingParams(const int id);
     void                            replyChannelIsFull(const Client& client, const std::string& channel);
+    void                            replyNotRegistered(const Client& client);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);

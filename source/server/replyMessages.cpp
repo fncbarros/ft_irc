@@ -334,3 +334,8 @@ void Server::replyChannelIsFull(const Client& client, const std::string& channel
 {
     addMessage(":" + HOST + " " + CHANNELISFULL + " " + client.getNickname() + " #" + channel + " :Cannot join channel (+l)\r\n", client.getId());
 }
+
+void Server::replyNotRegistered(const Client& client)
+{
+    addMessage(":"+ HOST + " " + NOTREGISTERED + " " +  client.getNickname() + " :You have not registered.\r\n", client.getId());
+}
