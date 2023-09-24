@@ -6,7 +6,7 @@
 /*   By: bshintak <bshintak@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 19:12:25 by fbarros           #+#    #+#             */
-/*   Updated: 2023/09/24 20:45:52 by bshintak         ###   ########.fr       */
+/*   Updated: 2023/09/24 20:53:21 by bshintak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ class Channel;
 
 // Const Definitions
 const int BUFFER_SIZE(30720);
-const std::string EOL("\r\n");
 
 static const std::string WELCOME("001");
 static const std::string YOURHOST("002");
@@ -66,6 +65,9 @@ static const std::string NOTONCHANNEL("442");
 static const std::string UNKNOWNMODE("472");
 static const std::string CHANOPRIVSNEEDED("482");
 static const std::string CANNOTSENDTOCHAN("404");
+static const std::string INVITEONLYCHAN("473");
+static const std::string CHANNELISFULL("471");
+static const std::string NOTREGISTERED("451");
 
 // Type Definitions
 typedef std::pair<std::string, std::string> tokenPair;
@@ -159,7 +161,7 @@ private:
     void                            replyCreationTime(const Client& client, const Channel& channel);
     void                            replyWho(const Client& client, const Channel& channel);
     void                            replyEndOfWho(const Client& client, const Channel& channel);
-    void                            replyBadJoin(const Client& client, const std::string& line);
+    void                            replyBadJoin(const Client& client, const std::string& channel);
     void                            replyList(const Client& client);
     void                            replyList(const Client& client, const Channel& channel);
     void                            replyNoSuchNick(const Client& client, const std::string& nickTarget);
@@ -179,13 +181,16 @@ private:
     void                            replyNoSuchChannelSimple(const int id, const std::string& channelName);
     void                            replyYouLeftChannel(const int id, const std::string& channelName, const std::string& reason);
     void                            replyBroadcastUserLeft(const int id, const Client& client, const std::string& reason);
+    void                            replyInviteOnly(const Client& client, const std::string& channel);
     void                            replyTopic(const Client& client, const Channel& channelTarget);
     void                            replyNoTopic(const Client& client, const Channel& channelTarget, const std::string nickTopic);
     void                            replyNoTopicSet(const Client& client, const Channel& channelTarget);
     void                            replyNoChannelJoined(const Client& client);
-    void                            replyModeMissingParams(const int id);
     void                            replyNoticePriv(const Client& client, const std::string& message, const std::string& channel, const Client& newClient);
     void                            replyChannelMessageNotice(const Client& client,  const Client& clientSender, const std::string& channelName, const std::string& message);
+    void                            replyModeMissingParams(const int id);
+    void                            replyChannelIsFull(const Client& client, const std::string& channel);
+    void                            replyNotRegistered(const Client& client);
 
     // communication.cpp
     void                            channelPrivateMessage(const Client& client, const std::string& channelname, const std::string& message);
@@ -196,8 +201,10 @@ private:
     ConnectionsList::iterator       getClient(const int fd);
     ConnectionsList::const_iterator getClient(const int fd) const;
 
+
     // Auxiliary functions
     ConnectionsList::const_iterator getClient(const std::string &nickname) const;
+    ConnectionsList::iterator       getClient(const std::string &nickname);
     void                            deleteClient(const int fd);
     static void                     printList(const ConnectionsList& list, const int fd);
 
@@ -205,10 +212,11 @@ private:
     //Channel related
     ChannelsList::iterator          getChannel(const std::string& name);
     ChannelsList::const_iterator    getChannel(const std::string& name) const;
-    static const std::string        returnChannelName(const std::string& line);
     bool                            channelExists(const std::string& name) const;
     void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
     void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);
+    void                            deleteIfEmpty(const std::string& channel);
+    void                            deleteIfEmpty(const ChannelsList::iterator it);
 
 public:
     void                            connectionLoop(void);

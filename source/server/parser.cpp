@@ -37,7 +37,7 @@ tokenList Server::parse(std::string buffer)
 
         if (spacePosition == std::string::npos)
         {
-           list.push_back(tokenPair(line.substr(0u, line.find(eof)), ""));
+           list.push_back(tokenPair(line.substr(0u, line.find(EOL)), ""));
            continue ;
         }
 
@@ -45,7 +45,6 @@ tokenList Server::parse(std::string buffer)
         std::string s2(line.substr(spacePosition + 1, (line.find(eof) - (spacePosition + 1))));
         list.push_back(tokenPair(s1, s2));
     }
-
     return list;
 }
 

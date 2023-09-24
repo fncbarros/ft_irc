@@ -49,34 +49,29 @@ Channel::~Channel()
     // TODO: broadcast to server?
 }
 
-std::string Channel::getName() const
+std::string Channel::getName(void) const
 {
     return _name;
 }
 
-std::string Channel::getTopic() const
+std::string Channel::getTopic(void) const
 {
     return _topic;
 }
 
-int Channel::getTopicNick() const
+int Channel::getTopicNick(void) const
 {
     return _clientTopicNick;
 }
 
-const ClientMap& Channel::getClients() const
+const ClientMap& Channel::getClients(void) const
 {
     return _clientsMap;
 }
 
-bool Channel::addClient(const Client& client, const bool chanop)
+bool Channel::addClient(Client& client, const bool chanop)
 {
-    // TODO: See if was invited
-    if (_clientsMap.find(client.getId()) != _clientsMap.end())
-    {
-        return false;
-    }
-    else if ((_modes.limit != 0) && (_clientsMap.size() == _modes.limit))
+    if ((limit() != 0) && (_clientsMap.size() == _modes.limit))
     {
         return false;
     }
@@ -85,9 +80,9 @@ bool Channel::addClient(const Client& client, const bool chanop)
         _clientsMap.insert(std::make_pair(client.getId(), &client));
         if (chanop)
             addOperator(client.getId());
+        client.removeInvited(_name);
     }
     return true;
-
 }
 
 bool    Channel::isClientInChannel(int fd) const
@@ -166,6 +161,11 @@ void Channel::setTopic(const std::string& newTopic)
 void Channel::setTopicNick(int newNick)
 {
     _clientTopicNick = newNick;
+}
+
+size_t Channel::size(void)const
+{
+    return _clientsMap.size();
 }
 
 bool Channel::setInviteOnly(const bool set)

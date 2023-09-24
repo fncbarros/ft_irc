@@ -43,12 +43,11 @@ public:
     };
 
     // Getters
-    std::string         getName() const;
-    std::string         getTopic() const;
-    int                 getTopicNick() const;
-    const ClientMap&    getClients() const;
+    std::string         getName(void) const;
+    int                 getTopicNick(void) const;
+    const ClientMap&    getClients(void) const;
 
-    bool                addClient(const Client& client, const bool chanop = false);
+    bool                addClient(Client& client, const bool chanop = false);
     bool                isClientInChannel(int fd) const;
     void                printList(int fd) const; // DEBUG
 
@@ -60,6 +59,9 @@ public:
     bool                isOperator(const int fd) const;
     bool                isInChannel(const int fd) const;
     std::string         returnModes(void) const;
+
+    std::string         getTopic(void) const;
+    size_t              size(void) const;
 
     void                setTopic(const std::string& newTopic);
     void                setTopicNick(int newNick);

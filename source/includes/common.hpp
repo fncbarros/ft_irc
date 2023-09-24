@@ -35,7 +35,9 @@
 class Channel;
 
 // Const data
-static const std::string HOST("IRC42");
+const std::string EOL("\r\n");
+static const std::string HOST("FT_IRC");
+static const std::string DOMAIN("42Lisboa.com");
 static const size_t token_num(13);
 static const std::string possible_tokens[token_num] =
 {

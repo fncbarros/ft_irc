@@ -88,3 +88,14 @@ These symbols are often part of the channel name and help users understand the t
 It's important to note that the use of symbols in channel names can vary between IRC networks and may be subject to network-specific conventions and rules. 
 Always check the guidelines of the IRC network you are using for specific details on channel naming conventions and their meanings.
 
+
+--------------------------------------------------------------------------------------------------------------
+TODO:
+   - Join -> check if channel is invite only
+   - Invite -> ERR_NEEDMOREPARAMS (461)
+   -                 // TODO: need to check if client is not channel user already
+                // TODO: REPLY >> Cannot join #testingIRCforProjectPurposes (User limit reached)
+                // TODO: reply if limit passed
+                // TODO: reply if invite only and not invited
+   JOIN bug -> channel founder is not re-added to channel if joining after parting
+   
