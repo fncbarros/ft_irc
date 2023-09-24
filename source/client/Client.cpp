@@ -65,7 +65,7 @@ bool  Client::isNickActive(void) const { return _auth.isValidNickName; }
 
 bool  Client::isValid(void) const { return (_auth.isValidPassword && _auth.isValidNickName && _auth.isValidUser); }
 
-bool Client::isMessageWaiting(void) const { return (_msgBuffer.find("\r\n") != std::string::npos); }
+bool Client::isMessageWaiting(void) const { return (_msgBuffer.find(EOL) != std::string::npos); }
 
 void Client::setUsername(const std::string& name) { _username = name; }
 
@@ -88,7 +88,7 @@ void Client::registerBuffer(const std::string msg)
 
 std::string Client::returnLine(void)
 {
-    const size_t pos(_msgBuffer.find("\r\n"));
+    const size_t pos(_msgBuffer.find(EOL));
 
     if (pos == std::string::npos)
         return "";
