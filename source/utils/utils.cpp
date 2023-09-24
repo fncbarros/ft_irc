@@ -40,8 +40,7 @@ namespace Utils
     {
         if (send(fd, s.c_str(), s.size(), 0) < static_cast<ssize_t>(s.size()))
         {
-            std::cerr << "Error: failed to send message:\n" << strerror(errno) << std::endl;
-            std::cerr << s << std::endl;
+            std::cerr << "Error: failed to send message:\n";
             return false;
         }
         return true;

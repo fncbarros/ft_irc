@@ -136,26 +136,25 @@ void Server::inspectEvent(int fd)
     }
 
     ConnectionsList::iterator client = getClient(fd);
+    if (client == _connections.end())
+        return;
     const std::string rawMsg = readMessage(fd);
     
     client->addToBuffer(rawMsg);
-    if (!Utils::isLineComplete(rawMsg))
-        return ;
 
     const std::string line(client->getLine());
+    if (line.empty())
+        return ;
 
     tokenList processedMsg = parse(line);
-
-    if (client == _connections.end())
-        return;
 
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
         if (!message->first.compare("CAP"))
         {
-            execCAP(*client, rawMsg);
+            execCAP(*client, message->second);
         }
-        else if (!client->isValid())
+        else if (!client->isValid() && message->first.compare("QUIT"))
         {
             auth(*client, *message);
         }
@@ -186,7 +185,6 @@ void Server::connectionLoop()
         int ret = select(FD_SETSIZE, &ready_connections_read, &ready_connections_write, NULL, &time);
         if (ret < 0)
         {
-            std::cout << "Select error: " << strerror(errno) << std::endl;
             continue;
         }
         else if (ret == 0)
@@ -226,8 +224,8 @@ std::string    Server::readMessage(int fd) const
     // Log
     if (bytesReceived < 0 && errno != EBADF)
     {
-        std::cerr << strerror(errno) << std::endl;
-        // std::cerr << "Failed to read message from client [fd " << fd << "]" << std::endl;
+        std::cerr << "Error: failed to read message\n";
+        std::cerr << buffer << std::endl;
     }
 
     return buffer;

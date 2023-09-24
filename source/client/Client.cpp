@@ -144,10 +144,10 @@ void Client::addToBuffer(const std::string msg)
 
 std::string Client::getLine(void)
 {
-    size_t pos(_buffer.find('\n'));
+    size_t pos(_buffer.rfind('\n'));
     if (pos == std::string::npos)
         return "";
-    const std::string line(_buffer.substr(0u, pos));
+    const std::string line(_buffer.substr(0u, pos + 1));
     _buffer.erase(0u, pos + 1);
     return line;
 }

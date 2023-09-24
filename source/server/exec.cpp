@@ -423,11 +423,11 @@ void Server::execPART(Client& client, const std::string line)
 void Server::execCAP(Client& client, std::string command)
 {
     std::string capabilities;
-    if (command.find("CAP LS") != std::string::npos)
-        capabilities = "CAP * LS :cap1, cap2, cap3";
-    else if (command.find("CAP REQ") != std::string::npos)
-        capabilities = "CAP * ACK :cap1, cap2, -cap3";
-    else if (command.find("CAP END") != std::string::npos)
-        capabilities = "CAP * ACK :CAP END";
+    if (command.find("LS") != std::string::npos)
+        capabilities = "* LS :cap1, cap2, cap3";
+    else if (command.find("REQ") != std::string::npos)
+        capabilities = "* ACK :cap1, cap2, -cap3";
+    else if (command.find("END") != std::string::npos)
+        capabilities = "* ACK :CAP END";
     replyCAPLS(client, capabilities);
 }
