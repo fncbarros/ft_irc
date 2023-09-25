@@ -138,11 +138,11 @@ void Server::inspectEvent(int fd)
         ConnectionsList::iterator client = getClient(fd);
         if (client == _connections.end())
             return;
-        const std::string rawMsg = readMessage(fd);
-        std::cout << rawMsg << std::endl;
-        client->addToBuffer(rawMsg);
 
+        const std::string rawMsg = readMessage(fd);
+        client->addToBuffer(rawMsg);
         const std::string line(client->getLine());
+
         if (line.empty()) {
             return ;
         }
@@ -225,14 +225,13 @@ std::string    Server::readMessage(int fd)
 
     int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
 
-    std::cout << bytesReceived << std::endl;
     if (bytesReceived == 0)
     {
         deleteClient(fd);
     }
     else if (bytesReceived < 0)
     {
-        std::cout << "fd " << fd << " don't have any messages to read" << std::endl;   
+        std::cerr << "Error: failed to read message" << std::endl;
     }
 
     return buffer;
