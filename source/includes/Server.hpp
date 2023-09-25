@@ -209,7 +209,6 @@ private:
     void                            broadcast(const std::string& msg, const std::string& channelName, const int exclude = 0);
     void                            broadcast(const std::string& msg, const Channel& channel, const int exclude = 0);
     void                            broadcast(const std::string& msg);
-    void                            deleteIfEmpty(const std::string& channel);
     void                            deleteIfEmpty(const ChannelsList::iterator it);
 
 public:

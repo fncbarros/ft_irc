@@ -54,10 +54,14 @@ ConnectionsList::iterator Server::getClient(const std::string &nickname)
 
 void Server::deleteClient(const int fd)
 {
-    for (size_t i = 0u; i < _channels.size(); i++)
+    ChannelsList::iterator it = _channels.begin();
+    while (it != _channels.end())
     {
-        _channels[i].deleteClient(fd);
-        deleteIfEmpty(_channels[i].getName());
+        it->deleteClient(fd);
+        if (!it->size())
+            it = _channels.erase(it);
+        else
+            it++;
     }
 
     ConnectionsList::iterator client = getClient(fd);
@@ -78,13 +82,6 @@ void Server::printList(const ConnectionsList& list, const int fd)
         nameList += it->getNickname() + "\n";
     }
     Utils::writeTo(nameList, fd);
-}
-
-void Server::deleteIfEmpty(const std::string& channel)
-{
-    ChannelsList::iterator it(getChannel(channel));
-    if (it->size() == 0)
-        _channels.erase(it);
 }
 
 void Server::deleteIfEmpty(const ChannelsList::iterator it)
