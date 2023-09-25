@@ -88,6 +88,11 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     std::string token(line.substr(0, line.find(' ')));
     const std::string message(line.substr(line.find(' ') + 1));
     
+    if (line.empty())
+    {
+        addMessage(" PRIVMSG :<target>[,<target>]+ :<message>\r\n", client.getId());
+    }
+
     if (token.at(0) == '#')
     {
         token.erase(0u, 1u); // remove '#'
@@ -419,7 +424,7 @@ void Server::execPART(Client& client, const std::string line)
                 replyPart(client, channelName);
             }
             channelIter->deleteClient(id);
-            deleteIfEmpty(channelName);
+            deleteIfEmpty(channelIter);
         }
     }
 }
