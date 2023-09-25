@@ -89,8 +89,7 @@ void Server::execPRIVMSG(Client& client, const std::string line)
     {
         addMessage(" PRIVMSG :<target>[,<target>]+ :<message>\r\n", client.getId());
     }
-
-    if (token.at(0) == '#')
+    else if (token.at(0) == '#')
     {
         token.erase(0u, 1u); // remove '#'
         ChannelsList::const_iterator channelIt(getChannel(token));
