@@ -149,7 +149,7 @@ void Server::inspectEvent(int fd)
 
     for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
     {
-        if (!message->first.compare("CAP"))
+        if (!message->first.compare("CAP") || !message->first.compare("WHO"))
         {
             continue ;
         }

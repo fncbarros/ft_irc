@@ -212,6 +212,7 @@ bool Channel::deleteClient(const int fd)
     return false;
 
 }
+
 bool    Channel::addOperator(const int fd)
 {
     // if not already operator
