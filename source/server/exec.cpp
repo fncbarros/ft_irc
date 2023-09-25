@@ -160,11 +160,9 @@ void Server::execJOIN(Client& client, const std::string line)
     std::string channelName;
     std::istringstream iss(line);
     iss >> channelName;
-    
-    // int i = -1;
-    
+
     transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
-    std::cout << channelName << std::endl;
+
     if (channelName.empty())
     {
         addMessage("Usage: JOIN <channel>, joins the channel\r\n", client.getId());
