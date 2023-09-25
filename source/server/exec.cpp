@@ -41,10 +41,7 @@ void Server::execUSER(Client& client, const std::string line)
         addMessage("Missing argument.\n", client.getId());
         return ;
     }
-    if (!client.getUsername().empty())
-    {
-        addMessage("Username " + name + " set.\n", client.getId());
-    }
+    addMessage("Username " + name + " set.\n", client.getId());
     client.setUserActive();
     client.setUsername(name);
 }
