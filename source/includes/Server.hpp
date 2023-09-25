@@ -23,6 +23,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <strings.h>
+#include <cctype>
 
 // Forward declarations
 class Channel;

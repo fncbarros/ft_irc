@@ -161,6 +161,10 @@ void Server::execJOIN(Client& client, const std::string line)
     std::istringstream iss(line);
     iss >> channelName;
     
+    // int i = -1;
+    
+    transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
+    std::cout << channelName << std::endl;
     if (channelName.empty())
     {
         addMessage("Usage: JOIN <channel>, joins the channel\r\n", client.getId());
@@ -283,19 +287,19 @@ void Server::execINVITE(Client& client, const std::string line)
     const std::string channelTarget(line.substr(line.find('#') + 1));
 
     ConnectionsList::iterator clientTargetIt = getClient(nickTarget);
-    ChannelsList::iterator channelTargetIt = getChannel(channelTarget.substr(1));
+    ChannelsList::iterator channelTargetIt = getChannel(channelTarget);
 
     if (nickTarget.empty() && channelTarget.empty())
     {
         addMessage("Usage: INVITE <nick> [<channel>], invites someone to a channel, by default the current channel (needs chanop)\r\n", client.getId());
     }
-    else if (channelTarget[0] != '#')
+    else if (clientTargetIt == _connections.end())
     {
-        replyChannelNotFound(client, channelTarget.substr(1));
+        replyNoSuchNick(client, nickTarget.substr(0, nickTarget.find(' ')));
     }
-    else if (clientTargetIt == _connections.end() || channelTargetIt == _channels.end())
+    else if (channelTargetIt == _channels.end())
     {
-        replyNoSuchNick(client, nickTarget);
+        replyNoSuchNick(client, line.substr(line.find('#')));
     }
     else if (!channelTargetIt->isClientInChannel(client.getId()))
     {
