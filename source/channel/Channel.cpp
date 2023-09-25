@@ -204,13 +204,14 @@ bool Channel::setLimit(const size_t limit)
 
 bool Channel::deleteClient(const int fd)
 {
-    if (_clientsMap.erase(fd) > 0)
+    const ClientMap::iterator it(_clientsMap.find(fd));
+    if (it != _clientsMap.end())
     {
+        _clientsMap.erase(it);
         removeOperator(fd);
         return true;
     }
     return false;
-
 }
 
 bool    Channel::addOperator(const int fd)
