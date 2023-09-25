@@ -133,35 +133,40 @@ void Server::inspectEvent(int fd)
         if ((fd = acceptNewConnection()) < 0)
             return;
     }
-
-    ConnectionsList::iterator client = getClient(fd);
-    if (client == _connections.end())
-        return;
-    const std::string rawMsg = readMessage(fd);
-    
-    client->addToBuffer(rawMsg);
-
-    const std::string line(client->getLine());
-    if (line.empty())
-        return ;
-
-    tokenList processedMsg = parse(line);
-
-    for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
+    else
     {
-        if (!message->first.compare("CAP") || !message->first.compare("WHO"))
-        {
-            continue ;
+        ConnectionsList::iterator client = getClient(fd);
+        if (client == _connections.end())
+            return;
+
+        const std::string rawMsg = readMessage(fd);
+        client->addToBuffer(rawMsg);
+        const std::string line(client->getLine());
+
+        if (line.empty()) {
+            return ;
         }
-        else if (!client->isValid() && message->first.compare("QUIT"))
+
+        tokenList processedMsg = parse(line);
+
+        for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
         {
-            auth(*client, *message);
-        }
-        else
-        {
-            exec(*client, *message);
+            if (!message->first.compare("CAP") || !message->first.compare("WHO"))
+            {
+                continue ;
+            }
+            else if (!client->isValid() && message->first.compare("QUIT"))
+            {
+                auth(*client, *message);
+            }
+            else
+            {
+                exec(*client, *message);
+            }
         }
     }
+
+    
 }
 
 void Server::connectionLoop()
@@ -213,18 +218,20 @@ void Server::connectionLoop()
     }
 }
 
-std::string    Server::readMessage(int fd) const
+std::string    Server::readMessage(int fd)
 {
     static char buffer[BUFFER_SIZE];
     bzero(buffer, BUFFER_SIZE);
 
     int bytesReceived = recv(fd, buffer, BUFFER_SIZE, 0);
 
-    // Log
-    if (bytesReceived < 0 && errno != EBADF)
+    if (bytesReceived == 0)
     {
-        std::cerr << "Error: failed to read message\n";
-        std::cerr << buffer << std::endl;
+        deleteClient(fd);
+    }
+    else if (bytesReceived < 0)
+    {
+        std::cerr << "Error: failed to read message" << std::endl;
     }
 
     return buffer;
