@@ -22,6 +22,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include <string.h>
 #include <vector>
