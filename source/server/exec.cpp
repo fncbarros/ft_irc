@@ -41,7 +41,7 @@ void Server::execUSER(Client& client, const std::string line)
         addMessage("Missing argument.\n", client.getId());
         return ;
     }
-    if (client.getUsername().empty())
+    if (!client.getUsername().empty())
     {
         addMessage("Username " + name + " set.\n", client.getId());
     }
@@ -160,11 +160,9 @@ void Server::execJOIN(Client& client, const std::string line)
     std::string channelName;
     std::istringstream iss(line);
     iss >> channelName;
-    
-    // int i = -1;
-    
+
     transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
-    std::cout << channelName << std::endl;
+
     if (channelName.empty())
     {
         addMessage("Usage: JOIN <channel>, joins the channel\r\n", client.getId());

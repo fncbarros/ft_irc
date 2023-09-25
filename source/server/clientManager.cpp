@@ -56,9 +56,7 @@ void Server::deleteClient(const int fd)
 {
     for (ChannelsList::iterator itChannel = _channels.begin(); itChannel != _channels.end(); itChannel++)
     {
-        std::cout << "for" << std::endl;
         itChannel->deleteClient(fd);
-        std::cout << "for2" << std::endl;
         deleteIfEmpty(itChannel);
     }
 
@@ -90,7 +88,6 @@ void Server::deleteIfEmpty(const std::string& channel)
 
 void Server::deleteIfEmpty(const ChannelsList::iterator it)
 {
-    std::cout << "deleteIfEmpty" << std::endl;
     if (it->size() == 0)
         _channels.erase(it);
 }
