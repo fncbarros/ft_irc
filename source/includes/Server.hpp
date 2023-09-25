@@ -86,7 +86,7 @@ public:
 
     // Internal functions
 private:
-    std::string                     readMessage(int fd) const;
+    std::string                     readMessage(int fd);
     int                             acceptNewConnection();
     /**
      *  Check in the connections vector the
