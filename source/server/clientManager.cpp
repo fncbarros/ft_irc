@@ -54,10 +54,10 @@ ConnectionsList::iterator Server::getClient(const std::string &nickname)
 
 void Server::deleteClient(const int fd)
 {
-    for (ChannelsList::iterator itChannel = _channels.begin(); itChannel != _channels.end(); itChannel++)
+    for (size_t i = 0u; i < _channels.size(); i++)
     {
-        itChannel->deleteClient(fd);
-        deleteIfEmpty(itChannel);
+        _channels[i].deleteClient(fd);
+        deleteIfEmpty(_channels[i].getName());
     }
 
     ConnectionsList::iterator client = getClient(fd);
@@ -66,7 +66,7 @@ void Server::deleteClient(const int fd)
     close(fd);
     FD_CLR(fd, &_connections_set_read);
     FD_CLR(fd, &_connections_set_write);
-    std::cout << "Client deleted" << std::endl;
+    std::cout << "Client disconnected" << std::endl;
 }
 
 // Static functions
