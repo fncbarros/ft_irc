@@ -151,7 +151,7 @@ void Server::inspectEvent(int fd)
 
         for (tokenList::iterator message = processedMsg.begin(); message != processedMsg.end(); message++)
         {
-            if (!message->first.compare("CAP"))
+            if (!message->first.compare("CAP") || !message->first.compare("WHO"))
             {
                 continue ;
             }
@@ -232,7 +232,7 @@ std::string    Server::readMessage(int fd)
     }
     else if (bytesReceived < 0)
     {
-        std::cout << "fd " << fd << " don't have any messages to read" << std::endl;
+        std::cout << "fd " << fd << " don't have any messages to read" << std::endl;   
     }
 
     return buffer;
