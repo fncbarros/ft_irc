@@ -166,7 +166,7 @@ void Server::execJOIN(Client& client, const std::string line)
     std::istringstream iss(line);
     iss >> channelName;
 
-    transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
+    std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
 
     if (channelName.empty())
     {
